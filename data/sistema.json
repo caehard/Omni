@@ -1,0 +1,140 @@
+{
+  "id": "omni",
+  "titulo": "Omni",
+  "versao": "0.1.0",
+  "versaoLivro": "V4",
+
+  "dominios": [
+    { "id": "fortitude",   "nome": "Fortitude",   "atributos": ["forca", "destreza"],     "descricao": "Aspecto físico de movimentação do corpo." },
+    { "id": "resiliencia", "nome": "Resiliência", "atributos": ["vitalidade", "ritmo"],   "descricao": "Capacidade de aguentar cansaço, ataques, desgaste e doenças." },
+    { "id": "mental",      "nome": "Mental",      "atributos": ["raciocinio", "instinto"], "descricao": "Faculdades mentais; como o personagem raciocina." },
+    { "id": "controle",    "nome": "Controle",    "atributos": ["potencia", "reserva"],   "descricao": "Controle de uma força mágica, esotérica, tecnológica ou similar." }
+  ],
+
+  "atributos": {
+    "forca":      { "nome": "Força",      "dominio": "fortitude",   "descricao": "Força bruta, impacto dos golpes, carga, movimentos explosivos." },
+    "destreza":   { "nome": "Destreza",   "dominio": "fortitude",   "descricao": "Coordenação refinada, consciência corporal e precisão." },
+    "vitalidade": { "nome": "Vitalidade", "dominio": "resiliencia", "descricao": "Suportar danos à saúde e cansaço de exercício intenso." },
+    "ritmo":      { "nome": "Ritmo",      "dominio": "resiliencia", "descricao": "Executar movimentos de forma contínua sem cansar." },
+    "raciocinio": { "nome": "Raciocínio", "dominio": "mental",      "descricao": "Raciocínio lógico usando experiência e informação." },
+    "instinto":   { "nome": "Instinto",   "dominio": "mental",      "descricao": "Conclusões e percepção por vias não racionais." },
+    "potencia":   { "nome": "Potência",   "dominio": "controle",    "descricao": "Nível de força empregado nos poderes." },
+    "reserva":    { "nome": "Reserva",    "dominio": "controle",    "descricao": "Quanto poder pode ser usado antes de ficar debilitado." }
+  },
+
+  "dadoPorNivelDominio": { "-1": 100, "0": 20, "1": 12, "2": 10, "3": 8, "4": 6, "5": 4, "6": 2 },
+
+  "categorias": [
+    { "id": "basico",        "nome": "Básico",        "niveis": [1, 2, 3],  "maxDominio": 2, "maxAtributo": 3, "maxAptidao": 2, "ns": 2, "ndMedio": 6 },
+    { "id": "intermediario", "nome": "Intermediário", "niveis": [4, 5, 6],  "maxDominio": 3, "maxAtributo": 5, "maxAptidao": 3, "ns": 3, "ndMedio": 5 },
+    { "id": "avancado",      "nome": "Avançado",      "niveis": [7, 8],     "maxDominio": 4, "maxAtributo": 7, "maxAptidao": 4, "ns": 5, "ndMedio": 4 },
+    { "id": "lendario",      "nome": "Lendário",      "niveis": [9, 10],    "maxDominio": 5, "maxAtributo": 9, "maxAptidao": 5, "ns": 7, "ndMedio": 2 }
+  ],
+
+  "niveisAptidao": [
+    "Sem treinamento ou habilidade na área",
+    "Conhecimento amador",
+    "Conhecimento fundamentado, porém incompleto",
+    "Conhecimento completo, nível profissional",
+    "Sem lacunas no conhecimento, nível especialista",
+    "Ultrapassa os limites conhecidos, nível gênio"
+  ],
+
+  "progressao": {
+    "custos": { "dominio": 6, "atributo": 3, "aptidao": 1, "habilidadePorNivel": 2, "poderPorNivel": 1 },
+    "minimoPorNivel": [0, 5, 15, 30, 50, 75, 105, 140, 180, 225],
+    "recompensaPorDificuldade": { "Muito Fácil": 1, "Fácil": 2, "Difícil": 3, "Muito Difícil": 4, "Impossível": 5 },
+    "fatorHereditario": [
+      { "nome": "Comum", "pontos": 10 },
+      { "nome": "Pessoa Excepcional", "pontos": 15 },
+      { "nome": "Pessoa Privilegiada", "pontos": 20 },
+      { "nome": "Sobre-Humano", "pontos": 25 },
+      { "nome": "Linhagem Lendária", "pontos": 30 },
+      { "nome": "Predestinado", "pontos": 40 }
+    ],
+    "criacao": {
+      "dominiosGratuitos": 3,
+      "idiomaNativoNivel": 3,
+      "maxVirtudes": 3,
+      "maxFalhas": 3,
+      "maxFatoresHereditarios": 3,
+      "defeitos": { "leve": 2, "medio": 4, "grave": 6 },
+      "fatores": { "traco": 2, "vantagem": 4, "dom": 6 }
+    }
+  },
+
+  "formulas": {
+    "vida": "1 + dominio.resiliencia + 2 * atributo.vitalidade",
+    "sanidade": "atributo.determinacao + 1",
+    "pontosDeTempo": "1 + atributo.ritmo + dominio.resiliencia - min(cansaco, 3)",
+    "pontosCriticos": "3",
+    "evasao": "7 - dominio.fortitude",
+    "resistenciaGeral": "triangular(dominio.resiliencia)",
+    "resistenciaMental": "triangular(dominio.mental)",
+    "pontosEspeciais": "1 + atributo.reserva",
+    "pontosConjuracao": "dominio.controle",
+    "slots": "atributo.forca + 5",
+    "pontosHeroicos": "2 * nivel",
+    "custoAcao": "acoesNaRodada + 1 + extra"
+  },
+
+  "zonas": [
+    { "id": "C",  "nome": "Curto",              "blocos": [0, 0],   "metros": "~1 m" },
+    { "id": "D",  "nome": "Distante",           "blocos": [1, 1],   "metros": "2–3 m" },
+    { "id": "L",  "nome": "Longe",              "blocos": [2, 3],   "metros": "8–12 m" },
+    { "id": "ML", "nome": "Muito Longe",        "blocos": [4, 7],   "metros": "20–50 m" },
+    { "id": "EL", "nome": "Extremamente Longe", "blocos": [8, 15],  "metros": "50–200 m" },
+    { "id": "FC", "nome": "Fora de Cena",       "blocos": [16, null], "metros": "> 500 m" }
+  ],
+  "movimentoBase": "L",
+
+  "cansaco": [
+    { "nivel": 1, "efeito": "−1 Ponto de Tempo máximo" },
+    { "nivel": 2, "efeito": "−1 Ponto de Tempo máximo (total −2)" },
+    { "nivel": 3, "efeito": "−1 Ponto de Tempo máximo (total −3)" },
+    { "nivel": 4, "efeito": "Desvantagem(1) em qualquer rolagem" },
+    { "nivel": 5, "efeito": "Atordoado enquanto durar" },
+    { "nivel": 6, "efeito": "Testes contra a morte (grau = nível de cansaço; soma ao grau de morte se já estiver nas portas da morte)" }
+  ],
+
+  "duracaoRodadaSegundos": "5 * 2^floor((rodada - 1) / 2)",
+
+  "raridades": [
+    { "id": "comum",   "nome": "Comum",   "manuseio": 1, "pontosCriacao": 3 },
+    { "id": "incomum", "nome": "Incomum", "manuseio": 2, "pontosCriacao": 5 },
+    { "id": "raro",    "nome": "Raro",    "manuseio": 3, "pontosCriacao": 8 },
+    { "id": "mitico",  "nome": "Mítico",  "manuseio": 5, "pontosCriacao": 12 }
+  ],
+
+  "pesoArma": {
+    "leve":   { "nome": "Leve",   "atributo": "destreza", "impacto": 1, "tempoExtra": 1, "maos": "uma" },
+    "medio":  { "nome": "Média",  "atributo": "forca",    "impacto": 2, "tempoExtra": 1, "tempoExtraUmaMao": 2, "maos": "uma ou duas" },
+    "pesado": { "nome": "Pesada", "atributo": "forca",    "impacto": 3, "tempoExtra": 2, "maos": "duas", "forcaMinima": 2 }
+  },
+  "pesoArmadura": {
+    "leve":   { "nome": "Leve",   "tempoMovimento": 0, "vestir": "3 min",  "imobilidadeBase": 1, "protecaoBase": 6 },
+    "medio":  { "nome": "Média",  "tempoMovimento": 1, "vestir": "5 min",  "imobilidadeBase": 2, "protecaoBase": 8 },
+    "pesado": { "nome": "Pesada", "tempoMovimento": 2, "vestir": "10 min", "imobilidadeBase": 3, "protecaoBase": 11, "furtividade": "Desvantagem(1) com 2+ peças ou torso" }
+  },
+  "tamanhoItem": {
+    "minusculo": { "nome": "Minúsculo", "slots": 0 },
+    "pequeno":   { "nome": "Pequeno",   "slots": 1 },
+    "medio":     { "nome": "Médio",     "slots": 2 },
+    "grande":    { "nome": "Grande",    "slots": 5 }
+  },
+
+  "falhaMagia": [
+    { "nivel": 1, "nd": 6, "ns": 2 },
+    { "nivel": 2, "nd": 5, "ns": 3 },
+    { "nivel": 3, "nd": 4, "ns": 4 },
+    { "nivel": 4, "nd": 2, "ns": 5 }
+  ],
+
+  "regrasOpcionais": {
+    "pontosHeroicos":       { "nome": "Pontos Heroicos", "padrao": true,  "descricao": "Gastar 1 ponto por crítico para rolar 1 dado extra." },
+    "criticoExplosivo":     { "nome": "Crítico explosivo", "padrao": false, "descricao": "Mundos fantásticos: cada crítico rola 1 dado extra sem gastar pontos." },
+    "heroicosDoMestre":     { "nome": "Pontos Heroicos do mestre", "padrao": false, "descricao": "Mestre recebe pontos igual ao PJ com mais pontos." },
+    "virtudesEFalhas":      { "nome": "Virtudes e Falhas", "padrao": true, "descricao": "Ativação 1× por arco: virtude = crítico automático; falha = falha automática." },
+    "sanidade":             { "nome": "Sanidade", "padrao": true, "descricao": "Usar a trilha de sanidade." }
+  }
+}

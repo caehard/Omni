@@ -1,0 +1,461 @@
+{
+ "versao": 1,
+ "armas": [
+  {
+   "id": "adaga",
+   "nome": "Adaga",
+   "raridade": "comum",
+   "alcance": "curto",
+   "peso": "leve",
+   "dano": [
+    "perfurante"
+   ],
+   "palavrasChave": {
+    "letal": 2
+   },
+   "aptidao": 0
+  },
+  {
+   "id": "nunchaku",
+   "nome": "Nunchaku",
+   "raridade": "comum",
+   "alcance": "curto",
+   "peso": "leve",
+   "dano": [
+    "contundente"
+   ],
+   "palavrasChave": {
+    "brutal": 4
+   },
+   "aptidao": 2
+  },
+  {
+   "id": "bastao",
+   "nome": "Bastão",
+   "raridade": "comum",
+   "alcance": "distante",
+   "peso": "medio",
+   "dano": [
+    "contundente"
+   ],
+   "palavrasChave": {
+    "brutal": 1,
+    "bloqueio": 1
+   },
+   "aptidao": 1
+  },
+  {
+   "id": "kunai",
+   "nome": "Kunai",
+   "raridade": "comum",
+   "alcance": "curto",
+   "peso": "leve",
+   "dano": [
+    "perfurante"
+   ],
+   "palavrasChave": {
+    "letal": 2,
+    "brutal": 1
+   },
+   "aptidao": 1
+  },
+  {
+   "id": "kunai-corrente",
+   "nome": "Kunai com Corrente",
+   "raridade": "comum",
+   "alcance": "distante",
+   "peso": "leve",
+   "dano": [
+    "perfurante"
+   ],
+   "palavrasChave": {
+    "letal": 2,
+    "brutal": 1
+   },
+   "aptidao": 2
+  },
+  {
+   "id": "katana",
+   "nome": "Katana",
+   "raridade": "incomum",
+   "alcance": "distante",
+   "peso": "medio",
+   "dano": [
+    "cortante"
+   ],
+   "palavrasChave": {
+    "letal": 3,
+    "brutal": 1
+   },
+   "aptidao": 1
+  },
+  {
+   "id": "espada-longa",
+   "nome": "Espada Longa",
+   "raridade": "incomum",
+   "alcance": "distante",
+   "peso": "medio",
+   "dano": [
+    "cortante"
+   ],
+   "palavrasChave": {
+    "letal": 2,
+    "brutal": 2
+   },
+   "aptidao": 1
+  },
+  {
+   "id": "rapieira",
+   "nome": "Rapieira",
+   "raridade": "incomum",
+   "alcance": "distante",
+   "peso": "leve",
+   "dano": [
+    "perfurante"
+   ],
+   "palavrasChave": {
+    "letal": 3,
+    "brutal": 1
+   },
+   "aptidao": 1
+  },
+  {
+   "id": "machado-de-guerra",
+   "nome": "Machado de Guerra",
+   "raridade": "incomum",
+   "alcance": "distante",
+   "peso": "pesado",
+   "dano": [
+    "cortante"
+   ],
+   "palavrasChave": {
+    "letal": 2,
+    "brutal": 3
+   },
+   "aptidao": 2
+  },
+  {
+   "id": "kusarigama",
+   "nome": "Kusarigama",
+   "raridade": "incomum",
+   "alcance": "distante",
+   "peso": "medio",
+   "dano": [
+    "cortante",
+    "contundente"
+   ],
+   "palavrasChave": {
+    "letal": 2,
+    "brutal": 2
+   },
+   "aptidao": 2
+  },
+  {
+   "id": "lanca-curta",
+   "nome": "Lança curta",
+   "raridade": "comum",
+   "incompleto": true
+  },
+  {
+   "id": "azagaia",
+   "nome": "Azagaia",
+   "raridade": "comum",
+   "incompleto": true
+  },
+  {
+   "id": "funda",
+   "nome": "Funda",
+   "raridade": "comum",
+   "incompleto": true
+  },
+  {
+   "id": "arco-curto",
+   "nome": "Arco curto",
+   "raridade": "comum",
+   "incompleto": true
+  },
+  {
+   "id": "maca",
+   "nome": "Maça",
+   "raridade": "comum",
+   "incompleto": true
+  },
+  {
+   "id": "arcabuz",
+   "nome": "Arcabuz",
+   "raridade": "comum",
+   "incompleto": true
+  },
+  {
+   "id": "mosquete",
+   "nome": "Mosquete",
+   "raridade": "comum",
+   "incompleto": true
+  },
+  {
+   "id": "revolver",
+   "nome": "Revólver",
+   "raridade": "comum",
+   "incompleto": true
+  },
+  {
+   "id": "gladio",
+   "nome": "Gládio",
+   "raridade": "incomum",
+   "incompleto": true
+  },
+  {
+   "id": "sabre",
+   "nome": "Sabre",
+   "raridade": "incomum",
+   "incompleto": true
+  },
+  {
+   "id": "mangual",
+   "nome": "Mangual",
+   "raridade": "incomum",
+   "incompleto": true
+  },
+  {
+   "id": "pike",
+   "nome": "Pike",
+   "raridade": "incomum",
+   "incompleto": true
+  },
+  {
+   "id": "glaive",
+   "nome": "Glaive",
+   "raridade": "incomum",
+   "incompleto": true
+  },
+  {
+   "id": "tomahawk",
+   "nome": "Tomahawk",
+   "raridade": "incomum",
+   "incompleto": true
+  },
+  {
+   "id": "arco-longo",
+   "nome": "Arco longo",
+   "raridade": "incomum",
+   "incompleto": true
+  },
+  {
+   "id": "besta-pesada",
+   "nome": "Besta pesada",
+   "raridade": "incomum",
+   "incompleto": true
+  },
+  {
+   "id": "escopeta",
+   "nome": "Escopeta",
+   "raridade": "incomum",
+   "incompleto": true
+  },
+  {
+   "id": "rifle-de-assalto",
+   "nome": "Rifle de assalto",
+   "raridade": "incomum",
+   "incompleto": true
+  },
+  {
+   "id": "machado-dinamarques",
+   "nome": "Machado dinamarquês",
+   "raridade": "raro",
+   "incompleto": true
+  },
+  {
+   "id": "montante",
+   "nome": "Montante",
+   "raridade": "raro",
+   "incompleto": true
+  },
+  {
+   "id": "alabarda",
+   "nome": "Alabarda",
+   "raridade": "raro",
+   "incompleto": true
+  },
+  {
+   "id": "rifle-laser",
+   "nome": "Rifle laser",
+   "raridade": "raro",
+   "incompleto": true
+  }
+ ],
+ "armaduras": [
+  {
+   "id": "broquel",
+   "nome": "Broquel",
+   "raridade": "comum",
+   "incompleto": true
+  },
+  {
+   "id": "tunica-acolchoada",
+   "nome": "Túnica acolchoada",
+   "raridade": "comum",
+   "incompleto": true
+  },
+  {
+   "id": "couraca-de-couro",
+   "nome": "Couraça de couro",
+   "raridade": "comum",
+   "incompleto": true
+  },
+  {
+   "id": "gibao-reforcado",
+   "nome": "Gibão reforçado",
+   "raridade": "comum",
+   "incompleto": true
+  },
+  {
+   "id": "escudo-torre",
+   "nome": "Escudo torre",
+   "raridade": "incomum",
+   "incompleto": true
+  },
+  {
+   "id": "paves",
+   "nome": "Pavês",
+   "raridade": "incomum",
+   "incompleto": true
+  },
+  {
+   "id": "cota-de-malha",
+   "nome": "Cota de malha",
+   "raridade": "incomum",
+   "incompleto": true
+  },
+  {
+   "id": "brigandina",
+   "nome": "Brigandina",
+   "raridade": "incomum",
+   "incompleto": true
+  },
+  {
+   "id": "corselete-de-aco",
+   "nome": "Corselete de aço",
+   "raridade": "incomum",
+   "incompleto": true
+  },
+  {
+   "id": "armadura-lamelar",
+   "nome": "Armadura lamelar",
+   "raridade": "incomum",
+   "incompleto": true
+  },
+  {
+   "id": "colete-balistico",
+   "nome": "Colete balístico",
+   "raridade": "incomum",
+   "incompleto": true
+  },
+  {
+   "id": "armadura-de-placas",
+   "nome": "Armadura de placas",
+   "raridade": "raro",
+   "incompleto": true
+  },
+  {
+   "id": "escudo-balistico",
+   "nome": "Escudo balístico",
+   "raridade": "raro",
+   "incompleto": true
+  },
+  {
+   "id": "exotraje-tatico",
+   "nome": "Exotraje tático",
+   "raridade": "raro",
+   "incompleto": true
+  }
+ ],
+ "armasImprovisadas": {
+  "leve": {
+   "impacto": 1,
+   "letal": 1,
+   "aptidao": 0
+  },
+  "medio": {
+   "impacto": 2,
+   "letal": 2,
+   "aptidao": 1
+  },
+  "pesado": {
+   "impacto": 3,
+   "letal": 3,
+   "aptidao": 2
+  }
+ },
+ "desarmado": {
+  "impacto": 1,
+  "tempoExtra": 0
+ },
+ "materiais": [
+  {
+   "nome": "Carne",
+   "absorcaoFisica": 6
+  },
+  {
+   "nome": "Ossos",
+   "absorcaoFisica": 7
+  },
+  {
+   "nome": "Madeira",
+   "absorcaoFisica": 8
+  },
+  {
+   "nome": "Tijolo",
+   "absorcaoFisica": 9
+  },
+  {
+   "nome": "Concreto",
+   "absorcaoFisica": 10
+  },
+  {
+   "nome": "Ferro",
+   "absorcaoFisica": 12
+  },
+  {
+   "nome": "Aço",
+   "absorcaoFisica": 15
+  },
+  {
+   "nome": "Fibra de Carbono",
+   "absorcaoFisica": 20
+  }
+ ],
+ "objetos": [
+  {
+   "nome": "Objetos pequenos (tábuas, bolas)",
+   "vida": 3
+  },
+  {
+   "nome": "Objetos médios (mesas, cadeiras)",
+   "vida": 6
+  },
+  {
+   "nome": "Painéis",
+   "vida": 8
+  },
+  {
+   "nome": "Parede",
+   "vida": 10
+  },
+  {
+   "nome": "Parede reforçada",
+   "vida": 20
+  },
+  {
+   "nome": "Objetos grandes (carros, barcos)",
+   "vida": 25
+  },
+  {
+   "nome": "Objetos imensos (navios, casas)",
+   "vida": 35
+  },
+  {
+   "nome": "Objetos colossais (cruzeiros, prédios)",
+   "vida": 50
+  }
+ ]
+}

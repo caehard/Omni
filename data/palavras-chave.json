@@ -1,0 +1,159 @@
+{
+ "versao": 1,
+ "palavrasChave": [
+  {
+   "id": "consistente",
+   "nome": "Consistente",
+   "grupo": "geral",
+   "temNivel": true,
+   "descricao": "Cada nível permite rolar novamente um dado, ficando com o novo resultado."
+  },
+  {
+   "id": "vantagem",
+   "nome": "Vantagem",
+   "grupo": "geral",
+   "temNivel": true,
+   "descricao": "+N sucessos. Acumulativa; cada nível anula 1 de Desvantagem."
+  },
+  {
+   "id": "desvantagem",
+   "nome": "Desvantagem",
+   "grupo": "geral",
+   "temNivel": true,
+   "descricao": "−N sucessos. Acumulativa; cada nível anula 1 de Vantagem."
+  },
+  {
+   "id": "extra",
+   "nome": "Extra",
+   "grupo": "geral",
+   "temNivel": true,
+   "descricao": "Adiciona N dados (tipo especificado) à rolagem."
+  },
+  {
+   "id": "maestria",
+   "nome": "Maestria",
+   "grupo": "geral",
+   "temNivel": true,
+   "descricao": "Reduz valores de dados, somando no máximo N. Reduzido até 1 não é crítico."
+  },
+  {
+   "id": "impacto",
+   "nome": "Impacto",
+   "grupo": "equipamento",
+   "temNivel": true,
+   "descricao": "Cada sucesso de ataque = N de dano; cada sucesso de defesa = +N de absorção."
+  },
+  {
+   "id": "manuseio",
+   "nome": "Manuseio",
+   "grupo": "equipamento",
+   "temNivel": true,
+   "descricao": "Com a aptidão mínima, soma N à Maestria."
+  },
+  {
+   "id": "absorcao",
+   "nome": "Absorção",
+   "grupo": "equipamento",
+   "temNivel": true,
+   "descricao": "Valor fixo substitui se maior; +N soma; −N subtrai. Por tipo, Física, Elemental ou Geral."
+  },
+  {
+   "id": "bloqueio",
+   "nome": "Bloqueio",
+   "grupo": "equipamento",
+   "temNivel": true,
+   "descricao": "Ao bloquear, soma N ao Impacto."
+  },
+  {
+   "id": "letal",
+   "nome": "Letal",
+   "grupo": "equipamento",
+   "temNivel": true,
+   "descricao": "Ao tirar Vida, aplica Sangramento igual à vida perdida, até N por ataque."
+  },
+  {
+   "id": "brutal",
+   "nome": "Brutal",
+   "grupo": "equipamento",
+   "temNivel": true,
+   "descricao": "Soma N ao dano causado."
+  },
+  {
+   "id": "enriste",
+   "nome": "Enriste",
+   "grupo": "equipamento",
+   "temNivel": false,
+   "descricao": "Após bloquear, bloqueia ataques da mesma direção sem custo de tempo até o fim da rodada. Mover-se quebra."
+  },
+  {
+   "id": "distancia",
+   "nome": "Distância",
+   "grupo": "equipamento",
+   "temNivel": true,
+   "descricao": "Zona ideal; Desvantagem(1) por zona de diferença."
+  },
+  {
+   "id": "arma-de-fogo",
+   "nome": "Arma de Fogo",
+   "grupo": "equipamento",
+   "temNivel": true,
+   "descricao": "Limite máximo de dano por ataque."
+  },
+  {
+   "id": "disparo",
+   "nome": "Disparo",
+   "grupo": "equipamento",
+   "temNivel": true,
+   "descricao": "Soma N ao Impacto no ataque."
+  },
+  {
+   "id": "imobilidade",
+   "nome": "Imobilidade",
+   "grupo": "equipamento",
+   "temNivel": true,
+   "descricao": "Por nível: Desvantagem(1) na esquiva e +1 ponto de tempo no movimento. Acumulativa."
+  },
+  {
+   "id": "recarga",
+   "nome": "Recarga",
+   "grupo": "equipamento",
+   "temNivel": true,
+   "descricao": "Após N ataques, precisa de uma ação para recarregar."
+  },
+  {
+   "id": "arremesso",
+   "nome": "Arremesso",
+   "grupo": "equipamento",
+   "temNivel": false,
+   "descricao": "Pode ser arremessada sem penalidade."
+  },
+  {
+   "id": "sobrecarga",
+   "nome": "Sobrecarga",
+   "grupo": "magia",
+   "temNivel": false,
+   "descricao": "Ao conjurar com sobrecarga, recebe Cicatrizes Arcanas = nível da magia."
+  },
+  {
+   "id": "cicatriz-arcana",
+   "nome": "Cicatriz Arcana",
+   "grupo": "magia",
+   "temNivel": true,
+   "descricao": "No início da rodada deixa de recuperar N pontos de conjuração; depois remove 1."
+  },
+  {
+   "id": "concentracao",
+   "nome": "Concentração",
+   "grupo": "magia",
+   "temNivel": true,
+   "descricao": "Paga N de conjuração no início da rodada e por ponto de vida perdido; perder sanidade quebra."
+  },
+  {
+   "id": "afinidade",
+   "nome": "Afinidade",
+   "grupo": "magia",
+   "temNivel": true,
+   "descricao": "Sem aptidão ≥ N, o efeito mágico não ativa."
+  }
+ ]
+}

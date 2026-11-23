@@ -1,0 +1,922 @@
+{
+ "versao": 1,
+ "habilidades": [
+  {
+   "id": "defeito-inapto",
+   "nome": "Inapto",
+   "pacote": "defeito",
+   "descricao": "Versão Leve: Alternativamente, você pode escolher um domínio e o limite de nível tanto para esse domínio quanto seus atributos é reduzido em 1.\n\nVersão Médio: Escolha um Domínio, subir de nível aquele domínio custa 1 ponto de progressão a mais a cada nível, esse efeito também se aplica para seus atributos.",
+   "graus": [
+    "leve",
+    "médio"
+   ],
+   "pontosConcedidos": {
+    "leve": 2,
+    "médio": 4
+   }
+  },
+  {
+   "id": "defeito-surdez",
+   "nome": "Surdez",
+   "pacote": "defeito",
+   "descricao": "Considerado um defeito mediano em mundos onde a tecnologia é precária e um defeito leve em mundos onde existem aparelhos análogos a aparelhos auditivos.\n\nVocê não consegue ouvir sem o auxílio de aparelhos auditivos ou equipamento similar, em testes para perceber pessoas fora do seu campo de visão por meio dos sons produzidos, você sempre falha.",
+   "graus": [
+    "leve",
+    "mediano"
+   ],
+   "pontosConcedidos": {
+    "leve": 2,
+    "mediano": 4
+   }
+  },
+  {
+   "id": "defeito-falta-de-olfato",
+   "nome": "Falta de Olfato",
+   "pacote": "defeito",
+   "descricao": "O seu personagem é incapaz de sentir cheiros, aromas ou essências, o que faz ele automaticamente falhar em qualquer teste que envolva isso.",
+   "graus": [
+    "leve"
+   ],
+   "pontosConcedidos": {
+    "leve": 2
+   }
+  },
+  {
+   "id": "defeito-pessoa-falha",
+   "nome": "Pessoa Falha",
+   "pacote": "defeito",
+   "descricao": "Escolha uma das falhas de seu personagem, essa falha pode ser ativada pelo mestre até duas vezes por arco.",
+   "graus": [
+    "leve"
+   ],
+   "pontosConcedidos": {
+    "leve": 2
+   }
+  },
+  {
+   "id": "defeito-asma",
+   "nome": "Asma",
+   "pacote": "defeito",
+   "descricao": "Você possui asma, o que na prática impede de você realizar um esforço físico muito elevado, no grau leve você só tem 2 pontos críticos máximos e no grau médio você só tem 1 ponto crítico máximo. Sempre que realizando um teste ao usar pontos críticos máximos no fim da rodada, recebe desvantagem(1), no grau leve e desvantagem(2), no grau médio",
+   "graus": [
+    "leve",
+    "médio"
+   ],
+   "pontosConcedidos": {
+    "leve": 2,
+    "médio": 4
+   }
+  },
+  {
+   "id": "defeito-cegueira",
+   "nome": "Cegueira",
+   "pacote": "defeito",
+   "descricao": "Recebe permanentemente a condição cego(1), se for leve, cego(2), se for médio, ou cego(3), se for grave.",
+   "graus": [
+    "leve",
+    "médio",
+    "grave"
+   ],
+   "pontosConcedidos": {
+    "leve": 2,
+    "médio": 4,
+    "grave": 6
+   }
+  },
+  {
+   "id": "defeito-dificuldade-de-movimentacao",
+   "nome": "Dificuldade de Movimentação",
+   "pacote": "defeito",
+   "descricao": "No nível médio o seu personagem tem a queda em uma zona em todos os movimentos e tem imobilidade(1).\n\nNo nível grave o seu personagem não pode utilizar uma ação para se mover e tem imobilidade(2).",
+   "graus": [
+    "médio",
+    "grave"
+   ],
+   "pontosConcedidos": {
+    "médio": 4,
+    "grave": 6
+   }
+  },
+  {
+   "id": "defeito-membro-faltante",
+   "nome": "Membro Faltante",
+   "pacote": "defeito",
+   "descricao": "Ao perder um membro você se torna incapaz de usá-lo para qualquer fim, obviamente.\n\nCaso o personagem perca mais da metade dos membros que constituem a sua base de apoio ele se torna incapaz de se movimentar e recebe imobilidade(2), perde 1 membro ou mais da base de apoio faz a movimentação de zona cair em uma e gera imobilidade(1).",
+   "graus": [
+    "grave"
+   ],
+   "pontosConcedidos": {
+    "grave": 6
+   }
+  },
+  {
+   "id": "defeito-azarado",
+   "nome": "Azarado",
+   "pacote": "defeito",
+   "descricao": "Sempre que ocorrer um evento aleatório que dependa exclusivamente de sorte com o seu personagem, você deve refazer o evento e escolher o pior resultado dentre os dois como o resultado oficial.",
+   "graus": [
+    "leve"
+   ],
+   "pontosConcedidos": {
+    "leve": 2
+   }
+  },
+  {
+   "id": "defeito-besta",
+   "nome": "Besta",
+   "pacote": "defeito",
+   "descricao": "Seu domínio Mental não pode nunca ter valor maior do que 1 e seu raciocínio nunca poderá ser maior do que 0, você também não pode adquirir aptidões. Em contrapartida, você pode escolher características do pacote de bestas na criação do seu personagem e seus atributos do domínio fortitude e resiliência podem ser até 2 níveis maiores do que o determinado por sua categoria.",
+   "graus": [
+    "grave"
+   ],
+   "pontosConcedidos": {
+    "grave": 6
+   }
+  },
+  {
+   "id": "defeito-fobia",
+   "nome": "Fobia",
+   "pacote": "defeito",
+   "descricao": "Escolha um tema que o seu personagem possui um medo severo, enquanto na presença daquela coisa o seu personagem recebe Aterrorizado(1) se for leve ou Aterrorizado(2) se for Médio.",
+   "graus": [
+    "leve",
+    "médio"
+   ],
+   "pontosConcedidos": {
+    "leve": 2,
+    "médio": 4
+   }
+  },
+  {
+   "id": "fator-bilingue",
+   "nome": "Bilíngue",
+   "pacote": "fator",
+   "descricao": "Devido a sua criação em um lar que utilizava mais de uma linguagem na comunicação, você possui duas línguas nativas desde criança nas quais você é fluente.",
+   "grau": "traço",
+   "custo": 2
+  },
+  {
+   "id": "fator-beleza",
+   "nome": "Beleza",
+   "pacote": "fator",
+   "descricao": "O seu personagem é considerado extremamente bonito para a maioria das pessoas, o que proporciona maior facilidade em situações em que a aparência é relevante. recebe Vantagem (1) em testes que a aptidão charme se aplicaria.",
+   "grau": "traço",
+   "custo": 2
+  },
+  {
+   "id": "fator-prodigio",
+   "nome": "Prodígio",
+   "pacote": "fator",
+   "descricao": "Você possui uma capacidade de se desenvolver em uma área naturalmente maior do que seus semelhantes, escolha 1 atributo o seu limite de nível por categoria naquele atributo é 2 níveis maior.",
+   "grau": "dom",
+   "custo": 6
+  },
+  {
+   "id": "fator-talento",
+   "nome": "Talento",
+   "pacote": "fator",
+   "descricao": "Mesmo sem se esforçar em algo você é naturalmente talentoso, por isso, você recebe mais 1 nível em algum atributo da sua escolha, esse nível adicional não é contabilizado no seu limite de nível de atributo por categoria ou no cálculo dos pontos de progressão.",
+   "grau": "vantagem",
+   "custo": 4
+  },
+  {
+   "id": "fator-riqueza",
+   "nome": "Riqueza",
+   "pacote": "fator",
+   "descricao": "Você é considerado muito rico para os padrões do seu mundo, seja por herança ou através de conquista e esforço, durante a sua vida você acumulou diversos recursos monetários que permitem você viver com conforto e comprar praticamente tudo o que você desejar. Por conta disso, você pode sempre comprar itens comuns e incomuns sem que isso impacte suas economias.",
+   "grau": "vantagem",
+   "custo": 4
+  },
+  {
+   "id": "fator-influencia",
+   "nome": "Influência",
+   "pacote": "fator",
+   "descricao": "Seja um cargo público, militar, ou simplesmente por você ser uma celebridade ao redor do mudo você, de alguma forma, é influente. Receba uma virtude que é fruto de sua influência e que possui uma regra de ativação peculiar: quando ativa, você pode ganhar favores de outras pessoas por meio de sua influência, conseguindo de forma mais fácil aquilo que deseja. Os favores devem ser condizentes com aquilo que a pessoa que você exerce influência sobre pode e está disposta a fazer.",
+   "grau": "vantagem",
+   "custo": 4
+  },
+  {
+   "id": "fator-pessoa-virtuosa",
+   "nome": "Pessoa Virtuosa",
+   "pacote": "fator",
+   "descricao": "Escolha uma das virtudes de seu personagem, essa virtude pode ser ativada até duas vezes por arco.",
+   "grau": "traço",
+   "custo": 2
+  },
+  {
+   "id": "fator-pessoa-resiliente",
+   "nome": "Pessoa Resiliente",
+   "pacote": "fator",
+   "descricao": "Escolha uma das falhas de seu personagem, essa falha é atenuada de modo que se torna um traço menor de personalidade, o mestre não pode mais transformar um sucesso crítico em uma falha ao ativar essa falha.",
+   "grau": "traço",
+   "custo": 2
+  },
+  {
+   "id": "fator-um-cara-de-sorte",
+   "nome": "Um Cara de Sorte",
+   "pacote": "fator",
+   "descricao": "Sempre que ocorrer um evento aleatório que dependa exclusivamente de sorte com o seu personagem, você pode refazer o evento e escolher o melhor resultado dentre os dois como o resultado oficial.",
+   "grau": "traço",
+   "custo": 2
+  },
+  {
+   "id": "fator-memoria-fotografica",
+   "nome": "Memória Fotográfica",
+   "pacote": "fator",
+   "descricao": "A memória do seu personagem é excelente, beirando o impossível, com essa memória o seu personagem é capaz de lembrar até os mínimos detalhes daquilo que ele viu ou ouviu, não importando o tempo que tenha passado desde o ocorrido.",
+   "grau": "vantagem",
+   "custo": 4
+  },
+  {
+   "id": "fator-mente-de-ferro",
+   "nome": "Mente de Ferro",
+   "pacote": "fator",
+   "descricao": "Você evita receber cansaço ao chegar a 50% de sanidade, além disso, sempre que você for perder pontos de sanidade, perca aquela quantidade menos um com mínimo de um ponto.",
+   "grau": "vantagem",
+   "custo": 4
+  },
+  {
+   "id": "fator-loucura-genial",
+   "nome": "Loucura Genial",
+   "pacote": "fator",
+   "descricao": "Você recebe uma falha chamada “Loucura Genial”, sempre que essa falha é ativa, além do efeito de falha habitual, o seu personagem recebe uma intuição quase que sobrenatural de alguma resposta que ele ou o grupo estava buscando, tendo certeza de que essa resposta está certa.",
+   "grau": "traço",
+   "custo": 2
+  },
+  {
+   "id": "fator-autodidata",
+   "nome": "Autodidata",
+   "pacote": "fator",
+   "descricao": "Por conta da sua alta capacidade de aprender diversas coisas sozinho, você acumulou mais conhecimentos ao longo da vida, sendo assim, sempre que você aprender uma nova aptidão no nível 1 você pode escolher outra para aprender no nível 1 sem gastar pontos de progressão ou ir diretamente para o nível 2 na aptidão escolhida.",
+   "grau": "dom",
+   "custo": 6
+  },
+  {
+   "id": "fator-ser-mistico",
+   "nome": "Ser Místico",
+   "pacote": "fator",
+   "descricao": "Você é um ser que possui o sobrenatural e místico em sua composição, implicando que você pode, durante a história, desenvolver habilidades e poderes advindos do pacote místico.",
+   "grau": "dom",
+   "custo": 6
+  },
+  {
+   "id": "humana-postura-de-combate",
+   "nome": "Postura de combate",
+   "pacote": "humana",
+   "descricao": "A sua postura de luta se torna mais estruturada e coordenada, permitindo o melhor uso de técnicas marciais. Sempre que o seu personagem toma uma ação de movimento, ele pode fazer com que essa ação sofra uma queda de zona de deslocamento para entrar em guarda. Enquanto em guarda o personagem pode usar o seguinte efeito: “ sempre que tomar uma ação de esquiva, bloqueio ou ataque corpo-a-corpo você pode gastar 1 ponto de combate, se fizer isso, receba consistente(1) na rolagem”.\n\nCaso seu personagem seja empurrado, se mova com deslocamento equivalente ao seu movimento base ou superior em uma rodada, seja jogado no chão, ou fique paralisado/incapacitado então a sua guarda é quebrada.\n\nVocê recebe 2 pontos de combate máximos que são restaurados todo início de uma nova rodada",
+   "niveis": {
+    "2": "Você tem 4 pontos de combate máximos.",
+    "3": "Você tem 6 pontos de combate máximos.",
+    "4": "Você tem 8 pontos de combate máximos."
+   },
+   "nivelMinimo": 1,
+   "nivelMaximo": 4
+  },
+  {
+   "id": "humana-esquiva-otimizada",
+   "nome": "Esquiva Otimizada",
+   "pacote": "humana",
+   "descricao": "Ao realizar uma esquiva você pode gastar 1 ponto de combate ou 1 ponto de tempo adicional para rolar um dado adicional em uma rolagem de esquiva, você pode fazer isso até 1 vez por esquiva.",
+   "niveis": {
+    "2": "Aumenta para até 2 vezes por esquiva.",
+    "3": "Você agora adicione 2 dados adicionais na rolagem de esquiva.",
+    "4": "Você agora pode fazer até 3 vezes por esquiva, a primeira vez que você faz confere vantagem(1) à esquiva."
+   },
+   "nivelMinimo": 1,
+   "nivelMaximo": 4
+  },
+  {
+   "id": "humana-antidesarme",
+   "nome": "Antidesarme",
+   "pacote": "humana",
+   "descricao": "Recebe vantagem(2) em disputas de desarme em que o personagem segurando esta arma está tentando ser desarmado igual ao nível de desarme.",
+   "nivelMinimo": 1
+  },
+  {
+   "id": "humana-ataque-otimizado",
+   "nome": "Ataque Otimizado",
+   "pacote": "humana",
+   "descricao": "Ao realizar um ataque você pode gastar 1 ponto de combate ou 1 ponto de tempo adicional para adicionar manuseio(+1), isso pode ser feito 1 vez por ataque.",
+   "niveis": {
+    "2": "Aumenta para até 2 vezes por ataque.",
+    "3": "Você agora adiciona ataque(2).",
+    "4": "Você agora pode fazer até 3 vezes por ataque, a primeira vez que você faz confere vantagem(1) ao ataque."
+   },
+   "nivelMinimo": 1,
+   "nivelMaximo": 4
+  },
+  {
+   "id": "humana-bloqueio-otimizado",
+   "nome": "Bloqueio Otimizado",
+   "pacote": "humana",
+   "descricao": "Ao realizar um bloqueio você pode gastar 1 ponto de combate ou 1 ponto de tempo adicional para adicionar bloqueio(1), isso pode ser feito 1 vez por bloqueio.",
+   "niveis": {
+    "2": "Aumenta para até 2 vezes por bloqueio.",
+    "3": "Você agora adiciona Bloqueio 2.",
+    "4": "Você agora pode fazer até 3 vezes por bloqueio, a primeira vez que você faz confere vantagem(1) ao bloqueio."
+   },
+   "nivelMinimo": 1,
+   "nivelMaximo": 4
+  },
+  {
+   "id": "humana-golpe-letal",
+   "nome": "Golpe Letal",
+   "pacote": "humana",
+   "descricao": "Seus golpes aplicam Letal(1)",
+   "niveis": {
+    "2": "Aplicam Letal(2)",
+    "3": "Aplicam Letal(3)",
+    "4": "Aplicam Letal(5)"
+   },
+   "nivelMinimo": 1,
+   "nivelMaximo": 4
+  },
+  {
+   "id": "humana-negociante-premium",
+   "nome": "Negociante Premium",
+   "pacote": "humana",
+   "descricao": "A sua experiência em negociação permite que você analise a situação e estude o alvo da negociação de modo a tornar a situação mais favorável, a primeira vez que você for realizar uma rolagem para negociar com uma pessoa, subtraia 1 em todos os dados da rolagem de negociação.",
+   "niveis": {
+    "2": "Além disso, recebe vantagem(1).",
+    "3": "Subtraia -2 a todas as rolagens."
+   },
+   "nivelMinimo": 1,
+   "nivelMaximo": 3
+  },
+  {
+   "id": "humana-construtor",
+   "nome": "Construtor",
+   "pacote": "humana",
+   "descricao": "Você se especializou na capacidade de construir um tipo de objeto, escolha uma categoria de objeto como máquinas, armas, armaduras ou qualquer outra coisa do gênero, você é capaz de confeccionar itens ou kits de raridade comum daquele tipo.",
+   "niveis": {
+    "2": "Você é capaz de confeccionar itens ou kits de raridade incomum daquele tipo.",
+    "3": "Você é capaz de confeccionar itens ou kits de raridade rara daquele tipo.",
+    "4": "Você é capaz de confeccionar itens ou kits de raridade lendária daquele tipo."
+   },
+   "nivelMinimo": 1,
+   "nivelMaximo": 4
+  },
+  {
+   "id": "humana-acao-de-combate",
+   "nome": "Ação de Combate",
+   "pacote": "humana",
+   "descricao": "1 Vez por rodada, uma jogada de ataque, bloqueio ou esquiva custa apenas os pontos de tempos extras daquela ação, essa ação não é contabilizada como uma ação realizada na rodada.",
+   "niveis": {
+    "3": "2 Vezes por rodada.",
+    "4": "3 Vezes por rodada."
+   },
+   "nivelMinimo": 2,
+   "nivelMaximo": 4
+  },
+  {
+   "id": "humana-especialista",
+   "nome": "Especialista",
+   "pacote": "humana",
+   "descricao": "A nível máximo de uma de suas aptidões é 1 maior do que aquele estabelecido por sua categoria, se esse nível já estiver maximizado, então recebe vantagem(1) em rolagens que utilizam aquela aptidão, ao invés disso.\n\nEssa habilidade pode ser comprada quantas vezes desejar, desde que para aptidões diferentes a cada vez.",
+   "nivelMinimo": 2
+  },
+  {
+   "id": "humana-brutalizador",
+   "nome": "Brutalizador",
+   "pacote": "humana",
+   "descricao": "Você pode pode gastar 1 ponto de combate e aumentar o custo em pontos de tempo de um ataque feito em 1 para conferir Brutal(1) a ele, se ele já possuía brutal então aumente o nível de brutal em 1.",
+   "niveis": {
+    "4": "O Brutal muda para (2), ou sobe em 2 níveis."
+   },
+   "nivelMinimo": 2,
+   "nivelMaximo": 4
+  },
+  {
+   "id": "humana-mestre-das-armas",
+   "nome": "Mestre das Armas",
+   "pacote": "humana",
+   "descricao": "Você aprimorou por anos as suas habilidades com os mais diversos tipos de armas, devido a isso você é capaz de manusear qualquer arma, seja ela improvisada ou não, como se possuísse aptidão 2 nela.",
+   "niveis": {
+    "3": "Você recebe aptidão 3",
+    "4": "Você recebe aptidão 4"
+   },
+   "nivelMinimo": 2,
+   "nivelMaximo": 4
+  },
+  {
+   "id": "humana-vigor-histerico",
+   "nome": "Vigor Histérico",
+   "pacote": "humana",
+   "descricao": "Você passa a ter 4 pontos de crítico totais e não 3.",
+   "niveis": {
+    "3": "Você passa a ter 5",
+    "4": "Você passa a ter 6"
+   },
+   "nivelMinimo": 2,
+   "nivelMaximo": 4
+  },
+  {
+   "id": "humana-improvisador",
+   "nome": "Improvisador",
+   "pacote": "humana",
+   "descricao": "Você é um improvisador nato e nascido para a gambiarra, utilizando dos recursos locais e seus equipamentos você pode juntar itens ao seu redor para compor um kit de raridade comum, alternativamente você pode mudar o tipo de um kit que você possui, porém ele cai em uma raridade no processo.",
+   "niveis": {
+    "3": "Você pode criar um kit de raridade incomum.",
+    "4": "Você pode criar um kit de raridade rara e quando converte o tipo de um kit para outro não há queda na qualidade."
+   },
+   "nivelMinimo": 2,
+   "nivelMaximo": 4
+  },
+  {
+   "id": "humana-esquiva-repetitiva",
+   "nome": "Esquiva Repetitiva",
+   "pacote": "humana",
+   "descricao": "Enquanto realizando esquivas em sequência isso é considerado como uma única ação, não aumentando o custo em pontos de tempo.",
+   "nivelMinimo": 3
+  },
+  {
+   "id": "humana-espirito-indomavel",
+   "nome": "Espírito Indomável",
+   "pacote": "humana",
+   "descricao": "Um número de vezes por dia igual ao nível do seu domínio Mental você junta todo o potencial do seu ser para refazer qualquer rolagem feita se assim desejar, escolhendo qualquer um dos dois resultados como o definitivo.",
+   "nivelMinimo": 3
+  },
+  {
+   "id": "humana-vontade-imortal",
+   "nome": "Vontade Imortal",
+   "pacote": "humana",
+   "descricao": "Sempre que rolando um teste contra a morte ou loucura, receba consistente(1) na rolagem.",
+   "nivelMinimo": 3
+  },
+  {
+   "id": "humana-chefe-de-guerra",
+   "nome": "Chefe de Guerra",
+   "pacote": "humana",
+   "descricao": "Você é um líder estrategista militar que governa sobre um exército que confia e depende de você. Sempre que comandando personagens de nível inferior ao seu, eles recebem um adicional de 1 dado na rolagem de qualquer teste, simbolizando o direcionamento adquirido pelas ordens do seu personagem.",
+   "nivelMinimo": 3
+  },
+  {
+   "id": "humana-grande-guerreiro",
+   "nome": "Grande Guerreiro",
+   "pacote": "humana",
+   "descricao": "Você não pode desmaiar ou ficar fora de si por qualquer efeito que não seja mágico e não sofre os efeitos negativos do cansaço, a única coisa que pode te parar é o cansaço, os efeitos de morte e teste contra a morte do cansaço(6) e cansaço(7) ainda são aplicados.",
+   "nivelMinimo": 4
+  },
+  {
+   "id": "humana-eu-sou-a-lenda",
+   "nome": "Eu sou a Lenda",
+   "pacote": "humana",
+   "descricao": "Seu nome se espalhou por todo mundo, sua fama é mais do que conhecida e todos os fatos e feitos são reais, você recebe uma virtude que quando ativada faz com que você tenha sucesso em qualquer teste ou disputa, sempre tendo sucesso com o menor valor possível.",
+   "nivelMinimo": 4
+  },
+  {
+   "id": "criatura-resistencia-a-venenos",
+   "nome": "Resistência a Venenos",
+   "pacote": "criatura",
+   "descricao": "Recebe absorção de venenos (+2).",
+   "niveis": {
+    "2": "Recebe absorção a venenos (+4).",
+    "3": "Recebe absorção a venenos (+6).",
+    "4": "Recebe imunidade a venenos."
+   },
+   "nivelMinimo": 1,
+   "nivelMaximo": 4
+  },
+  {
+   "id": "criatura-protecao-natural",
+   "nome": "Proteção natural",
+   "pacote": "criatura",
+   "descricao": "Recebe absorção física (3).",
+   "niveis": {
+    "2": "Recebe absorção física (5).",
+    "3": "Recebe absorção física (8).",
+    "4": "Recebe Imunidade Física."
+   },
+   "nivelMinimo": 1,
+   "nivelMaximo": 4
+  },
+  {
+   "id": "criatura-escalada",
+   "nome": "Escalada",
+   "pacote": "criatura",
+   "descricao": "Você possui uma capacidade aprimorada de escalada, enquanto tentando escalar uma superfície, receba extra(2d4).",
+   "niveis": {
+    "2": "Você consegue se grudar em qualquer superfície sólida."
+   },
+   "nivelMinimo": 1,
+   "nivelMaximo": 2
+  },
+  {
+   "id": "criatura-visao-no-escuro",
+   "nome": "Visão no Escuro",
+   "pacote": "criatura",
+   "descricao": "Você consegue enxergar normalmente em ambientes mal iluminados e como se possuísse cego(1) em ambientes totalmente escuros.",
+   "niveis": {
+    "2": "Você enxerga normalmente em ambientes totalmente escuros."
+   },
+   "nivelMinimo": 1,
+   "nivelMaximo": 2
+  },
+  {
+   "id": "criatura-voo",
+   "nome": "Voo",
+   "pacote": "criatura",
+   "descricao": "Permite que quando você tome a ação de movimento você seja capaz de voar, o seu voo é uma zona abaixo do seu deslocamento base.",
+   "niveis": {
+    "2": "seu voo consegue se mover com a mesma zona do seu deslocamento base.",
+    "3": "seu voo consegue se mover uma zona acima do seu deslocamento base"
+   },
+   "nivelMinimo": 1,
+   "nivelMaximo": 3
+  },
+  {
+   "id": "criatura-nado",
+   "nome": "Nado",
+   "pacote": "criatura",
+   "descricao": "Permite que quando você tome a ação de movimento você seja capaz de nadar de forma eficiente, o seu nado é igual ao seu deslocamento base",
+   "niveis": {
+    "2": "seu nado consegue se mover uma zona acima do seu deslocamento base"
+   },
+   "nivelMinimo": 1,
+   "nivelMaximo": 2
+  },
+  {
+   "id": "criatura-respiracao-adaptada",
+   "nome": "Respiração Adaptada",
+   "pacote": "criatura",
+   "descricao": "O seu corpo é adaptado para respirar em ambientes atípicos como no espaço, no oceano ou algum gás que não seja oxigênio, porém você não respira oxigênio.",
+   "niveis": {
+    "2": "Você pode respirar no ambiente escolhido e oxigênio",
+    "3": "Você não precisa respirar."
+   },
+   "nivelMinimo": 1,
+   "nivelMaximo": 3
+  },
+  {
+   "id": "criatura-armas-naturais",
+   "nome": "Armas Naturais",
+   "pacote": "criatura",
+   "descricao": "Você possui garras, presas ou qualquer outra parte do corpo que pode ser utilizada como uma arma de corpo-a-corpo com um tipo de dano físico, essa arma natural é considerada de raridade comum, a aptidão necessariamente é 0, você pode usar o atributo força mesmo para armas leves naturais.",
+   "niveis": {
+    "2": "A raridade se torna incomum",
+    "3": "A raridade se torna rara",
+    "4": "A raridade se torna Mítica"
+   },
+   "nivelMinimo": 1,
+   "nivelMaximo": 4
+  },
+  {
+   "id": "criatura-camuflagem",
+   "nome": "Camuflagem",
+   "pacote": "criatura",
+   "descricao": "Você possui a capacidade de se camuflar dada as condições corretas, escolha um ambiente como floresta, montanha, neve, deserto, oceano ou outro. Enquanto nesse ambiente, recebe vantagem(1) em testes para se esconder.",
+   "niveis": {
+    "2": "Escolha um segundo ambiente",
+    "3": "Funciona em qualquer ambiente",
+    "4": "Funciona em qualquer ambiente e fornece vantagem(2)."
+   },
+   "nivelMinimo": 1,
+   "nivelMaximo": 4
+  },
+  {
+   "id": "criatura-instintos-agucados",
+   "nome": "Instintos Aguçados",
+   "pacote": "criatura",
+   "descricao": "Escolha visão, olfato ou audição, o sentido que você escolher é extremamente aprimorado de modo que te ajuda a perceber e localizar coisas, sempre que realizando uma rolagem onde esse sentido pode ser usado para perceber algo, receba vantagem(1).\n\nVocê pode pegar essas habilidades diversas vezes, cada uma melhorando um sentido diferente.",
+   "niveis": {
+    "3": "Esses sentidos são ainda mais ampliados de modo e chegarem em um estado antinatural, recebe vantagem(2) ao invés de vantagem(1)."
+   },
+   "nivelMinimo": 1,
+   "nivelMaximo": 3
+  },
+  {
+   "id": "criatura-salto-longo",
+   "nome": "Salto Longo",
+   "pacote": "criatura",
+   "descricao": "Duplica a distância do salto base, em testes de salto recebe vantagem(1).",
+   "niveis": {
+    "2": "Triplica a distância do salto base, em testes de salto recebem vantagem(2)."
+   },
+   "nivelMinimo": 1,
+   "nivelMaximo": 2
+  },
+  {
+   "id": "criatura-anti-queda",
+   "nome": "Anti-queda",
+   "pacote": "criatura",
+   "descricao": "Você possui um mecanismo interno que amortece consideravelmente os efeitos de cair, para de contabilização de dano de queda, só é contabilizado 1 metro em queda livre após o personagem percorrer 2 metros.",
+   "niveis": {
+    "2": "Só é contabilizado 1 metro em queda livre após o personagem percorrer 3 metros.",
+    "3": "Não recebe dano de queda."
+   },
+   "nivelMinimo": 1,
+   "nivelMaximo": 3
+  },
+  {
+   "id": "criatura-mente-colmeia",
+   "nome": "Mente Colmeia",
+   "pacote": "criatura",
+   "descricao": "Você está conectado a uma entidade maior que permite você obter e fornecer informações para os seus semelhantes através da liberação de hormônios, telepaticamente, ou qualquer outro meio discreto. Todos conectados à mente colmeia sabem o que acontece com todos os seus integrantes.",
+   "niveis": {
+    "3": "Você controla a mente colmeia, determinando o que cada indivíduo na rede pode ou não fazer.",
+    "4": "Você tem a capacidade de parasitar e adicionar outros seres vivos inconscientes à mente colmeia."
+   },
+   "nivelMinimo": 1,
+   "nivelMaximo": 4
+  },
+  {
+   "id": "criatura-visao-total",
+   "nome": "Visão Total",
+   "pacote": "criatura",
+   "descricao": "É capaz de enxergar 360° Simultaneamente no plano, porém não consegue enxergar embaixo, no mesmo nível e em cima ao mesmo tempo.",
+   "niveis": {
+    "2": "Consegue enxergar em todos os ângulos possíveis simultaneamente."
+   },
+   "nivelMinimo": 1,
+   "nivelMaximo": 2
+  },
+  {
+   "id": "criatura-veneno",
+   "nome": "Veneno",
+   "pacote": "criatura",
+   "descricao": "Seus ataques feitos utilizando uma parte do seu corpo contém veneno, sempre que o ataque causar dano físico a um personagem, aquele personagem fica envenenado, recebendo todo início de rodada 2 de dano de veneno, para o veneno cessar, é preciso que o personagem obtenha ao todo 3 sucessos em um teste de Vitalidade (Resiliência) ND 6 que é realizado todo início do turno antes da aplicação do dano. sofrer dano novamente da mesma parte do corpo reaplica o veneno, adicionando uma nova quantidade de sucessos ao total e acumulando o dano de veneno no início do turno.",
+   "niveis": {
+    "3": "A ND passa a ser 4 e o Nível de sucessos passa a ser 6, além disso, é possível escolher como efeito secundário do veneno aumentar o dano de veneno em 2, adicionar o efeito de cegueira(1), Danificado no membro atingido ou 1 ponto de cansaço por rodada envenenado.",
+    "4": "A ND passa a ser 2 e o Nível de sucessos passa a ser 10, além disso, é possível escolher aumentar o dano de veneno em 3, adicionar o efeito de paralisado ou 2 pontos de cansaço por rodada envenenado."
+   },
+   "nivelMinimo": 2,
+   "nivelMaximo": 4
+  },
+  {
+   "id": "criatura-ecolizacao",
+   "nome": "Ecolização",
+   "pacote": "criatura",
+   "descricao": "Escolha um meio: ar, água ou outro. Essa habilidade permite você identificar objetos no mesmo ambiente que você por meio da vibração do som nesse meio ou outro meio, podendo identificar todas as pessoas em uma cena.",
+   "nivelMinimo": 2
+  },
+  {
+   "id": "criatura-bote",
+   "nome": "Bote",
+   "pacote": "criatura",
+   "descricao": "Permite que a segunda ação de movimento tomada a cada rodada também use o deslocamento base sem ocorrer a queda de zona.",
+   "nivelMinimo": 2
+  },
+  {
+   "id": "criatura-regeneracao-natural",
+   "nome": "Regeneração Natural",
+   "pacote": "criatura",
+   "descricao": "Suas recuperações rápidas contam como se fossem recuperações curtas e sua recuperação curta conta como duas recuperações curtas. Realiza recuperações prolongadas na metade do tempo.",
+   "nivelMinimo": 2
+  },
+  {
+   "id": "criatura-animacao-suspensa",
+   "nome": "Animação suspensa",
+   "pacote": "criatura",
+   "descricao": "Quando houver escassez de recursos como alimento, água ou oxigênio, o personagem pode entrar em estado de animação suspensa, reduzindo ao mínimo suas atividades metabólicas e ficando em um estado de quase morte, isso pode ser feito por um número de meses igual a 2 vezes o seu nível de vitalidade.",
+   "niveis": {
+    "4": "Pode se manter assim permanentemente."
+   },
+   "nivelMinimo": 2,
+   "nivelMaximo": 4
+  },
+  {
+   "id": "criatura-membros-extras",
+   "nome": "Membros extras",
+   "pacote": "criatura",
+   "descricao": "Você possui um par de pernas, asas, patas, braços, garras, ou qualquer outra estrutura que permite que sempre que você tome uma ação com um dos membros você pode realizar outra ação do mesmo tipo com o membro extra como se fosse uma única ação.",
+   "nivelMinimo": 2
+  },
+  {
+   "id": "criatura-superforca",
+   "nome": "Superforça",
+   "pacote": "criatura",
+   "descricao": "Seus ataques recebem +2 de dano físico e sempre que rolando um teste de força, recebe um extra (2).",
+   "niveis": {
+    "4": "Seus ataques recebem +4 de dano físico, recebe um extra (4)."
+   },
+   "nivelMinimo": 3,
+   "nivelMaximo": 4
+  },
+  {
+   "id": "criatura-velocista",
+   "nome": "Velocista",
+   "pacote": "criatura",
+   "descricao": "Aumenta em uma zona toda a movimentação feita na rodada, sempre que realizando uma rolagem de Destreza, receba extra(2).",
+   "niveis": {
+    "4": "Aumenta em 2 zonas toda a movimentação feita na rodada, receba extra(4)"
+   },
+   "nivelMinimo": 3,
+   "nivelMaximo": 4
+  },
+  {
+   "id": "criatura-metamorfose",
+   "nome": "Metamorfose",
+   "pacote": "criatura",
+   "descricao": "É capaz de alterar completamente a sua aparência para a de outro ser da mesma espécie ou semelhante, precisa de 1 hiato de pelo menos 1 cena para isso ocorrer.",
+   "niveis": {
+    "4": "É capaz de alterar a sua aparência instantaneamente."
+   },
+   "nivelMinimo": 3,
+   "nivelMaximo": 4
+  },
+  {
+   "id": "criatura-logica-da-selva",
+   "nome": "Lógica da Selva",
+   "pacote": "criatura",
+   "descricao": "Permite que você utilize instinto no lugar de raciocínio em suas rolagens, desde que não seja um teste com pré-requisito em alguma aptidão.",
+   "nivelMinimo": 4
+  },
+  {
+   "id": "mistico-resistencia-elemental",
+   "nome": "Resistência Elemental",
+   "pacote": "mistico",
+   "descricao": "Escolha um tipo de dano elemental, para aquele elemento, receba resistência elemental (+2).",
+   "niveis": {
+    "2": "receba resistência elemental (+4)",
+    "3": "receba resistência elemental (+6)",
+    "4": "receba imunidade ao dano elemental."
+   },
+   "nivelMinimo": 1,
+   "nivelMaximo": 4
+  },
+  {
+   "id": "mistico-aura",
+   "nome": "Aura",
+   "pacote": "mistico",
+   "descricao": "O seu personagem emana uma pequena aura no seu entorno que reflete em quem estiver perto uma sensação escolhida, como medo, confiança, felicidade ou outra.\n\nEnquanto o seu personagem estiver no mesmo ambiente que outro personagem a uma zona distante ou inferior, esse personagem deve realizar um teste do Atributo de Determinação ND 7 e NS 2, caso falhe será contagiado pela sensação da aura.",
+   "niveis": {
+    "2": "Diminui a ND do teste para 5.",
+    "3": "Diminui a ND para 4, o NS para 3 e o alcance para Longe.",
+    "4": "Diminui a ND para 3, o NS para 4 e o alcance para extremamente longe."
+   },
+   "nivelMinimo": 1,
+   "nivelMaximo": 4
+  },
+  {
+   "id": "mistico-intangibilidade",
+   "nome": "Intangibilidade",
+   "pacote": "mistico",
+   "descricao": "O seu corpo existe em um outro plano de existência, de modo que você é intangível pelo mundo físico.",
+   "niveis": {
+    "2": "Você pode, ao se concentrar por alguns minutos, interagir brevemente com o mundo físico, permitindo que você arremesse objetos, empurre coisas ou carregue brevemente um objeto.",
+    "3": "Você pode intercalar livremente entre o mundo físico e a intangibilidade, podendo se tornar tangível apenas com uma ação.",
+    "4": "Você existe em um estado onde pode influenciar livremente a realidade, manipulando objetos e os tocando, porém nada que não seja do seu interesse pode tocá-lo."
+   },
+   "nivelMinimo": 1,
+   "nivelMaximo": 4
+  },
+  {
+   "id": "mistico-invisibilidade",
+   "nome": "Invisibilidade",
+   "pacote": "mistico",
+   "descricao": "O seu personagem é capaz de se tornar invisível quando quiser naturalmente, precisando para isso apenas de uma ação.",
+   "nivelMinimo": 2
+  },
+  {
+   "id": "mistico-olhos-misticos",
+   "nome": "Olhos Místicos",
+   "pacote": "mistico",
+   "descricao": "Você possui olhos que são capazes de enxergar através da realidade, conferindo a você a capacidade de enxergar manifestações mágicas, encantamentos e auras.",
+   "niveis": {
+    "3": "Além disso, você também consegue enxergar espíritos a alma e a essência das coisas, podendo vê-las através de paredes.",
+    "4": "Em adição, você consegue perceber a construção da própria realidade, permitindo que você enxergue outras dimensões sobrepostas e possa observar o passado, presente e futuro, até certo nível."
+   },
+   "nivelMinimo": 2,
+   "nivelMaximo": 4
+  },
+  {
+   "id": "mistico-imortalidade",
+   "nome": "Imortalidade",
+   "pacote": "mistico",
+   "descricao": "Você não pode morrer pela passagem do tempo e também não envelhece.",
+   "niveis": {
+    "3": "Você é imortal, o que implica que seu personagem não pode morrer facilmente, porém ele deve ter pelo menos uma fraqueza que fará com que ele morra, como um tipo de magia ou arma específica ou caso o corpo seja muito danificado.",
+    "4": "Você é conceitualmente imortal, isso significa que você só morrerá caso algo consiga matar imortais, caso contrário, mesmo se o seu corpo for apagado da existência você eventualmente voltaria a existir."
+   },
+   "nivelMinimo": 2,
+   "nivelMaximo": 4
+  },
+  {
+   "id": "mistico-resistencia-magica",
+   "nome": "Resistência Mágica",
+   "pacote": "mistico",
+   "descricao": "Recebe absorção (+1) contra danos vindos de fontes mágicas e possui vantagem (1) em qualquer rolagem utilizando o domínio Resiliência, Mental ou Controle para resistir ao efeito de uma magia.",
+   "niveis": {
+    "3": "Recebe absorção (+2) e vantagem (2)",
+    "4": "Recebe absorção (+4) e vantagem (3)."
+   },
+   "nivelMinimo": 2,
+   "nivelMaximo": 4
+  },
+  {
+   "id": "mistico-regeneracao-magica",
+   "nome": "Regeneração Mágica",
+   "pacote": "mistico",
+   "descricao": "Recupera todo início de rodada um número de pontos de vida equivalente a seu nível em resiliência, não cura membros decepados.",
+   "niveis": {
+    "4": "Restaura completamente todo início de rodada."
+   },
+   "nivelMinimo": 3,
+   "nivelMaximo": 4
+  },
+  {
+   "id": "mistico-transcender",
+   "nome": "Transcender",
+   "pacote": "mistico",
+   "descricao": "Escolha um domínio, o seu limite de nível naquele domínio é 1 maior do que a sua categoria.",
+   "nivelMinimo": 4
+  },
+  {
+   "id": "arcano-versado-em-magia",
+   "nome": "Versado em Magia",
+   "pacote": "arcano",
+   "descricao": "Escolha um tipo de magia entre Mahi, Logi e Centi, você pode aprender, conjurar e desenvolver magias desse tipo do nível l, sendo o atributo secundário Raciocínio, para Logi, Determinação para Centi e Instinto para Mahi.",
+   "niveis": {
+    "2": "Você pode aprender, conjurar e desenvolver magias desse tipo do nível 2.",
+    "3": "Você pode aprender, conjurar e desenvolver magias desse tipo do nível 3.",
+    "4": "Você pode aprender, conjurar e desenvolver magias desse tipo do nível 4."
+   },
+   "nivelMinimo": 1,
+   "nivelMaximo": 4
+  },
+  {
+   "id": "arcano-controle-superior",
+   "nome": "Controle Superior",
+   "pacote": "arcano",
+   "descricao": "Receba 2 pontos de conjuração crítico para o seu total de pontos de conjuração, toda vez que esse ponto for utilizado em uma magia, se essa magia possui risco de falha, você recebe desvantagem igual ao número de pontos de conjuração críticos usados na magia. Adicionalmente, no fim da rodada o personagem deve realizar um teste de Potência (Controle), cuja ND é 5 - Pontos de Conjuração Críticos usados e o NS é a quantidade de pontos de conjuração críticos usados. Em caso de falha, seu personagem recebe 1 nível de cansaço.\n\nCada nível de cansaço remove 1 ponto de conjuração crítico que pode ser usado.",
+   "niveis": {
+    "2": "Receba 3 pontos de conjuração crítico.",
+    "3": "Receba 4 pontos de conjuração crítico.",
+    "4": "Receba 6 pontos de conjuração crítico."
+   },
+   "nivelMinimo": 1,
+   "nivelMaximo": 4
+  },
+  {
+   "id": "arcano-refino-de-mana",
+   "nome": "Refino de Mana",
+   "pacote": "arcano",
+   "descricao": "Suas Magias custam 1 ponto especial a menos para serem conjuradas",
+   "niveis": {
+    "3": "Custam 2 pontos a menos",
+    "4": "Custam 3 pontos a menos"
+   },
+   "nivelMinimo": 2,
+   "nivelMaximo": 4
+  },
+  {
+   "id": "arcano-mago-experimental",
+   "nome": "Mago Experimental",
+   "pacote": "arcano",
+   "descricao": "Recebe Vantagem (1) em testes contra falhas de magia.",
+   "niveis": {
+    "4": "Recebe Vantagem (2)."
+   },
+   "nivelMinimo": 2,
+   "nivelMaximo": 4
+  },
+  {
+   "id": "arcano-naturalizar",
+   "nome": "Naturalizar",
+   "pacote": "arcano",
+   "descricao": "Escolha uma magia passiva conhecida de nível 1, você é capaz de mantê-la ativa sem que isso implique em uma redução dos pontos especiais totais.",
+   "niveis": {
+    "3": "Escolha uma magia passiva de nível 2.",
+    "4": "Escolha uma magia passiva de nível 3."
+   },
+   "nivelMinimo": 2,
+   "nivelMaximo": 4
+  },
+  {
+   "id": "arcano-foco-absoluto",
+   "nome": "Foco Absoluto",
+   "pacote": "arcano",
+   "descricao": "Reduz o nível de concentração requerido nas magias conjuradas em 1.",
+   "niveis": {
+    "4": "Reduz em 2."
+   },
+   "nivelMinimo": 3,
+   "nivelMaximo": 4
+  },
+  {
+   "id": "arcano-recuperacao-arcana",
+   "nome": "Recuperação Arcana",
+   "pacote": "arcano",
+   "descricao": "Sempre que você for remover uma cicatriz arcana, remova 2.",
+   "niveis": {
+    "4": "Remova 3."
+   },
+   "nivelMinimo": 3,
+   "nivelMaximo": 4
+  },
+  {
+   "id": "arcano-essencia-da-magia",
+   "nome": "Essência da Magia",
+   "pacote": "arcano",
+   "descricao": "Para conjurar magias você utiliza a aptidão de misticismo ao invés das aptidões próprias de cada tipo de magia na conjuração. Você possui acesso a qualquer variante para qualquer magia conhecida. Você pode combinar o efeito de duas magias diferentes em uma única magia sem precisar aprendê-la para usá-la sem o risco de falha, se fizer isso, o nível da magia conjurada é sempre 1 acima da magia de maior nível dessa combinação.",
+   "nivelMinimo": 4
+  },
+  {
+   "id": "arcano-todo-saber",
+   "nome": "Todo Saber",
+   "pacote": "arcano",
+   "descricao": "Você conhece todas as magias existentes e é capaz de conjurá-las em sua forma base, sem as variantes.",
+   "nivelMinimo": 4
+  }
+ ]
+}

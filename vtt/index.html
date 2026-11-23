@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Omni — Mesa Virtual</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap">
+  <link rel="stylesheet" href="css/omni.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='44' fill='none' stroke='%23111' stroke-width='8'/%3E%3Cpolygon points='50,22 24,74 76,74' fill='none' stroke='%23111' stroke-width='8'/%3E%3C/svg%3E">
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <div class="brand"><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="44"/><polygon points="50,22 24,74 76,74"/></svg>OMNI <small>mesa virtual · protótipo</small></div>
+      <nav class="tools" aria-label="Ferramentas">
+        <button id="btn-new-pc">＋ Personagem</button>
+        <button id="btn-new-npc">＋ NPC</button>
+        <span class="sep"></span>
+        <button id="btn-map" title="Carregar imagem de mapa">🗺 Mapa</button>
+        <button id="btn-ruler" aria-pressed="false" title="Régua de zonas (ou Ctrl+arrastar)">📏 Régua</button>
+        <button id="btn-center" title="Centralizar">⌖</button>
+        <button id="btn-scene" title="Configurar cena e grade">⚙ Cena</button>
+        <span class="sep"></span>
+        <button id="btn-rules">Regras</button>
+        <button id="btn-export" title="Baixar a mesa em JSON">Exportar</button>
+        <button id="btn-import" title="Carregar mesa ou personagem JSON">Importar</button>
+        <button id="btn-help" title="Ajuda">?</button>
+      </nav>
+      <span id="round-badge" class="round-badge" aria-live="polite"></span>
+    </header>
+
+    <aside class="left">
+      <div class="panel-tabs" role="tablist">
+        <button data-panel="actors" aria-selected="true" role="tab">Fichas</button>
+        <button data-panel="combat" aria-selected="false" role="tab">Combate</button>
+      </div>
+      <div id="actors" class="panel"></div>
+      <div id="combat" class="panel" hidden></div>
+    </aside>
+
+    <main class="board-wrap"><canvas id="board" aria-label="Mapa da cena"></canvas></main>
+
+    <aside class="right">
+      <h3 class="chat-title">Registro</h3>
+      <div id="chat-log" class="chat-log" aria-live="polite"></div>
+      <form id="chat-form" class="chat-form" autocomplete="off">
+        <input name="msg" placeholder="Mensagem ou /r 2d10" aria-label="Mensagem">
+        <button class="primary">Enviar</button>
+      </form>
+    </aside>
+  </div>
+  <script>
+    // Mostra erros na tela (protótipo): facilita reportar problemas.
+    addEventListener('error', e => showErr(e.message + ' @ ' + (e.filename || '').split('/').pop() + ':' + e.lineno));
+    addEventListener('unhandledrejection', e => showErr(String(e.reason && (e.reason.stack || e.reason))));
+    function showErr(m) { const d = document.createElement('pre'); d.className = 'err-box'; d.textContent = m; d.onclick = () => d.remove(); document.body.append(d); }
+  </script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

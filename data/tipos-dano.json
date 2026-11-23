@@ -1,0 +1,80 @@
+{
+ "versao": 1,
+ "categorias": [
+  {
+   "id": "fisico",
+   "nome": "Físico",
+   "tipos": [
+    {
+     "id": "cortante",
+     "nome": "Cortante"
+    },
+    {
+     "id": "contundente",
+     "nome": "Contundente"
+    },
+    {
+     "id": "compressao",
+     "nome": "Compressão"
+    },
+    {
+     "id": "perfurante",
+     "nome": "Perfurante"
+    },
+    {
+     "id": "lacerante",
+     "nome": "Lacerante"
+    }
+   ]
+  },
+  {
+   "id": "elemental",
+   "nome": "Elemental",
+   "nota": "Não pode ser bloqueado ou aparado por meios físicos, salvo habilidade.",
+   "tipos": [
+    {
+     "id": "gelido",
+     "nome": "Gélido"
+    },
+    {
+     "id": "eletrico",
+     "nome": "Elétrico"
+    },
+    {
+     "id": "fogo",
+     "nome": "Fogo"
+    },
+    {
+     "id": "acido",
+     "nome": "Ácido"
+    }
+   ]
+  },
+  {
+   "id": "especial",
+   "nome": "Especial",
+   "tipos": [
+    {
+     "id": "alma",
+     "nome": "Alma",
+     "nota": "Só cura com descanso; cada ponto como dano de morte soma +1 ao grau de morte."
+    },
+    {
+     "id": "veneno",
+     "nome": "Veneno",
+     "nota": "Ocorre no início de cada rodada."
+    },
+    {
+     "id": "mental",
+     "nome": "Mental",
+     "nota": "Usa Resistência Mental; normalmente não tira Vida."
+    },
+    {
+     "id": "arcano",
+     "nome": "Arcano",
+     "nota": "Cada ponto gera 1 Cicatriz Arcana."
+    }
+   ]
+  }
+ ]
+}

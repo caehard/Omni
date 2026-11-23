@@ -1,0 +1,155 @@
+{
+ "versao": 1,
+ "observacao": "maxNivel 0 = condição sem nível; 99 = nível acumulável sem teto.",
+ "condicoes": [
+  {
+   "id": "deitado",
+   "nome": "Deitado/Agachado",
+   "maxNivel": 0,
+   "descricao": "Move-se como em terreno difícil. −1 ND de evasão contra ataques de Longe ou mais; Vantagem(1) em furtividade; Imobilidade(1) contra ataques de Distante ou mais perto.",
+   "automacao": {}
+  },
+  {
+   "id": "sangramento",
+   "nome": "Sangramento",
+   "maxNivel": 99,
+   "descricao": "No início de cada rodada perde Vida igual ao nível; depois o nível cai 1. Cumulativo.",
+   "automacao": {
+    "inicioRodada": {
+     "perdaVida": "nivel",
+     "reduz": 1
+    }
+   }
+  },
+  {
+   "id": "combustao",
+   "nome": "Combustão",
+   "maxNivel": 99,
+   "descricao": "No início de cada rodada sofre dano de fogo igual ao nível; depois o nível cai 1. Cumulativo.",
+   "automacao": {
+    "inicioRodada": {
+     "dano": "nivel",
+     "tipo": "fogo",
+     "reduz": 1
+    }
+   }
+  },
+  {
+   "id": "terreno-dificil",
+   "nome": "Terreno Difícil",
+   "maxNivel": 99,
+   "descricao": "Imobilidade(1) por nível.",
+   "automacao": {
+    "imobilidade": "nivel"
+   }
+  },
+  {
+   "id": "paralisado",
+   "nome": "Paralisado",
+   "maxNivel": 0,
+   "descricao": "Não pode agir; evasão anulada (todo dado acerta).",
+   "automacao": {
+    "evasaoNula": true
+   }
+  },
+  {
+   "id": "distraido",
+   "nome": "Distraído",
+   "maxNivel": 0,
+   "descricao": "Desvantagem(1) em esquiva, bloqueio, ataque de oportunidade e percepção.",
+   "automacao": {}
+  },
+  {
+   "id": "aterrorizado",
+   "nome": "Aterrorizado",
+   "maxNivel": 4,
+   "descricao": "1: Desv.(1) no domínio Mental · 2: Desv.(1) em tudo · 3: Atordoado, −1 Sanidade · 4: Paralisado, trauma, −3 Sanidade. Cai 1 por turno sem a fonte do medo.",
+   "automacao": {}
+  },
+  {
+   "id": "cercado",
+   "nome": "Cercado",
+   "maxNivel": 0,
+   "descricao": "Não pode sair do cerco com movimento (salvo rota livre). Ataques contra ele são de oportunidade.",
+   "automacao": {}
+  },
+  {
+   "id": "atordoado",
+   "nome": "Atordoado",
+   "maxNivel": 0,
+   "descricao": "+1 ponto de tempo em todas as ações e Desvantagem(1) em todas as rolagens.",
+   "automacao": {
+    "tempoExtra": 1,
+    "desvantagem": 1
+   }
+  },
+  {
+   "id": "restringido",
+   "nome": "Restringido",
+   "maxNivel": 3,
+   "descricao": "1: não pode se mover · 2: + Desv.(1) em ataques, esquivas e bloqueios · 3: Paralisado.",
+   "automacao": {}
+  },
+  {
+   "id": "danificado",
+   "nome": "Danificado",
+   "maxNivel": 0,
+   "descricao": "Ataques/testes com o membro: Desv.(1). Perna: todo terreno é difícil. Cabeça: teste de Vitalidade com Resistência a Condições.",
+   "automacao": {}
+  },
+  {
+   "id": "inutilizado",
+   "nome": "Inutilizado",
+   "maxNivel": 0,
+   "descricao": "Membro não pode ser usado. Torso ou cabeça: morte instantânea.",
+   "automacao": {}
+  },
+  {
+   "id": "envenenado",
+   "nome": "Envenenado",
+   "maxNivel": 0,
+   "descricao": "Teste de Vitalidade (Resiliência) com aptidão em Venenos a cada período do veneno.",
+   "automacao": {}
+  },
+  {
+   "id": "cego",
+   "nome": "Cego",
+   "maxNivel": 3,
+   "descricao": "1: Desv.(1) para enxergar além de Curto · 2: Desv.(1) para enxergar · 3: Desv.(2) para enxergar.",
+   "automacao": {}
+  },
+  {
+   "id": "inconsciente",
+   "nome": "Inconsciente",
+   "maxNivel": 0,
+   "descricao": "Sem sucesso na rolagem de morte.",
+   "automacao": {}
+  },
+  {
+   "id": "estabilizado",
+   "nome": "Estabilizado",
+   "maxNivel": 0,
+   "descricao": "Sucessos de morte ≥ grau de morte; para de rolar.",
+   "automacao": {}
+  },
+  {
+   "id": "cicatriz-arcana",
+   "nome": "Cicatriz Arcana",
+   "maxNivel": 99,
+   "descricao": "No início da rodada deixa de recuperar pontos de conjuração igual ao nível; depois remove 1.",
+   "automacao": {
+    "inicioRodada": {
+     "bloqueiaConjuracao": "nivel",
+     "reduz": 1
+    }
+   }
+  },
+  {
+   "id": "concentracao",
+   "nome": "Concentração",
+   "maxNivel": 99,
+   "descricao": "Paga conjuração = nível no início da rodada e por ponto de vida perdido. Perder sanidade quebra.",
+   "automacao": {}
+  }
+ ]
+}

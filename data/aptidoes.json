@@ -1,0 +1,180 @@
+{
+ "versao": 1,
+ "observacao": "Aptidões com 'especializavel' = true podem ter níveis diferentes por especialização (ex.: Armamento (Espadas)). Aptidão parcial = metade do nível, arredondado para baixo.",
+ "aptidoes": [
+  {
+   "id": "artes",
+   "nome": "Artes",
+   "especializavel": true,
+   "descricao": "Conhecimento e prática em uma forma de arte específica (pintura, escultura, dança, teatro)."
+  },
+  {
+   "id": "armamento",
+   "nome": "Armamento",
+   "especializavel": true,
+   "descricao": "Experiência prática e tática no uso de um tipo de arma ou armadura."
+  },
+  {
+   "id": "acrobacia",
+   "nome": "Acrobacia",
+   "especializavel": false,
+   "descricao": "Movimentos ágeis e evasivos."
+  },
+  {
+   "id": "furtividade",
+   "nome": "Furtividade",
+   "especializavel": false,
+   "descricao": "Mover-se silenciosamente e evitar ser notado."
+  },
+  {
+   "id": "prestidigitacao",
+   "nome": "Prestidigitação",
+   "especializavel": false,
+   "descricao": "Destreza manual com pequenos objetos: truques, falsificação, pequenos furtos."
+  },
+  {
+   "id": "literatura-historia-religiao",
+   "nome": "Literatura / História / Religião",
+   "especializavel": false,
+   "descricao": "Tradições, textos sagrados ou históricos, mitos e narrativas."
+  },
+  {
+   "id": "medicina-humana",
+   "nome": "Medicina Humana",
+   "especializavel": false,
+   "descricao": "Corpo humano, diagnóstico, primeiros socorros e tratamentos."
+  },
+  {
+   "id": "aritmetica",
+   "nome": "Aritmética",
+   "especializavel": false,
+   "descricao": "Matemática básica e avançada."
+  },
+  {
+   "id": "conhecimento-animal",
+   "nome": "Conhecimento Animal",
+   "especializavel": false,
+   "descricao": "Comportamento, fisiologia e hábitos de animais."
+  },
+  {
+   "id": "tecnologia",
+   "nome": "Tecnologia",
+   "especializavel": false,
+   "descricao": "Compreensão e uso de dispositivos tecnológicos do mundo."
+  },
+  {
+   "id": "misticismo",
+   "nome": "Misticismo",
+   "especializavel": true,
+   "descricao": "Fenômenos esotéricos, tradições ocultas e manifestações mágicas."
+  },
+  {
+   "id": "percepcao",
+   "nome": "Percepção",
+   "especializavel": false,
+   "descricao": "Atenção ativa e vigilância em relação ao ambiente."
+  },
+  {
+   "id": "intimidacao",
+   "nome": "Intimidação",
+   "especializavel": false,
+   "descricao": "Influência por meio do medo, imposição ou presença."
+  },
+  {
+   "id": "empatia",
+   "nome": "Empatia",
+   "especializavel": false,
+   "descricao": "Sensibilidade emocional; perceber intenções e confortar."
+  },
+  {
+   "id": "conducao",
+   "nome": "Condução",
+   "especializavel": true,
+   "descricao": "Guiar meios de transporte e se orientar em viagens."
+  },
+  {
+   "id": "investigacao",
+   "nome": "Investigação",
+   "especializavel": false,
+   "descricao": "Análise lógica de pistas para formular conclusões."
+  },
+  {
+   "id": "venenos",
+   "nome": "Venenos",
+   "especializavel": false,
+   "descricao": "Conhecimento teórico e prático sobre substâncias tóxicas."
+  },
+  {
+   "id": "resistencia-a-condicoes",
+   "nome": "Resistência a Condições",
+   "especializavel": false,
+   "descricao": "Suportar drogas, venenos, doenças ou condições adversas."
+  },
+  {
+   "id": "esportes",
+   "nome": "Esportes",
+   "especializavel": true,
+   "descricao": "Talento físico e técnico em modalidades esportivas."
+  },
+  {
+   "id": "idiomas",
+   "nome": "Idiomas",
+   "especializavel": true,
+   "descricao": "Domínio de línguas. Idioma nativo começa no nível 3."
+  },
+  {
+   "id": "charme",
+   "nome": "Charme",
+   "especializavel": false,
+   "descricao": "Cativar, atrair ou influenciar pela aparência e carisma."
+  },
+  {
+   "id": "diplomacia",
+   "nome": "Diplomacia",
+   "especializavel": false,
+   "descricao": "Negociação, etiqueta e trato político."
+  },
+  {
+   "id": "expressao",
+   "nome": "Expressão",
+   "especializavel": false,
+   "descricao": "Comunicar emoções, ideias ou intenções com impacto."
+  },
+  {
+   "id": "kits",
+   "nome": "Kits",
+   "especializavel": true,
+   "descricao": "Experiência prática com kits de ferramentas específicos."
+  }
+ ],
+ "magicas": [
+  {
+   "id": "destruicao",
+   "nome": "Destruição"
+  },
+  {
+   "id": "mental",
+   "nome": "Mental"
+  },
+  {
+   "id": "mutacao",
+   "nome": "Mutação"
+  },
+  {
+   "id": "encantamento",
+   "nome": "Encantamento"
+  },
+  {
+   "id": "invocacao",
+   "nome": "Invocação"
+  },
+  {
+   "id": "cura",
+   "nome": "Cura"
+  },
+  {
+   "id": "divina",
+   "nome": "Divina"
+  }
+ ]
+}
