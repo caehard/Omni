@@ -29,6 +29,7 @@ export function createActor(overrides = {}) {
       poderes: [],
       inventario: [],
       armas: [],
+      armaduras: [],
       absorcao: { geral: 0, fisico: 0, elemental: 0 },
       recursos: { vida: null, sanidade: null, pontosEspeciais: null, conjuracao: null, heroicos: null,
         cansaco: 0, grauMorte: 0, sucessosMorte: 0, portasDaMorte: false, morto: false },
@@ -105,7 +106,7 @@ export function prepareDerived(actor) {
   const cat = categoryForLevel(nivel);
   const gastos = spentPoints(actor);
   const disponiveis = num(s.progressao.inicial) + ganhos;
-  const cansaco = num(s.recursos.cansaco);
+  const cansaco = fatigueForPenalties(actor);
 
   const slotsUsados = s.inventario.reduce((acc, i) => acc + num(i.slots) * Math.max(1, num(i.quantidade) || 1), 0);
 
@@ -132,6 +133,9 @@ export function prepareDerived(actor) {
     avisos: [],
   };
   d.pontosTempoMax = Math.max(0, d.pontosTempoBase - Math.min(cansaco, 3) - num(s.combate?.penalidadeCriticos));
+  const armad = (s.armaduras || []).filter(a => a.equipada);
+  d.imobilidade = armad.reduce((acc, a) => acc + num(a.imobilidade), 0) + num(s.condicoes['terreno-dificil']);
+  d.movimentoPT = Math.max(0, ...armad.map(a => CONFIG.sistema.pesoArmadura[a.peso]?.tempoMovimento || 0)) + d.imobilidade;
   d.metadeVida = Math.floor(d.vidaMax / 2);
   d.metadeSanidade = Math.floor(d.sanidadeMax / 2);
 
@@ -160,7 +164,18 @@ export function aptidaoLabel(ap) {
 export function absorptionFor(actor, tipo) {
   const ab = actor.system.absorcao || {};
   const cat = CONFIG.tipoDano[tipo]?.categoria;
-  return num(ab.geral) + (cat ? num(ab[cat]) : 0) + num(ab[tipo]);
+  const atual = num(ab.geral) + (cat ? num(ab[cat]) : 0) + num(ab[tipo]);
+  // armaduras equipadas: absorção de valor fixo — substitui se for maior
+  const armadura = Math.max(0, ...(actor.system.armaduras || []).filter(a => a.equipada).map(a => num(a.absorcao?.[tipo])));
+  return Math.max(atual, armadura);
+}
+
+export const hasSkill = (actor, ref) => actor.system.habilidades.some(h => h.ref === ref);
+
+/** Cansaço que conta para penalidades (Grande Guerreiro ignora os níveis 1 a 5). */
+export function fatigueForPenalties(actor) {
+  const c = num(actor.system.recursos.cansaco);
+  return hasSkill(actor, 'humana-grande-guerreiro') && c < 6 ? 0 : c;
 }
 
 /** Atributo -> domínio. */
@@ -182,8 +197,9 @@ export function rollBase(actor, attr) {
 export function autoPenalties(actor, dom) {
   const s = actor.system, list = [];
   let desv = 0;
-  if (num(s.recursos.cansaco) >= 4) { desv += 1; list.push('Cansaço 4+'); }
-  if (s.condicoes.atordoado || num(s.recursos.cansaco) >= 5 || num(s.condicoes.aterrorizado) === 3) {
+  const cans = fatigueForPenalties(actor);
+  if (cans >= 4) { desv += 1; list.push('Cansaço 4+'); }
+  if (s.condicoes.atordoado || cans >= 5 || num(s.condicoes.aterrorizado) === 3) {
     desv += 1; list.push('Atordoado');
   }
   const terror = num(s.condicoes.aterrorizado);

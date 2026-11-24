@@ -19,34 +19,37 @@ Este arquivo registra as **decisões já tomadas** sobre contradições do livro
 | D11 | Dano “Concussão” | Padronizado como **Contundente** (tipo existente) | Tabela de armas |
 | D12 | Estrutura de Status | Vale o livro: **4 Domínios × 2 Atributos** (a ficha antiga tinha 3 atributos por domínio) | Ficha |
 | D13 | Numeração | Capítulos renumerados (não havia 2.4); seções do Apêndice numeradas 4.x | Livro |
+| D14 | Mente de Ferro | Evita o **trauma** (não o cansaço) ao chegar a 50% de sanidade | 3.1 Fatores |
+| D15 | Grande Guerreiro | Ignora os efeitos dos níveis 1–5 de cansaço; o cansaço ainda acumula e o nível 6 (testes contra a morte) se aplica | 3.1 Humanas |
+| D16 | Recuperação | “Crítico” = **Grave**. Rápida: leve +1. Curta: grave +1, leve +3, **letal não recupera**. Variante rápida: letal usa a regra do grave, grave usa a do leve | 2.7 |
+| D17 | “Ataque” | Não é palavra-chave, é ação básica. Ataque Otimizado: **Maestria(+1)** por uso; nível 3: **Maestria(+2)** por uso | 3.1 Humanas |
+| D18 | Enriste | Basta a arma ser **média ou pesada** (2 pontos de criação) | Apêndice 4.3 |
+| D19 | Armaduras | Sem pontos gastos em cobertura, a proteção base **não se aplica a nenhum tipo de dano**; é obrigatório gastar ≥ 1 ponto | Apêndice 4.3 |
+| D20 | Tabela de armas/armaduras | Recriada: 46 armas e 12 armaduras, todas validadas pelo Criador de Equipamentos (`tools/equipamentos.py`) | 2.5 |
+| D21 | Magias e seções incompletas | Adiadas pelo autor (magias, Investigação e Exploração, Classes, Cidades) | — |
 
 ## ❓ Pendências (precisam da sua decisão)
 
-### Regras centrais
-1. **Mente de Ferro** diz “evita receber cansaço ao chegar a 50% de sanidade”, mas chegar a 50% de sanidade gera **trauma**, não cansaço. O efeito deveria evitar o trauma?
-2. **Grande Guerreiro** cita “cansaço(6) e cansaço(7)”, mas só existem 6 níveis de cansaço.
-3. **Recuperação** usa o estado “crítico”, mas os estados definidos são **Leve / Grave / Letal**. “Crítico” = Grave? Também falta dizer o que a recuperação rápida/curta faz no estado Letal.
-4. **Palavra-chave `Ataque(N)`** aparece em Ataque Otimizado (nível 3: “ataque(2)”) e em Enriste (“ataque(−1)/ataque(−2)”), mas não está definida em Palavras-Chave.
-5. **Ataque Otimizado** fala em “manuseio(+1)”; Manuseio não tem forma com sinal. Seria Maestria(+1)?
+### Regras
 6. **Extra(N)** exige tipo de dado, mas Superforça (“extra(2)”, “extra(4)”) e Velocista não informam o dado. Usar o dado do domínio do personagem?
 7. **Antidesarme**: “Recebe vantagem(2)… igual ao nível de desarme” — texto confuso; qual o efeito por nível?
 8. **Resistência Elemental** (Místico) usa “resistência elemental (+2)”; pelo D6, deveria ser **Absorção Elemental (+2)** do tipo escolhido?
 9. **Pontos Heroicos** em Testes vs. Disputas: só podem ser gastos por PJs; o NPC do mestre usa a regra opcional. OK como está?
-10. **Armas — Alcance**: a seção define “Curto / Longo / Distância(zona)”, mas a tabela usa “Distante”. “Longo” = “Distante”?
+10. **Armas — Alcance**: a seção define “Curto / Longo / Distância(zona)”, mas as tabelas usam “Distante”. Tratei “Longo” = “Distante”.
 11. **Armas improvisadas** usam “Letal(+1)” com sinal; nas demais armas é “Letal(N)”.
 
-### Conteúdo incompleto
-12. **Tabela de armas e armaduras**: a maioria dos itens está sem estatísticas; **Machado de Guerra** aparece em Comum (vazio) e em Incomum (Pesado, Cortante); Mítico está vazio. Armaduras não têm Peso/Imobilidade/Absorção.
-13. **Lendo uma Magia** remete à seção “Pacotes > Magias”, que não existe. **Versado em Magia** cita os tipos **Mahi, Logi e Centi**, que não são descritos em lugar nenhum.
-14. **Regras de Investigação e Exploração**: seção vazia.
-15. **Uso de Classes**: promete 3 classes de exemplo que não foram escritas.
-16. **Cidades**: os testes de exemplo usam “Fortificações (Proteção)” e “Orgânicos (Recursos)”, que não existem (seriam Vigilância/Militarização e Insumos?). A introdução diz “3 atributos por domínio”, mas cada domínio tem 2. A descrição de **Infraestrutura** é cópia da de Recursos. “Pontos de criação” e “pontos de construção” aparecem misturados nos Pontos Excepcionais.
+### Adiado pelo autor
+13. Magias (“Pacotes > Magias”; tipos Mahi, Logi e Centi). 14. Investigação e Exploração. 15. Uso de Classes. 16. Cidades.
 
-### Interpretações provisórias no TTS (confirme)
-18. **Excesso de dano ao chegar a 0 de Vida**: o TTS conta o dano que passa de 0 no mesmo golpe como **Dano de Morte** (sobe o grau de morte). O livro só diz “cada dano recebido após chegar a 0”.
-19. **Absorção total por tipo** = Absorção Geral + Absorção da categoria (Física/Elemental) + Absorção do tipo específico (ex.: Cortante), somadas.
+### Interpretações provisórias (confirme)
+18. **Excesso de dano ao chegar a 0 de Vida**: o TTS conta o dano que passa de 0 no mesmo golpe como **Dano de Morte**.
+19. **Absorção por tipo** = Geral + categoria (Física/Elemental) + tipo específico, somadas; uma **armadura equipada** (valor fixo) substitui esse total se for maior.
 20. **Ponto Heroico** usa a Maestria que sobrou na rolagem para o dado extra.
-21. **Virtude** no TTS transforma o pior dado em crítico; **Falha** transforma o melhor dado em falha (o livro diz “qualquer dado”; escolha automática por praticidade).
+21. **Virtude** transforma o pior dado em crítico; **Falha** transforma o melhor dado em falha (escolha automática no TTS).
+22. **Cobertura de armadura** pode ser comprada mais de uma vez (ex.: 2 × “2 tipos físicos” = 4 tipos por 2 pontos; os 5 tipos físicos custam 3 pontos).
+23. **Zonas ideais adicionais** (Distância) custam o valor da tabela + 1; no catálogo só usei zonas adicionais Distante/Longe (custo 1), evitando a ambiguidade.
+24. **Escudos** foram criados como **armas** (bloqueiam com Impacto + Bloqueio), não como armaduras.
+25. **Ajustes no catálogo para obedecer às regras**: Arcabuz, Mosquete e Revólver foram para **Incomum** (arma de fogo só existe a partir de incomum); o Machado de Guerra comum virou **Machadinha** (o de guerra ficou só em Incomum); “Pike” virou **Pique**.
 
 ### Ficha
-17. A ficha antiga tinha campo **Família** e **Dinheiro**; mantive. Deseja adicionar **Atributo de Determinação** (Raciocínio/Instinto) como campo explícito? (Adicionei na ficha nova — confirme.)
+17. Adicionei **Atributo de Determinação** (Raciocínio/Instinto) como campo explícito na ficha nova — confirme.

@@ -1,7 +1,8 @@
 // Ficha de personagem interativa (mesmo layout da ficha imprimível em docs/ficha).
 import { CONFIG } from '../system/config.js';
 import { prepareDerived, aptidaoLabel } from '../system/actor.js';
-import { applyDamage, heal, loseSanity, deathRoll, spendAction } from '../system/combat.js';
+import { applyDamage, heal, loseSanity, deathRoll, spendAction, rest } from '../system/combat.js';
+import { blockDistance, zoneForBlocks } from './board.js';
 import { rollFormula } from '../system/dice.js';
 import { state, update, getActor, subscribe } from '../core/store.js';
 import { makeWindow, esc, getPath, setPath, toast, closeWindow, readFile, pickFile } from './dom.js';
@@ -29,7 +30,7 @@ export function openSheet(actorId) {
 function structureSig(a) {
   const s = a.system;
   return [s.aptidoes.length, s.virtudes.length, s.falhas.length, s.habilidades.length, s.poderes.length,
-    s.inventario.length, s.armas.length, Object.keys(s.condicoes).sort().join(','), Object.keys(s.absorcao).join(','),
+    s.inventario.length, s.armas.length, (s.armaduras || []).length, Object.keys(s.condicoes).sort().join(','), Object.keys(s.absorcao).join(','),
     a.tipo, a.imagem.length, s.recursos.portasDaMorte, s.recursos.morto].join('|');
 }
 
@@ -203,7 +204,8 @@ function pagePrincipal(a, d) {
         ${absRows}
         <div class="add-row"><select data-new="abs">${absTypes.map(t => `<option value="${t.id}">${t.nome}</option>`).join('')}</select><button data-act="add-abs">+ absorção</button></div>
       </div>
-      <div class="move"><h4>Movimento</h4><span class="tag-hex">Longe</span><small>demais ações: Distante</small></div>
+      <div class="move"><h4>Movimento</h4><span class="tag-hex">Longe</span><small>demais: Distante · PT+ ${calc('movimentoPT', d)} · Imob. ${calc('imobilidade', d)}</small></div>
+      <button data-act="dodge" title="Disputa de Destreza; ND = sua Evasão; Desvantagem = Imobilidade">Esquiva</button>
     </section>
   </div>`;
 }
@@ -281,6 +283,16 @@ function pageInventario(a, d) {
       <td class="btns"><button data-act="attack" data-i="${i}" class="primary" title="Atacar">⚔</button><button data-act="block" data-i="${i}" title="Bloquear">🛡</button>
         <button class="icon-btn" data-act="del" data-list="armas" data-i="${i}" title="Remover">✕</button></td></tr>`).join('');
   const catalogo = CONFIG.equipamentos.armas.filter(x => !x.incompleto).map(x => `<option value="${x.id}">${x.nome} (${x.raridade})</option>`).join('');
+  const absTxt = ab => Object.entries(ab || {}).map(([k, v]) => `${CONFIG.tipoDano[k]?.nome || k} ${v}`).join(', ');
+  const pesoOpts = sel => Object.entries(CONFIG.sistema.pesoArmadura).map(([k, v]) => `<option value="${k}" ${sel === k ? 'selected' : ''}>${v.nome}</option>`).join('');
+  const armads = (s.armaduras || []).map((ar, i) => `<tr>
+      <td><input type="checkbox" data-path="system.armaduras.${i}.equipada" ${ar.equipada ? 'checked' : ''} title="Equipada"></td>
+      <td>${inp(`system.armaduras.${i}.nome`, ar.nome, { ph: 'Armadura' })}</td>
+      <td><select data-path="system.armaduras.${i}.peso">${pesoOpts(ar.peso)}</select></td>
+      <td>${inp(`system.armaduras.${i}.imobilidade`, ar.imobilidade, { type: 'number', min: 0, cls: 'num', title: 'Imobilidade' })}</td>
+      <td><input data-armor-abs="${i}" value="${esc(absTxt(ar.absorcao))}" placeholder="ex.: Cortante 7, Perfurante 7" aria-label="Absorção"></td>
+      <td><button class="icon-btn" data-act="del" data-list="armaduras" data-i="${i}" title="Remover">✕</button></td></tr>`).join('');
+  const catArm = CONFIG.equipamentos.armaduras.map(x => `<option value="${x.id}">${x.nome} (${x.raridade})</option>`).join('');
   const inv = s.inventario.map((it, i) => `<tr><td>${inp(`system.inventario.${i}.nome`, it.nome, { ph: 'Item' })}</td>
       <td>${inp(`system.inventario.${i}.quantidade`, it.quantidade, { type: 'number', min: 0, cls: 'num' })}</td>
       <td>${inp(`system.inventario.${i}.slots`, it.slots, { type: 'number', min: 0, cls: 'num' })}</td>
@@ -294,6 +306,10 @@ function pageInventario(a, d) {
     <section class="box wide"><h3>Armas</h3>
       <div class="table-scroll"><table class="weapons"><thead><tr><th>Arma</th><th>Atributo</th><th>Aptidão</th><th title="Aptidão exigida">Apt.</th><th title="Impacto">Imp.</th><th title="Brutal">Brut.</th><th title="Letal">Let.</th><th title="Bloqueio">Bloq.</th><th title="Manuseio">Man.</th><th title="Tempo extra">PT+</th><th>Dano</th><th>Palavras-chave</th><th></th></tr></thead><tbody>${armas}</tbody></table></div>
       <div class="add-row"><select data-new="arma"><option value="">Arma em branco</option>${catalogo}</select><button data-act="add-arma">+ arma</button></div></section>
+    <section class="box wide"><h3>Armaduras</h3>
+      <div class="table-scroll"><table class="weapons armors"><thead><tr><th title="Equipada">Eq.</th><th>Armadura</th><th>Peso</th><th title="Imobilidade">Imob.</th><th>Absorção (valor fixo por tipo)</th><th></th></tr></thead><tbody>${armads}</tbody></table></div>
+      <p class="hint">Absorção de armadura é valor fixo: substitui a absorção do personagem naquele tipo se for maior. Imobilidade: Desvantagem(1) na esquiva e +1 PT no movimento por nível.</p>
+      <div class="add-row"><select data-new="armadura"><option value="">Armadura em branco</option>${catArm}</select><button data-act="add-armadura">+ armadura</button></div></section>
     <section class="box wide"><h3>Anotações da História</h3><textarea class="notes tall" data-path="system.notas.historia">${esc(s.notas.historia)}</textarea></section>
   </div>`;
 }
@@ -301,8 +317,20 @@ function pageInventario(a, d) {
 // ---------- eventos ----------
 function onChange(actorId, e) {
   const el = e.target;
-  if (!el.dataset.path) return;
   const actor = getActor(actorId);
+  if (el.dataset.armorAbs != null) {
+    // "Cortante 7, Perfurante 7" -> { cortante: 7, perfurante: 7 }
+    const byName = Object.fromEntries(Object.values(CONFIG.tipoDano).map(t => [t.nome.toLowerCase(), t.id]));
+    const ab = {};
+    for (const part of el.value.split(',')) {
+      const m = part.trim().match(/^(.+?)\s+(\d+)$/);
+      const id = m && (byName[m[1].toLowerCase()] || CONFIG.tipoDano[m[1].toLowerCase()]?.id);
+      if (id) ab[id] = Number(m[2]);
+    }
+    update(() => { actor.system.armaduras[+el.dataset.armorAbs].absorcao = ab; });
+    return;
+  }
+  if (!el.dataset.path) return;
   let v = el.type === 'checkbox' ? el.checked : el.value;
   if (el.dataset.num !== undefined) v = v === '' ? null : Number(v);
   update(() => {
@@ -322,6 +350,7 @@ function onClick(actorId, e) {
     virtudes: { nome: '', usada: false }, falhas: { nome: '', usada: false },
     poderes: { nome: '', nivel: 1, duracao: '', alcance: '', componentes: '', aptidao: '', descricao: '', variantes: '', falha: false, passivo: false },
     inventario: { nome: '', quantidade: 1, slots: 1 },
+    armaduras: { nome: '', peso: 'leve', imobilidade: 0, absorcao: {}, equipada: true },
   };
   switch (act) {
     case 'add': update(() => s[b.dataset.list].push(structuredClone(blank[b.dataset.list]))); break;
@@ -347,6 +376,12 @@ function onClick(actorId, e) {
     case 'rolar': openRollDialog(actorId); break;
     case 'attack': attack(actor, +b.dataset.i); break;
     case 'block': block(actor, +b.dataset.i); break;
+    case 'dodge': dodge(actor); break;
+    case 'add-armadura': {
+      const ref = CONFIG.equipamentos.armaduras.find(x => x.id === sel('armadura'));
+      update(() => (s.armaduras ||= []).push(armorFromCatalog(ref)));
+      break;
+    }
     case 'cast': cast(actor, +b.dataset.i); break;
     case 'dano': openDamageDialog(actorId); break;
     case 'descanso': openRestDialog(actorId); break;
@@ -359,10 +394,34 @@ function weaponFromCatalog(ref) {
   if (!ref) return { nome: '', atributo: 'forca', aptIndex: '', aptExigida: 1, impacto: 2, brutal: 0, letal: 0, bloqueio: 0, manuseio: 1, tempoExtra: 1, dano: 'cortante', palavrasChave: '' };
   const p = CONFIG.sistema.pesoArma[ref.peso];
   const rar = CONFIG.sistema.raridades.find(r => r.id === ref.raridade);
-  const kw = ref.palavrasChave || {};
-  return { nome: ref.nome, ref: ref.id, atributo: p.atributo, aptIndex: '', aptExigida: ref.aptidao, impacto: p.impacto,
-    brutal: kw.brutal || 0, letal: kw.letal || 0, bloqueio: kw.bloqueio || 0, manuseio: rar?.manuseio || 0,
-    tempoExtra: p.tempoExtra, dano: ref.dano[0], palavrasChave: `Alcance ${ref.alcance}; ${ref.dano.join(', ')}` };
+  return { nome: ref.nome, ref: ref.id, atributo: p.atributo, aptIndex: '', aptExigida: ref.aptidao ?? 1, impacto: p.impacto,
+    brutal: ref.brutal || 0, letal: ref.letal || 0, bloqueio: ref.bloqueio || 0, manuseio: rar?.manuseio || 0,
+    tempoExtra: p.tempoExtra, dano: ref.dano[0], alcance: ref.alcance || null, distancia: ref.distancia || null,
+    palavrasChave: [ref.distancia ? '' : `Alcance ${ref.alcance}`, ref.palavrasChaveTexto || ''].filter(Boolean).join(' · ') };
+}
+
+function armorFromCatalog(ref) {
+  if (!ref) return { nome: '', peso: 'leve', imobilidade: 0, absorcao: {}, equipada: true };
+  return { nome: ref.nome, ref: ref.id, peso: ref.peso, imobilidade: ref.imobilidade, absorcao: { ...ref.absorcao }, equipada: true };
+}
+
+/** Zona entre os tokens do atacante e do alvo (ou null se algum não estiver no mapa). */
+function zoneBetween(a, b) {
+  const ta = state.cena.tokens.find(t => t.atorId === a.id), tb = b && state.cena.tokens.find(t => t.atorId === b.id);
+  if (!ta || !tb) return null;
+  return zoneForBlocks(blockDistance(ta, tb));
+}
+
+/** Desvantagem por distância (palavra-chave Distância) ou aviso de alcance corpo a corpo. */
+function rangeCheck(w, zona) {
+  if (!zona) return { desv: 0, nota: '' };
+  const ids = CONFIG.sistema.zonas.map(z => z.id), idx = ids.indexOf(zona.id);
+  if (w.distancia?.length) {
+    const desv = Math.min(...w.distancia.map(z => Math.abs(ids.indexOf(z) - idx)));
+    return { desv, nota: desv ? `alvo a ${zona.nome}: Desvantagem(${desv}) por distância` : `alvo a ${zona.nome}` };
+  }
+  const max = w.alcance === 'distante' ? 1 : 0;
+  return { desv: 0, nota: idx > max ? `⚠ alvo a ${zona.nome}: fora do alcance da arma` : `alvo a ${zona.nome}` };
 }
 
 function combatantFor(actorId) {
@@ -385,9 +444,18 @@ function attack(actor, i) {
   const limite = Number((w.palavrasChave || '').match(/arma de fogo\s*\((\d+)\)/i)?.[1]) || 0;
   const disparo = Number((w.palavrasChave || '').match(/disparo\s*\((\d+)\)/i)?.[1]) || 0;
   const alvo = getActor(state.cena.alvoId); // ND do ataque = Evasão do alvo
+  const rc = rangeCheck(w, alvo && zoneBetween(actor, alvo));
+  if (rc.nota.startsWith('⚠')) toast(rc.nota);
   openRollDialog(actor.id, { attr: w.atributo, aptIndex: w.aptIndex, aptExigida: w.aptExigida, manuseio: w.manuseio,
-    titulo: `Ataque: ${w.nome}${alvo ? ' → ' + alvo.nome : ''}`, nd: alvo ? prepareDerived(alvo).evasao : 6,
-    dano: { impacto: (Number(w.impacto) || 1) + disparo, brutal: Number(w.brutal) || 0, limite, tipo: CONFIG.tipoDano[w.dano]?.nome || w.dano } });
+    titulo: `Ataque: ${w.nome}${alvo ? ' → ' + alvo.nome : ''}${rc.nota ? ` (${rc.nota})` : ''}`, nd: alvo ? prepareDerived(alvo).evasao : 6,
+    desvantagem: rc.desv,
+    dano: { impacto: (Number(w.impacto) || 1) + disparo, brutal: Number(w.brutal) || 0, letal: Number(w.letal) || 0, limite, tipo: CONFIG.tipoDano[w.dano]?.nome || w.dano } });
+}
+
+function dodge(actor) {
+  if (!chargeTime(actor, 0, 'Esquiva')) return;
+  const d = prepareDerived(actor);
+  openRollDialog(actor.id, { attr: 'destreza', titulo: 'Esquiva', nd: d.evasao, tipo: 'disputa', desvantagem: d.imobilidade });
 }
 
 function block(actor, i) {
@@ -453,55 +521,22 @@ export function openDamageDialog(actorId) {
 }
 
 // ---------- descanso ----------
-function stateOf(cur, max, letal) {
-  if (letal) return 'letal';
-  return cur > Math.floor(max / 2) ? 'leve' : 'grave';
-}
-
 export function openRestDialog(actorId) {
   const actor = getActor(actorId);
-  const w = makeWindow('rest-' + actorId, `Descanso — ${actor.nome}`, { width: 320 });
+  const w = makeWindow('rest-' + actorId, `Descanso — ${actor.nome}`, { width: 330 });
   w.body.innerHTML = `<div class="rest">
     <button data-r="rapida">Recuperação rápida <small>alguns minutos</small></button>
     <button data-r="curta">Recuperação curta <small>horas / 1 dia</small></button>
     <button data-r="prolongada">Recuperação prolongada <small>dias / semanas</small></button>
-    <p class="muted">Pontos Heroicos são restaurados no início de cada sessão: <button data-r="sessao" class="link">nova sessão</button></p></div>`;
+    <p class="hint">Rápida: só estado leve. Curta: leve +3, grave +1, letal não recupera.</p>
+    <p class="muted">Pontos Heroicos voltam no início de cada sessão: <button data-r="sessao" class="link">nova sessão</button></p></div>`;
   w.body.addEventListener('click', e => {
     const k = e.target.closest('[data-r]')?.dataset.r;
     if (!k) return;
-    const msgs = [];
-    update(() => {
-      const r = actor.system.recursos, d = prepareDerived(actor);
-      const fis = stateOf(r.vida, d.vidaMax, r.portasDaMorte);
-      const men = stateOf(r.sanidade, d.sanidadeMax, r.sanidade < 0);
-      if (k === 'sessao') { r.heroicos = d.heroicosMax; msgs.push(`Pontos Heroicos restaurados (${d.heroicosMax}).`); return; }
-      if (k === 'prolongada') {
-        const horas = 12 * ((d.vidaMax - r.vida) + Math.max(0, d.sanidadeMax - r.sanidade) + r.cansaco);
-        Object.assign(r, { vida: d.vidaMax, sanidade: d.sanidadeMax, cansaco: 0, pontosEspeciais: d.pontosEspeciaisMax, conjuracao: d.conjuracaoMax, portasDaMorte: false, grauMorte: 0, sucessosMorte: 0 });
-        delete actor.system.condicoes.inconsciente; delete actor.system.condicoes.estabilizado;
-        msgs.push(`Recuperação prolongada: tudo restaurado (≈ ${horas} h).`);
-        return;
-      }
-      if (k === 'rapida') {
-        if (fis === 'leve' && r.vida < d.vidaMax) { r.vida++; msgs.push('+1 Vida.'); }
-        if (men === 'leve' && r.sanidade < d.sanidadeMax) { r.sanidade++; msgs.push('+1 Sanidade.'); }
-        if (r.cansaco >= 1 && r.cansaco <= 2) { r.cansaco--; msgs.push('−1 Cansaço.'); }
-      }
-      if (k === 'curta') {
-        const ganho = s => (s === 'leve' ? 3 : s === 'grave' ? 1 : 0);
-        const gv = Math.min(ganho(fis), d.vidaMax - r.vida), gs = Math.min(ganho(men), d.sanidadeMax - r.sanidade);
-        if (gv > 0) { r.vida += gv; msgs.push(`+${gv} Vida.`); }
-        if (gs > 0) { r.sanidade += gs; msgs.push(`+${gs} Sanidade.`); }
-        if (r.cansaco === 4) { r.cansaco = 3; msgs.push('−1 Cansaço.'); } else if (r.cansaco > 0 && r.cansaco <= 3) { r.cansaco = 0; msgs.push('Cansaço zerado.'); }
-        const ctrl = Number(actor.system.dominios.controle) || 0;
-        const mana = Math.max(0, ctrl - (fis === 'grave' ? 1 : fis === 'letal' ? 2 : 0));
-        const gm = Math.min(mana, d.pontosEspeciaisMax - r.pontosEspeciais);
-        if (gm > 0) { r.pontosEspeciais += gm; msgs.push(`+${gm} Pontos Especiais.`); }
-      }
-      if (!msgs.length) msgs.push('Nada recuperado neste estado.');
-    });
-    postSystem(`<b>Descanso (${k})</b>: ${msgs.join(' ')}`, { atorId: actorId });
+    let msgs = [];
+    update(() => { msgs = rest(actor, k); });
+    const nomes = { rapida: 'rápida', curta: 'curta', prolongada: 'prolongada', sessao: 'nova sessão' };
+    postSystem(`<b>Descanso (${nomes[k]})</b>: ${msgs.join(' ')}`, { atorId: actorId });
     w.close();
   });
 }
-

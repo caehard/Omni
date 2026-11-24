@@ -1,372 +1,1472 @@
 {
- "versao": 1,
+ "versao": 2,
  "armas": [
   {
    "id": "adaga",
    "nome": "Adaga",
    "raridade": "comum",
-   "alcance": "curto",
    "peso": "leve",
+   "alcance": "curto",
    "dano": [
     "perfurante"
    ],
-   "palavrasChave": {
-    "letal": 2
-   },
-   "aptidao": 0
+   "letal": 2,
+   "aptidao": 0,
+   "custoDetalhado": [
+    "Letal(2) +2",
+    "aptidão 0 +1"
+   ],
+   "palavrasChaveTexto": "Letal(2)"
   },
   {
    "id": "nunchaku",
    "nome": "Nunchaku",
    "raridade": "comum",
-   "alcance": "curto",
    "peso": "leve",
+   "alcance": "curto",
    "dano": [
     "contundente"
    ],
-   "palavrasChave": {
-    "brutal": 4
-   },
-   "aptidao": 2
+   "brutal": 4,
+   "aptidao": 2,
+   "custoDetalhado": [
+    "Brutal(4) +4",
+    "aptidão 2 -1"
+   ],
+   "palavrasChaveTexto": "Brutal(4)"
   },
   {
    "id": "bastao",
    "nome": "Bastão",
    "raridade": "comum",
-   "alcance": "distante",
    "peso": "medio",
+   "alcance": "distante",
    "dano": [
     "contundente"
    ],
-   "palavrasChave": {
-    "brutal": 1,
-    "bloqueio": 1
-   },
-   "aptidao": 1
+   "brutal": 1,
+   "bloqueio": 1,
+   "aptidao": 1,
+   "custoDetalhado": [
+    "alcance Distante +1",
+    "Brutal(1) +1",
+    "Bloqueio(1) +1"
+   ],
+   "palavrasChaveTexto": "Brutal(1) Bloqueio(1)"
   },
   {
    "id": "kunai",
    "nome": "Kunai",
    "raridade": "comum",
-   "alcance": "curto",
    "peso": "leve",
+   "alcance": "curto",
    "dano": [
     "perfurante"
    ],
-   "palavrasChave": {
-    "letal": 2,
-    "brutal": 1
-   },
-   "aptidao": 1
+   "letal": 2,
+   "brutal": 1,
+   "aptidao": 1,
+   "custoDetalhado": [
+    "Letal(2) +2",
+    "Brutal(1) +1"
+   ],
+   "palavrasChaveTexto": "Letal(2) Brutal(1)"
   },
   {
    "id": "kunai-corrente",
    "nome": "Kunai com Corrente",
    "raridade": "comum",
-   "alcance": "distante",
    "peso": "leve",
+   "alcance": "distante",
    "dano": [
     "perfurante"
    ],
-   "palavrasChave": {
-    "letal": 2,
-    "brutal": 1
-   },
-   "aptidao": 2
-  },
-  {
-   "id": "katana",
-   "nome": "Katana",
-   "raridade": "incomum",
-   "alcance": "distante",
-   "peso": "medio",
-   "dano": [
-    "cortante"
+   "letal": 2,
+   "brutal": 1,
+   "aptidao": 2,
+   "custoDetalhado": [
+    "alcance Distante +1",
+    "Letal(2) +2",
+    "Brutal(1) +1",
+    "aptidão 2 -1"
    ],
-   "palavrasChave": {
-    "letal": 3,
-    "brutal": 1
-   },
-   "aptidao": 1
-  },
-  {
-   "id": "espada-longa",
-   "nome": "Espada Longa",
-   "raridade": "incomum",
-   "alcance": "distante",
-   "peso": "medio",
-   "dano": [
-    "cortante"
-   ],
-   "palavrasChave": {
-    "letal": 2,
-    "brutal": 2
-   },
-   "aptidao": 1
-  },
-  {
-   "id": "rapieira",
-   "nome": "Rapieira",
-   "raridade": "incomum",
-   "alcance": "distante",
-   "peso": "leve",
-   "dano": [
-    "perfurante"
-   ],
-   "palavrasChave": {
-    "letal": 3,
-    "brutal": 1
-   },
-   "aptidao": 1
-  },
-  {
-   "id": "machado-de-guerra",
-   "nome": "Machado de Guerra",
-   "raridade": "incomum",
-   "alcance": "distante",
-   "peso": "pesado",
-   "dano": [
-    "cortante"
-   ],
-   "palavrasChave": {
-    "letal": 2,
-    "brutal": 3
-   },
-   "aptidao": 2
-  },
-  {
-   "id": "kusarigama",
-   "nome": "Kusarigama",
-   "raridade": "incomum",
-   "alcance": "distante",
-   "peso": "medio",
-   "dano": [
-    "cortante",
-    "contundente"
-   ],
-   "palavrasChave": {
-    "letal": 2,
-    "brutal": 2
-   },
-   "aptidao": 2
+   "palavrasChaveTexto": "Letal(2) Brutal(1)"
   },
   {
    "id": "lanca-curta",
-   "nome": "Lança curta",
+   "nome": "Lança Curta",
    "raridade": "comum",
-   "incompleto": true
+   "peso": "medio",
+   "alcance": "distante",
+   "dano": [
+    "perfurante"
+   ],
+   "letal": 1,
+   "arremesso": true,
+   "aptidao": 1,
+   "custoDetalhado": [
+    "alcance Distante +1",
+    "Letal(1) +1",
+    "Arremesso +1"
+   ],
+   "palavrasChaveTexto": "Letal(1) Arremesso"
   },
   {
    "id": "azagaia",
    "nome": "Azagaia",
    "raridade": "comum",
-   "incompleto": true
+   "peso": "medio",
+   "alcance": "curto",
+   "dano": [
+    "perfurante"
+   ],
+   "letal": 2,
+   "arremesso": true,
+   "aptidao": 1,
+   "custoDetalhado": [
+    "Letal(2) +2",
+    "Arremesso +1"
+   ],
+   "palavrasChaveTexto": "Letal(2) Arremesso"
   },
   {
    "id": "funda",
    "nome": "Funda",
    "raridade": "comum",
-   "incompleto": true
+   "peso": "leve",
+   "distancia": [
+    "D",
+    "L"
+   ],
+   "recarga": 1,
+   "dano": [
+    "contundente"
+   ],
+   "brutal": 2,
+   "aptidao": 1,
+   "custoDetalhado": [
+    "Distância(D,L) +1",
+    "Brutal(2) +2"
+   ],
+   "palavrasChaveTexto": "Distância(D, L) Recarga(1) Brutal(2)"
   },
   {
    "id": "arco-curto",
-   "nome": "Arco curto",
+   "nome": "Arco Curto",
    "raridade": "comum",
-   "incompleto": true
+   "peso": "leve",
+   "distancia": [
+    "L"
+   ],
+   "recarga": 1,
+   "dano": [
+    "perfurante"
+   ],
+   "letal": 2,
+   "brutal": 1,
+   "aptidao": 1,
+   "custoDetalhado": [
+    "Distância(L) +0",
+    "Letal(2) +2",
+    "Brutal(1) +1"
+   ],
+   "palavrasChaveTexto": "Distância(L) Recarga(1) Letal(2) Brutal(1)"
+  },
+  {
+   "id": "machadinha",
+   "nome": "Machadinha",
+   "raridade": "comum",
+   "peso": "leve",
+   "alcance": "curto",
+   "dano": [
+    "cortante"
+   ],
+   "letal": 1,
+   "brutal": 2,
+   "aptidao": 1,
+   "custoDetalhado": [
+    "Letal(1) +1",
+    "Brutal(2) +2"
+   ],
+   "palavrasChaveTexto": "Letal(1) Brutal(2)"
   },
   {
    "id": "maca",
    "nome": "Maça",
    "raridade": "comum",
-   "incompleto": true
+   "peso": "medio",
+   "alcance": "curto",
+   "dano": [
+    "contundente"
+   ],
+   "brutal": 3,
+   "aptidao": 1,
+   "custoDetalhado": [
+    "Brutal(3) +3"
+   ],
+   "palavrasChaveTexto": "Brutal(3)"
   },
   {
-   "id": "arcabuz",
-   "nome": "Arcabuz",
+   "id": "porrete",
+   "nome": "Porrete",
    "raridade": "comum",
-   "incompleto": true
+   "peso": "medio",
+   "alcance": "curto",
+   "dano": [
+    "contundente"
+   ],
+   "brutal": 2,
+   "aptidao": 0,
+   "custoDetalhado": [
+    "Brutal(2) +2",
+    "aptidão 0 +1"
+   ],
+   "palavrasChaveTexto": "Brutal(2)"
   },
   {
-   "id": "mosquete",
-   "nome": "Mosquete",
+   "id": "foice",
+   "nome": "Foice",
    "raridade": "comum",
-   "incompleto": true
+   "peso": "medio",
+   "alcance": "curto",
+   "dano": [
+    "cortante"
+   ],
+   "letal": 2,
+   "brutal": 1,
+   "aptidao": 1,
+   "custoDetalhado": [
+    "Letal(2) +2",
+    "Brutal(1) +1"
+   ],
+   "palavrasChaveTexto": "Letal(2) Brutal(1)"
   },
   {
-   "id": "revolver",
-   "nome": "Revólver",
+   "id": "soco-ingles",
+   "nome": "Soco-Inglês",
    "raridade": "comum",
-   "incompleto": true
+   "peso": "leve",
+   "alcance": "curto",
+   "dano": [
+    "contundente"
+   ],
+   "brutal": 2,
+   "aptidao": 0,
+   "custoDetalhado": [
+    "Brutal(2) +2",
+    "aptidão 0 +1"
+   ],
+   "palavrasChaveTexto": "Brutal(2)"
+  },
+  {
+   "id": "broquel",
+   "nome": "Broquel",
+   "raridade": "comum",
+   "peso": "leve",
+   "alcance": "curto",
+   "dano": [
+    "contundente"
+   ],
+   "brutal": 1,
+   "bloqueio": 1,
+   "aptidao": 0,
+   "custoDetalhado": [
+    "Brutal(1) +1",
+    "Bloqueio(1) +1",
+    "aptidão 0 +1"
+   ],
+   "palavrasChaveTexto": "Brutal(1) Bloqueio(1)"
   },
   {
    "id": "gladio",
    "nome": "Gládio",
    "raridade": "incomum",
-   "incompleto": true
+   "peso": "leve",
+   "alcance": "curto",
+   "dano": [
+    "perfurante",
+    "cortante"
+   ],
+   "letal": 2,
+   "brutal": 1,
+   "aptidao": 0,
+   "custoDetalhado": [
+    "tipos físicos extras +1",
+    "Letal(2) +2",
+    "Brutal(1) +1",
+    "aptidão 0 +1"
+   ],
+   "palavrasChaveTexto": "Letal(2) Brutal(1)"
+  },
+  {
+   "id": "katana",
+   "nome": "Katana",
+   "raridade": "incomum",
+   "peso": "medio",
+   "alcance": "distante",
+   "dano": [
+    "cortante"
+   ],
+   "letal": 3,
+   "brutal": 1,
+   "aptidao": 1,
+   "custoDetalhado": [
+    "alcance Distante +1",
+    "Letal(3) +3",
+    "Brutal(1) +1"
+   ],
+   "palavrasChaveTexto": "Letal(3) Brutal(1)"
   },
   {
    "id": "sabre",
    "nome": "Sabre",
    "raridade": "incomum",
-   "incompleto": true
+   "peso": "medio",
+   "alcance": "distante",
+   "dano": [
+    "cortante"
+   ],
+   "letal": 2,
+   "brutal": 1,
+   "aptidao": 0,
+   "custoDetalhado": [
+    "alcance Distante +1",
+    "Letal(2) +2",
+    "Brutal(1) +1",
+    "aptidão 0 +1"
+   ],
+   "palavrasChaveTexto": "Letal(2) Brutal(1)"
+  },
+  {
+   "id": "espada-longa",
+   "nome": "Espada Longa",
+   "raridade": "incomum",
+   "peso": "medio",
+   "alcance": "distante",
+   "dano": [
+    "cortante"
+   ],
+   "letal": 2,
+   "brutal": 2,
+   "aptidao": 1,
+   "custoDetalhado": [
+    "alcance Distante +1",
+    "Letal(2) +2",
+    "Brutal(2) +2"
+   ],
+   "palavrasChaveTexto": "Letal(2) Brutal(2)"
+  },
+  {
+   "id": "rapieira",
+   "nome": "Rapieira",
+   "raridade": "incomum",
+   "peso": "leve",
+   "alcance": "distante",
+   "dano": [
+    "perfurante"
+   ],
+   "letal": 3,
+   "brutal": 1,
+   "aptidao": 1,
+   "custoDetalhado": [
+    "alcance Distante +1",
+    "Letal(3) +3",
+    "Brutal(1) +1"
+   ],
+   "palavrasChaveTexto": "Letal(3) Brutal(1)"
   },
   {
    "id": "mangual",
    "nome": "Mangual",
    "raridade": "incomum",
-   "incompleto": true
+   "peso": "medio",
+   "alcance": "curto",
+   "dano": [
+    "contundente",
+    "perfurante"
+   ],
+   "brutal": 4,
+   "aptidao": 1,
+   "custoDetalhado": [
+    "tipos físicos extras +1",
+    "Brutal(4) +4"
+   ],
+   "palavrasChaveTexto": "Brutal(4)"
   },
   {
-   "id": "pike",
-   "nome": "Pike",
+   "id": "machado-de-guerra",
+   "nome": "Machado de Guerra",
    "raridade": "incomum",
-   "incompleto": true
+   "peso": "pesado",
+   "alcance": "distante",
+   "dano": [
+    "cortante"
+   ],
+   "letal": 2,
+   "brutal": 3,
+   "aptidao": 2,
+   "custoDetalhado": [
+    "alcance Distante +1",
+    "Letal(2) +2",
+    "Brutal(3) +3",
+    "aptidão 2 -1"
+   ],
+   "palavrasChaveTexto": "Letal(2) Brutal(3)"
+  },
+  {
+   "id": "kusarigama",
+   "nome": "Kusarigama",
+   "raridade": "incomum",
+   "peso": "medio",
+   "alcance": "distante",
+   "dano": [
+    "cortante",
+    "contundente"
+   ],
+   "letal": 2,
+   "brutal": 2,
+   "aptidao": 2,
+   "custoDetalhado": [
+    "alcance Distante +1",
+    "tipos físicos extras +1",
+    "Letal(2) +2",
+    "Brutal(2) +2",
+    "aptidão 2 -1"
+   ],
+   "palavrasChaveTexto": "Letal(2) Brutal(2)"
+  },
+  {
+   "id": "pique",
+   "nome": "Pique",
+   "raridade": "incomum",
+   "peso": "pesado",
+   "alcance": "distante",
+   "dano": [
+    "perfurante"
+   ],
+   "letal": 2,
+   "enriste": true,
+   "aptidao": 1,
+   "custoDetalhado": [
+    "alcance Distante +1",
+    "Letal(2) +2",
+    "Enriste +2"
+   ],
+   "palavrasChaveTexto": "Letal(2) Enriste"
   },
   {
    "id": "glaive",
    "nome": "Glaive",
    "raridade": "incomum",
-   "incompleto": true
+   "peso": "pesado",
+   "alcance": "distante",
+   "dano": [
+    "cortante"
+   ],
+   "letal": 2,
+   "brutal": 3,
+   "aptidao": 2,
+   "custoDetalhado": [
+    "alcance Distante +1",
+    "Letal(2) +2",
+    "Brutal(3) +3",
+    "aptidão 2 -1"
+   ],
+   "palavrasChaveTexto": "Letal(2) Brutal(3)"
   },
   {
    "id": "tomahawk",
    "nome": "Tomahawk",
    "raridade": "incomum",
-   "incompleto": true
+   "peso": "leve",
+   "alcance": "curto",
+   "dano": [
+    "cortante",
+    "contundente"
+   ],
+   "letal": 2,
+   "brutal": 2,
+   "aptidao": 1,
+   "custoDetalhado": [
+    "tipos físicos extras +1",
+    "Letal(2) +2",
+    "Brutal(2) +2"
+   ],
+   "palavrasChaveTexto": "Letal(2) Brutal(2)"
   },
   {
    "id": "arco-longo",
-   "nome": "Arco longo",
+   "nome": "Arco Longo",
    "raridade": "incomum",
-   "incompleto": true
+   "peso": "medio",
+   "distancia": [
+    "ML"
+   ],
+   "recarga": 1,
+   "dano": [
+    "perfurante"
+   ],
+   "letal": 2,
+   "brutal": 2,
+   "aptidao": 1,
+   "custoDetalhado": [
+    "Distância(ML) +1",
+    "Letal(2) +2",
+    "Brutal(2) +2"
+   ],
+   "palavrasChaveTexto": "Distância(ML) Recarga(1) Letal(2) Brutal(2)"
   },
   {
    "id": "besta-pesada",
-   "nome": "Besta pesada",
+   "nome": "Besta Pesada",
    "raridade": "incomum",
-   "incompleto": true
+   "peso": "pesado",
+   "distancia": [
+    "L"
+   ],
+   "recarga": 1,
+   "dano": [
+    "perfurante"
+   ],
+   "letal": 2,
+   "brutal": 2,
+   "aptidao": 0,
+   "custoDetalhado": [
+    "Distância(L) +0",
+    "Letal(2) +2",
+    "Brutal(2) +2",
+    "aptidão 0 +1"
+   ],
+   "palavrasChaveTexto": "Distância(L) Recarga(1) Letal(2) Brutal(2)"
+  },
+  {
+   "id": "arcabuz",
+   "nome": "Arcabuz",
+   "raridade": "incomum",
+   "peso": "medio",
+   "distancia": [
+    "D"
+   ],
+   "recarga": 1,
+   "armaDeFogo": {
+    "limite": 10,
+    "disparo": 4
+   },
+   "dano": [
+    "perfurante"
+   ],
+   "letal": 2,
+   "brutal": 1,
+   "aptidao": 1,
+   "custoDetalhado": [
+    "Distância(D) +0",
+    "Arma de Fogo(10)/Disparo(4) +2",
+    "Letal(2) +2",
+    "Brutal(1) +1"
+   ],
+   "palavrasChaveTexto": "Distância(D) Recarga(1) Arma de Fogo(10) Disparo(4) Letal(2) Brutal(1)"
+  },
+  {
+   "id": "mosquete",
+   "nome": "Mosquete",
+   "raridade": "incomum",
+   "peso": "pesado",
+   "distancia": [
+    "L"
+   ],
+   "recarga": 1,
+   "armaDeFogo": {
+    "limite": 15,
+    "disparo": 3
+   },
+   "dano": [
+    "perfurante"
+   ],
+   "letal": 2,
+   "brutal": 2,
+   "aptidao": 1,
+   "custoDetalhado": [
+    "Distância(L) +0",
+    "Arma de Fogo(15)/Disparo(3) +1",
+    "Letal(2) +2",
+    "Brutal(2) +2"
+   ],
+   "palavrasChaveTexto": "Distância(L) Recarga(1) Arma de Fogo(15) Disparo(3) Letal(2) Brutal(2)"
+  },
+  {
+   "id": "revolver",
+   "nome": "Revólver",
+   "raridade": "incomum",
+   "peso": "leve",
+   "distancia": [
+    "D"
+   ],
+   "recarga": 6,
+   "armaDeFogo": {
+    "limite": 10,
+    "disparo": 4
+   },
+   "dano": [
+    "perfurante"
+   ],
+   "aptidao": 1,
+   "custoDetalhado": [
+    "Distância(D) +0",
+    "Recarga(6) +3",
+    "Arma de Fogo(10)/Disparo(4) +2"
+   ],
+   "palavrasChaveTexto": "Distância(D) Recarga(6) Arma de Fogo(10) Disparo(4)"
   },
   {
    "id": "escopeta",
    "nome": "Escopeta",
    "raridade": "incomum",
-   "incompleto": true
+   "peso": "medio",
+   "distancia": [
+    "C"
+   ],
+   "recarga": 1,
+   "armaDeFogo": {
+    "limite": 15,
+    "disparo": 3
+   },
+   "dano": [
+    "perfurante"
+   ],
+   "letal": 2,
+   "brutal": 3,
+   "aptidao": 1,
+   "custoDetalhado": [
+    "Distância(C) -1",
+    "Arma de Fogo(15)/Disparo(3) +1",
+    "Letal(2) +2",
+    "Brutal(3) +3"
+   ],
+   "palavrasChaveTexto": "Distância(C) Recarga(1) Arma de Fogo(15) Disparo(3) Letal(2) Brutal(3)"
   },
   {
    "id": "rifle-de-assalto",
-   "nome": "Rifle de assalto",
+   "nome": "Rifle de Assalto",
    "raridade": "incomum",
-   "incompleto": true
-  },
-  {
-   "id": "machado-dinamarques",
-   "nome": "Machado dinamarquês",
-   "raridade": "raro",
-   "incompleto": true
-  },
-  {
-   "id": "montante",
-   "nome": "Montante",
-   "raridade": "raro",
-   "incompleto": true
-  },
-  {
-   "id": "alabarda",
-   "nome": "Alabarda",
-   "raridade": "raro",
-   "incompleto": true
-  },
-  {
-   "id": "rifle-laser",
-   "nome": "Rifle laser",
-   "raridade": "raro",
-   "incompleto": true
-  }
- ],
- "armaduras": [
-  {
-   "id": "broquel",
-   "nome": "Broquel",
-   "raridade": "comum",
-   "incompleto": true
-  },
-  {
-   "id": "tunica-acolchoada",
-   "nome": "Túnica acolchoada",
-   "raridade": "comum",
-   "incompleto": true
-  },
-  {
-   "id": "couraca-de-couro",
-   "nome": "Couraça de couro",
-   "raridade": "comum",
-   "incompleto": true
-  },
-  {
-   "id": "gibao-reforcado",
-   "nome": "Gibão reforçado",
-   "raridade": "comum",
-   "incompleto": true
+   "peso": "medio",
+   "distancia": [
+    "L"
+   ],
+   "recarga": 6,
+   "armaDeFogo": {
+    "limite": 20,
+    "disparo": 2
+   },
+   "dano": [
+    "perfurante"
+   ],
+   "letal": 1,
+   "aptidao": 1,
+   "custoDetalhado": [
+    "Distância(L) +0",
+    "Recarga(6) +3",
+    "Arma de Fogo(20)/Disparo(2) +1",
+    "Letal(1) +1"
+   ],
+   "palavrasChaveTexto": "Distância(L) Recarga(6) Arma de Fogo(20) Disparo(2) Letal(1)"
   },
   {
    "id": "escudo-torre",
-   "nome": "Escudo torre",
+   "nome": "Escudo Torre",
    "raridade": "incomum",
-   "incompleto": true
+   "peso": "pesado",
+   "alcance": "curto",
+   "dano": [
+    "contundente"
+   ],
+   "bloqueio": 3,
+   "enriste": true,
+   "aptidao": 1,
+   "custoDetalhado": [
+    "Bloqueio(3) +3",
+    "Enriste +2"
+   ],
+   "palavrasChaveTexto": "Bloqueio(3) Enriste"
   },
   {
    "id": "paves",
    "nome": "Pavês",
    "raridade": "incomum",
-   "incompleto": true
+   "peso": "pesado",
+   "alcance": "curto",
+   "dano": [
+    "contundente"
+   ],
+   "brutal": 1,
+   "bloqueio": 3,
+   "enriste": true,
+   "aptidao": 2,
+   "custoDetalhado": [
+    "Brutal(1) +1",
+    "Bloqueio(3) +3",
+    "Enriste +2",
+    "aptidão 2 -1"
+   ],
+   "palavrasChaveTexto": "Brutal(1) Bloqueio(3) Enriste"
+  },
+  {
+   "id": "machado-dinamarques",
+   "nome": "Machado Dinamarquês",
+   "raridade": "raro",
+   "peso": "pesado",
+   "alcance": "distante",
+   "dano": [
+    "cortante"
+   ],
+   "letal": 3,
+   "brutal": 4,
+   "aptidao": 1,
+   "custoDetalhado": [
+    "alcance Distante +1",
+    "Letal(3) +3",
+    "Brutal(4) +4"
+   ],
+   "palavrasChaveTexto": "Letal(3) Brutal(4)"
+  },
+  {
+   "id": "montante",
+   "nome": "Montante",
+   "raridade": "raro",
+   "peso": "pesado",
+   "alcance": "distante",
+   "dano": [
+    "cortante"
+   ],
+   "letal": 3,
+   "brutal": 3,
+   "bloqueio": 1,
+   "aptidao": 1,
+   "custoDetalhado": [
+    "alcance Distante +1",
+    "Letal(3) +3",
+    "Brutal(3) +3",
+    "Bloqueio(1) +1"
+   ],
+   "palavrasChaveTexto": "Letal(3) Brutal(3) Bloqueio(1)"
+  },
+  {
+   "id": "alabarda",
+   "nome": "Alabarda",
+   "raridade": "raro",
+   "peso": "pesado",
+   "alcance": "distante",
+   "dano": [
+    "cortante",
+    "perfurante"
+   ],
+   "letal": 2,
+   "brutal": 3,
+   "enriste": true,
+   "aptidao": 2,
+   "custoDetalhado": [
+    "alcance Distante +1",
+    "tipos físicos extras +1",
+    "Letal(2) +2",
+    "Brutal(3) +3",
+    "Enriste +2",
+    "aptidão 2 -1"
+   ],
+   "palavrasChaveTexto": "Letal(2) Brutal(3) Enriste"
+  },
+  {
+   "id": "arco-composto",
+   "nome": "Arco Composto",
+   "raridade": "raro",
+   "peso": "medio",
+   "distancia": [
+    "ML"
+   ],
+   "recarga": 3,
+   "dano": [
+    "perfurante"
+   ],
+   "letal": 3,
+   "brutal": 2,
+   "aptidao": 1,
+   "custoDetalhado": [
+    "Distância(ML) +1",
+    "Recarga(3) +2",
+    "Letal(3) +3",
+    "Brutal(2) +2"
+   ],
+   "palavrasChaveTexto": "Distância(ML) Recarga(3) Letal(3) Brutal(2)"
+  },
+  {
+   "id": "rifle-de-precisao",
+   "nome": "Rifle de Precisão",
+   "raridade": "raro",
+   "peso": "medio",
+   "distancia": [
+    "EL"
+   ],
+   "recarga": 1,
+   "armaDeFogo": {
+    "limite": 25,
+    "disparo": 1
+   },
+   "dano": [
+    "perfurante"
+   ],
+   "letal": 3,
+   "brutal": 2,
+   "aptidao": 1,
+   "custoDetalhado": [
+    "Distância(EL) +2",
+    "Arma de Fogo(25)/Disparo(1) +1",
+    "Letal(3) +3",
+    "Brutal(2) +2"
+   ],
+   "palavrasChaveTexto": "Distância(EL) Recarga(1) Arma de Fogo(25) Disparo(1) Letal(3) Brutal(2)"
+  },
+  {
+   "id": "rifle-laser",
+   "nome": "Rifle Laser",
+   "raridade": "raro",
+   "peso": "medio",
+   "distancia": [
+    "L"
+   ],
+   "recarga": null,
+   "armaDeFogo": {
+    "limite": 20,
+    "disparo": 2
+   },
+   "dano": [
+    "fogo"
+   ],
+   "brutal": 1,
+   "aptidao": 1,
+   "custoDetalhado": [
+    "Distância(L) +0",
+    "Recarga(—) +4",
+    "Arma de Fogo(20)/Disparo(2) +1",
+    "dano elemental +2",
+    "Brutal(1) +1"
+   ],
+   "palavrasChaveTexto": "Distância(L) Arma de Fogo(20) Disparo(2) Brutal(1)"
+  },
+  {
+   "id": "escudo-balistico",
+   "nome": "Escudo Balístico",
+   "raridade": "raro",
+   "peso": "medio",
+   "alcance": "curto",
+   "dano": [
+    "contundente"
+   ],
+   "brutal": 1,
+   "bloqueio": 3,
+   "enriste": true,
+   "aptidao": 1,
+   "habilidades": [
+    {
+     "nome": "Cobertura móvel",
+     "descricao": "Enquanto empunhado, concede meia cobertura contra ataques à distância vindos da frente.",
+     "custo": 2
+    }
+   ],
+   "custoDetalhado": [
+    "Brutal(1) +1",
+    "Bloqueio(3) +3",
+    "Enriste +2",
+    "Cobertura móvel +2"
+   ],
+   "palavrasChaveTexto": "Brutal(1) Bloqueio(3) Enriste"
+  },
+  {
+   "id": "lamina-do-crepusculo",
+   "nome": "Lâmina do Crepúsculo",
+   "raridade": "mitico",
+   "peso": "medio",
+   "alcance": "distante",
+   "dano": [
+    "alma"
+   ],
+   "letal": 3,
+   "brutal": 3,
+   "aptidao": 2,
+   "habilidades": [
+    {
+     "nome": "Sede",
+     "descricao": "Ao reduzir um alvo a 0 de Vida, o portador recupera 1 Ponto de Tempo nesta rodada.",
+     "custo": 2
+    }
+   ],
+   "custoDetalhado": [
+    "alcance Distante +1",
+    "dano especial +4",
+    "Letal(3) +3",
+    "Brutal(3) +3",
+    "aptidão 2 -1",
+    "Sede +2"
+   ],
+   "palavrasChaveTexto": "Letal(3) Brutal(3)"
+  },
+  {
+   "id": "martelo-trovejante",
+   "nome": "Martelo Trovejante",
+   "raridade": "mitico",
+   "peso": "pesado",
+   "alcance": "curto",
+   "dano": [
+    "eletrico"
+   ],
+   "brutal": 6,
+   "bloqueio": 2,
+   "arremesso": true,
+   "aptidao": 1,
+   "habilidades": [
+    {
+     "nome": "Retorno",
+     "descricao": "Após ser arremessado, volta à mão do portador no fim da ação.",
+     "custo": 1
+    }
+   ],
+   "custoDetalhado": [
+    "dano elemental +2",
+    "Brutal(6) +6",
+    "Bloqueio(2) +2",
+    "Arremesso +1",
+    "Retorno +1"
+   ],
+   "palavrasChaveTexto": "Brutal(6) Bloqueio(2) Arremesso"
+  },
+  {
+   "id": "arco-do-vendaval",
+   "nome": "Arco do Vendaval",
+   "raridade": "mitico",
+   "peso": "medio",
+   "distancia": [
+    "ML"
+   ],
+   "recarga": null,
+   "dano": [
+    "perfurante"
+   ],
+   "letal": 3,
+   "brutal": 2,
+   "aptidao": 1,
+   "habilidades": [
+    {
+     "nome": "Vento guia",
+     "descricao": "Os ataques não recebem Desvantagem por zona de distância diferente da ideal.",
+     "custo": 2
+    }
+   ],
+   "custoDetalhado": [
+    "Distância(ML) +1",
+    "Recarga(—) +4",
+    "Letal(3) +3",
+    "Brutal(2) +2",
+    "Vento guia +2"
+   ],
+   "palavrasChaveTexto": "Distância(ML) Letal(3) Brutal(2)"
+  },
+  {
+   "id": "egide",
+   "nome": "Égide",
+   "raridade": "mitico",
+   "peso": "medio",
+   "alcance": "curto",
+   "dano": [
+    "contundente"
+   ],
+   "brutal": 2,
+   "bloqueio": 5,
+   "enriste": true,
+   "aptidao": 1,
+   "habilidades": [
+    {
+     "nome": "Escudo absoluto",
+     "descricao": "Bloqueios com a Égide também funcionam contra dano elemental.",
+     "custo": 3
+    }
+   ],
+   "custoDetalhado": [
+    "Brutal(2) +2",
+    "Bloqueio(5) +5",
+    "Enriste +2",
+    "Escudo absoluto +3"
+   ],
+   "palavrasChaveTexto": "Brutal(2) Bloqueio(5) Enriste"
+  }
+ ],
+ "armaduras": [
+  {
+   "id": "tunica-acolchoada",
+   "nome": "Túnica Acolchoada",
+   "raridade": "comum",
+   "peso": "leve",
+   "imobilidade": 0,
+   "protecao": 7,
+   "cobertura": [
+    {
+     "tipo": "fisico2",
+     "danos": [
+      "contundente",
+      "compressao"
+     ]
+    }
+   ],
+   "custoDetalhado": [
+    "imobilidade 1→0 +1",
+    "proteção 6→7 +1",
+    "cobertura Contundente/Compressão +1"
+   ],
+   "absorcao": {
+    "contundente": 7,
+    "compressao": 7
+   }
+  },
+  {
+   "id": "couraca-de-couro",
+   "nome": "Couraça de Couro",
+   "raridade": "comum",
+   "peso": "leve",
+   "imobilidade": 1,
+   "protecao": 7,
+   "cobertura": [
+    {
+     "tipo": "fisico2",
+     "danos": [
+      "cortante",
+      "contundente"
+     ]
+    },
+    {
+     "tipo": "fisico2",
+     "danos": [
+      "perfurante",
+      "lacerante"
+     ]
+    }
+   ],
+   "custoDetalhado": [
+    "proteção 6→7 +1",
+    "cobertura Cortante/Contundente +1",
+    "cobertura Perfurante/Lacerante +1"
+   ],
+   "absorcao": {
+    "cortante": 7,
+    "contundente": 7,
+    "perfurante": 7,
+    "lacerante": 7
+   }
+  },
+  {
+   "id": "gibao-reforcado",
+   "nome": "Gibão Reforçado",
+   "raridade": "comum",
+   "peso": "medio",
+   "imobilidade": 1,
+   "protecao": 8,
+   "cobertura": [
+    {
+     "tipo": "fisico2",
+     "danos": [
+      "cortante",
+      "perfurante"
+     ]
+    },
+    {
+     "tipo": "fisico2",
+     "danos": [
+      "contundente",
+      "lacerante"
+     ]
+    }
+   ],
+   "custoDetalhado": [
+    "imobilidade 2→1 +1",
+    "cobertura Cortante/Perfurante +1",
+    "cobertura Contundente/Lacerante +1"
+   ],
+   "absorcao": {
+    "cortante": 8,
+    "perfurante": 8,
+    "contundente": 8,
+    "lacerante": 8
+   }
   },
   {
    "id": "cota-de-malha",
-   "nome": "Cota de malha",
+   "nome": "Cota de Malha",
    "raridade": "incomum",
-   "incompleto": true
+   "peso": "medio",
+   "imobilidade": 1,
+   "protecao": 10,
+   "cobertura": [
+    {
+     "tipo": "fisico2",
+     "danos": [
+      "cortante",
+      "lacerante"
+     ]
+    },
+    {
+     "tipo": "fisico2",
+     "danos": [
+      "contundente",
+      "compressao"
+     ]
+    }
+   ],
+   "custoDetalhado": [
+    "imobilidade 2→1 +1",
+    "proteção 8→10 +2",
+    "cobertura Cortante/Lacerante +1",
+    "cobertura Contundente/Compressão +1"
+   ],
+   "absorcao": {
+    "cortante": 10,
+    "lacerante": 10,
+    "contundente": 10,
+    "compressao": 10
+   }
   },
   {
    "id": "brigandina",
    "nome": "Brigandina",
    "raridade": "incomum",
-   "incompleto": true
+   "peso": "medio",
+   "imobilidade": 2,
+   "protecao": 11,
+   "cobertura": [
+    {
+     "tipo": "fisico2",
+     "danos": [
+      "cortante",
+      "perfurante"
+     ]
+    },
+    {
+     "tipo": "fisico2",
+     "danos": [
+      "contundente",
+      "lacerante"
+     ]
+    }
+   ],
+   "custoDetalhado": [
+    "proteção 8→11 +3",
+    "cobertura Cortante/Perfurante +1",
+    "cobertura Contundente/Lacerante +1"
+   ],
+   "absorcao": {
+    "cortante": 11,
+    "perfurante": 11,
+    "contundente": 11,
+    "lacerante": 11
+   }
   },
   {
    "id": "corselete-de-aco",
-   "nome": "Corselete de aço",
+   "nome": "Corselete de Aço",
    "raridade": "incomum",
-   "incompleto": true
+   "peso": "pesado",
+   "imobilidade": 2,
+   "protecao": 13,
+   "cobertura": [
+    {
+     "tipo": "fisico2",
+     "danos": [
+      "cortante",
+      "perfurante"
+     ]
+    },
+    {
+     "tipo": "fisico2",
+     "danos": [
+      "contundente",
+      "lacerante"
+     ]
+    }
+   ],
+   "custoDetalhado": [
+    "imobilidade 3→2 +1",
+    "proteção 11→13 +2",
+    "cobertura Cortante/Perfurante +1",
+    "cobertura Contundente/Lacerante +1"
+   ],
+   "absorcao": {
+    "cortante": 13,
+    "perfurante": 13,
+    "contundente": 13,
+    "lacerante": 13
+   }
   },
   {
    "id": "armadura-lamelar",
-   "nome": "Armadura lamelar",
+   "nome": "Armadura Lamelar",
    "raridade": "incomum",
-   "incompleto": true
+   "peso": "medio",
+   "imobilidade": 2,
+   "protecao": 10,
+   "cobertura": [
+    {
+     "tipo": "fisico2",
+     "danos": [
+      "cortante",
+      "perfurante"
+     ]
+    },
+    {
+     "tipo": "fisico2",
+     "danos": [
+      "contundente",
+      "lacerante"
+     ]
+    },
+    {
+     "tipo": "fisico+1",
+     "danos": [
+      "compressao"
+     ]
+    }
+   ],
+   "custoDetalhado": [
+    "proteção 8→10 +2",
+    "cobertura Cortante/Perfurante +1",
+    "cobertura Contundente/Lacerante +1",
+    "cobertura Compressão +1"
+   ],
+   "absorcao": {
+    "cortante": 10,
+    "perfurante": 10,
+    "contundente": 10,
+    "lacerante": 10,
+    "compressao": 11
+   }
   },
   {
    "id": "colete-balistico",
-   "nome": "Colete balístico",
+   "nome": "Colete Balístico",
    "raridade": "incomum",
-   "incompleto": true
+   "peso": "leve",
+   "imobilidade": 1,
+   "protecao": 10,
+   "cobertura": [
+    {
+     "tipo": "fisico2",
+     "danos": [
+      "perfurante",
+      "contundente"
+     ]
+    }
+   ],
+   "custoDetalhado": [
+    "proteção 6→10 +4",
+    "cobertura Perfurante/Contundente +1"
+   ],
+   "absorcao": {
+    "perfurante": 10,
+    "contundente": 10
+   }
   },
   {
    "id": "armadura-de-placas",
-   "nome": "Armadura de placas",
+   "nome": "Armadura de Placas",
    "raridade": "raro",
-   "incompleto": true
-  },
-  {
-   "id": "escudo-balistico",
-   "nome": "Escudo balístico",
-   "raridade": "raro",
-   "incompleto": true
+   "peso": "pesado",
+   "imobilidade": 2,
+   "protecao": 15,
+   "cobertura": [
+    {
+     "tipo": "fisico2",
+     "danos": [
+      "cortante",
+      "perfurante"
+     ]
+    },
+    {
+     "tipo": "fisico2",
+     "danos": [
+      "contundente",
+      "lacerante"
+     ]
+    },
+    {
+     "tipo": "fisico+1",
+     "danos": [
+      "compressao"
+     ]
+    }
+   ],
+   "custoDetalhado": [
+    "imobilidade 3→2 +1",
+    "proteção 11→15 +4",
+    "cobertura Cortante/Perfurante +1",
+    "cobertura Contundente/Lacerante +1",
+    "cobertura Compressão +1"
+   ],
+   "absorcao": {
+    "cortante": 15,
+    "perfurante": 15,
+    "contundente": 15,
+    "lacerante": 15,
+    "compressao": 16
+   }
   },
   {
    "id": "exotraje-tatico",
-   "nome": "Exotraje tático",
+   "nome": "Exotraje Tático",
    "raridade": "raro",
-   "incompleto": true
+   "peso": "medio",
+   "imobilidade": 0,
+   "protecao": 10,
+   "cobertura": [
+    {
+     "tipo": "fisico2",
+     "danos": [
+      "perfurante",
+      "contundente"
+     ]
+    },
+    {
+     "tipo": "fisico2",
+     "danos": [
+      "cortante",
+      "lacerante"
+     ]
+    },
+    {
+     "tipo": "elemental",
+     "danos": [
+      "fogo"
+     ]
+    }
+   ],
+   "custoDetalhado": [
+    "imobilidade 2→0 +2",
+    "proteção 8→10 +2",
+    "cobertura Perfurante/Contundente +1",
+    "cobertura Cortante/Lacerante +1",
+    "cobertura Fogo +2"
+   ],
+   "absorcao": {
+    "perfurante": 10,
+    "contundente": 10,
+    "cortante": 10,
+    "lacerante": 10,
+    "fogo": 10
+   }
+  },
+  {
+   "id": "manto-etereo",
+   "nome": "Manto Etéreo",
+   "raridade": "mitico",
+   "peso": "leve",
+   "imobilidade": 0,
+   "protecao": 8,
+   "cobertura": [
+    {
+     "tipo": "fisico2",
+     "danos": [
+      "cortante",
+      "perfurante"
+     ]
+    },
+    {
+     "tipo": "fisico2",
+     "danos": [
+      "contundente",
+      "lacerante"
+     ]
+    },
+    {
+     "tipo": "especial",
+     "danos": [
+      "alma"
+     ]
+    },
+    {
+     "tipo": "elemental",
+     "danos": [
+      "fogo"
+     ]
+    },
+    {
+     "tipo": "elemental",
+     "danos": [
+      "gelido"
+     ]
+    }
+   ],
+   "custoDetalhado": [
+    "imobilidade 1→0 +1",
+    "proteção 6→8 +2",
+    "cobertura Cortante/Perfurante +1",
+    "cobertura Contundente/Lacerante +1",
+    "cobertura Alma +3",
+    "cobertura Fogo +2",
+    "cobertura Gélido +2"
+   ],
+   "absorcao": {
+    "cortante": 8,
+    "perfurante": 8,
+    "contundente": 8,
+    "lacerante": 8,
+    "alma": 8,
+    "fogo": 8,
+    "gelido": 8
+   }
+  },
+  {
+   "id": "placas-do-tita",
+   "nome": "Placas do Titã",
+   "raridade": "mitico",
+   "peso": "pesado",
+   "imobilidade": 1,
+   "protecao": 16,
+   "cobertura": [
+    {
+     "tipo": "fisico2",
+     "danos": [
+      "cortante",
+      "perfurante"
+     ]
+    },
+    {
+     "tipo": "fisico2",
+     "danos": [
+      "contundente",
+      "lacerante"
+     ]
+    },
+    {
+     "tipo": "fisico+1",
+     "danos": [
+      "compressao"
+     ]
+    }
+   ],
+   "habilidades": [
+    {
+     "nome": "Inabalável",
+     "descricao": "O portador não pode ser empurrado nem derrubado por efeitos não mágicos.",
+     "custo": 2
+    }
+   ],
+   "custoDetalhado": [
+    "imobilidade 3→1 +2",
+    "proteção 11→16 +5",
+    "cobertura Cortante/Perfurante +1",
+    "cobertura Contundente/Lacerante +1",
+    "cobertura Compressão +1",
+    "Inabalável +2"
+   ],
+   "absorcao": {
+    "cortante": 16,
+    "perfurante": 16,
+    "contundente": 16,
+    "lacerante": 16,
+    "compressao": 17
+   }
   }
  ],
  "armasImprovisadas": {

@@ -71,7 +71,7 @@ Podemos utilizar os hiatos também para recuperar personagens que sofreram ferim
 
 Existem 3 tipos de recuperação, a primeira é a rápida que leva apenas alguns minutos do dia dedicados para descansar, sendo, portanto, um hiato bem curto investido nisso. A segunda é a recuperação curta que consiste em algumas horas ou um dia investido no descanso e sob condições propícias. Por fim temos a recuperação prolongada que exige dias, semanas ou até meses para o personagem voltar com sua saúde, normalmente necessitando de cuidado e auxílio médico devido.
 
-De modo geral, separamos o estado do personagem em 3 graus: Leve, Grave e Letal. Esses graus servem tanto para representar o estado físico quanto mental do personagem, sendo assim, um personagem pode estar no estado leve fisicamente e crítico mentalmente. A definição de cada um desses graus é a seguinte.
+De modo geral, separamos o estado do personagem em 3 graus: Leve, Grave e Letal. Esses graus servem tanto para representar o estado físico quanto mental do personagem, sendo assim, um personagem pode estar no estado leve fisicamente e grave mentalmente. A definição de cada um desses graus é a seguinte.
 
 **Leve**: O Personagem está com mais de 50% da vida máxima ou sanidade máxima.
 
@@ -81,15 +81,15 @@ De modo geral, separamos o estado do personagem em 3 graus: Leve, Grave e Letal.
 
 A regra de recuperação de pontos de vida que estamos usando aqui busca certo nível de realismo no sentido de que os ferimentos vão demorar mais ou menos para se curarem de acordo com o grau do ferimento, a regra é a seguinte.
 
-Conforme o personagem vai se curando seu grau de ferimento vai diminuindo de acordo, portanto, após determinado tempo de hiato é possível que o grau de ferimento tenha caído de crítico para grave, por exemplo.
+Conforme o personagem vai se curando seu grau de ferimento vai diminuindo de acordo, portanto, após determinado tempo de hiato é possível que o grau de ferimento tenha caído de letal para grave, por exemplo.
 
-Na recuperação rápida você recupera 1 ponto de vida ou sanidade se o personagem estiver no estado leve ou 1 nível de cansaço se o personagem estiver com cansaço no nível 1 ou 2.
+**Recuperação rápida:** recupera 1 ponto de vida ou sanidade se o personagem estiver no estado **leve**, ou 1 nível de cansaço se o cansaço estiver no nível 1 ou 2.
 
-Na recuperação curta você recupera 1 ponto de vida ou sanidade se o personagem estiver no estado crítico e 3 pontos se ele estiver no estado leve. Você também recupera 1 nível de cansaço se o cansaço estiver no nível 4 e todo o cansaço se ele estiver no nível 3 ou menos.
+**Recuperação curta:** recupera 1 ponto de vida ou sanidade se o personagem estiver no estado **grave** e 3 pontos se ele estiver no estado **leve**. Um personagem no estado **letal** não recupera vida ou sanidade em uma recuperação curta. Você também recupera 1 nível de cansaço se o cansaço estiver no nível 4 e todo o cansaço se ele estiver no nível 3 ou menos.
 
-Uma recuperação prolongada sempre recupera toda a sua vida e sanidade, além de restaurar todo o cansaço. A duração de uma recuperação prolongada pode ser calculada como 12 horas por ponto de vida, sanidade recuperada ou nível de cansaço restaurado.
+**Recuperação prolongada:** sempre recupera toda a sua vida e sanidade, além de restaurar todo o cansaço. A duração de uma recuperação prolongada pode ser calculada como 12 horas por ponto de vida, sanidade recuperada ou nível de cansaço restaurado.
 
-É possível ajustar a regra de recuperação se aquilo que se deseja é mestrar um ambiente onde os personagens rapidamente se recuperam, um bom jeito de fazer isso é transformar a regra de recuperação letal na regra de recuperação crítica, a de recuperação crítica na grave e assim por diante. Nesse caso, considere que uma recuperação rápida sempre restaura todo o vigor de um personagem com grau leve de ferimento, fazendo seu cansaço sumir e seus pontos de vida retornarem.
+É possível ajustar a regra de recuperação se aquilo que se deseja é mestrar um ambiente onde os personagens rapidamente se recuperam, um bom jeito de fazer isso é tratar cada estado como um grau mais leve: o estado letal passa a usar a regra do grave, e o grave passa a usar a regra do leve. Nesse caso, considere que uma recuperação rápida sempre restaura todo o vigor de um personagem com grau leve de ferimento, fazendo seu cansaço sumir e seus pontos de vida retornarem.
 
 Essas regras não são escritas em pedra e por isso podem ser alteradas de acordo com a circunstância, tratamentos alternativos, poderes e magias, por exemplo, podem fazer com que o personagem se recupere mais rápido ou devagar.
 

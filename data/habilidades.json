@@ -231,7 +231,7 @@
    "id": "fator-mente-de-ferro",
    "nome": "Mente de Ferro",
    "pacote": "fator",
-   "descricao": "Você evita receber cansaço ao chegar a 50% de sanidade, além disso, sempre que você for perder pontos de sanidade, perca aquela quantidade menos um com mínimo de um ponto.",
+   "descricao": "Você evita receber trauma ao chegar a 50% de sanidade, além disso, sempre que você for perder pontos de sanidade, perca aquela quantidade menos um com mínimo de um ponto.",
    "grau": "vantagem",
    "custo": 4
   },
@@ -296,10 +296,10 @@
    "id": "humana-ataque-otimizado",
    "nome": "Ataque Otimizado",
    "pacote": "humana",
-   "descricao": "Ao realizar um ataque você pode gastar 1 ponto de combate ou 1 ponto de tempo adicional para adicionar manuseio(+1), isso pode ser feito 1 vez por ataque.",
+   "descricao": "Ao realizar um ataque você pode gastar 1 ponto de combate ou 1 ponto de tempo adicional para adicionar Maestria(+1), isso pode ser feito 1 vez por ataque.",
    "niveis": {
     "2": "Aumenta para até 2 vezes por ataque.",
-    "3": "Você agora adiciona ataque(2).",
+    "3": "Cada uso agora adiciona Maestria(+2).",
     "4": "Você agora pode fazer até 3 vezes por ataque, a primeira vez que você faz confere vantagem(1) ao ataque."
    },
    "nivelMinimo": 1,
@@ -454,7 +454,7 @@
    "id": "humana-grande-guerreiro",
    "nome": "Grande Guerreiro",
    "pacote": "humana",
-   "descricao": "Você não pode desmaiar ou ficar fora de si por qualquer efeito que não seja mágico e não sofre os efeitos negativos do cansaço, a única coisa que pode te parar é o cansaço, os efeitos de morte e teste contra a morte do cansaço(6) e cansaço(7) ainda são aplicados.",
+   "descricao": "Você não pode desmaiar ou ficar fora de si por qualquer efeito que não seja mágico e ignora os efeitos dos níveis 1 a 5 de cansaço (redução de Pontos de Tempo, Desvantagem(1) e Atordoado). Ainda assim, o cansaço continua sendo acumulado normalmente e o nível 6 de cansaço — os testes contra a morte — ainda se aplica.",
    "nivelMinimo": 4
   },
   {

@@ -78,11 +78,11 @@ function rollCard(m, head) {
 function effectLine(m) {
   const r = m.roll;
   if (m.dano) {
-    const { impacto = 1, brutal = 0, limite = 0, tipo = '' } = m.dano;
+    const { impacto = 1, brutal = 0, limite = 0, tipo = '', letal = 0 } = m.dano;
     let total = r.successes > 0 ? r.successes * impacto + brutal : 0;
     const capped = limite && total > limite;
     if (capped) total = limite;
-    return `<div class="effect">Dano: ${r.successes} × ${impacto}${brutal ? ` + ${brutal}` : ''} = <b>${total}</b> ${esc(tipo)}${capped ? ' (limite da arma de fogo)' : ''}</div>`;
+    return `<div class="effect">Dano: ${r.successes} × ${impacto}${brutal ? ` + ${brutal}` : ''} = <b>${total}</b> ${esc(tipo)}${capped ? ' (limite da arma de fogo)' : ''}${letal ? ` · Letal(${letal})` : ''}</div>`;
   }
   if (m.bloqueio) {
     const v = r.successes * m.bloqueio;

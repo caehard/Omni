@@ -6,32 +6,162 @@
   "imagem": "",
   "cor": "#222222",
   "system": {
-    "dados": { "altura": "", "peso": "", "idade": "", "familia": "", "dinheiro": "", "idiomaNativo": "" },
-    "progressao": { "inicial": 10, "ganhos": 0 },
-    "dominios":  { "fortitude": 1, "resiliencia": 1, "mental": 1, "controle": 0 },
-    "atributos": { "forca": 0, "destreza": 0, "vitalidade": 0, "ritmo": 0, "raciocinio": 0, "instinto": 0, "potencia": 0, "reserva": 0 },
-    "determinacao": "raciocinio",
-    "aptidoes": [ { "id": "idiomas", "especializacao": "Nativo", "nivel": 3, "nativo": true } ],
-    "virtudes": [ { "nome": "", "usada": false } ],
-    "falhas":   [ { "nome": "", "usada": false } ],
-    "habilidades": [ { "ref": "humana-postura-de-combate", "nivel": 1, "tipo": "habilidade" } ],
-    "poderes": [
-      { "nome": "", "nivel": 1, "duracao": "", "alcance": "", "componentes": "", "aptidao": [], "descricao": "", "variantes": "", "falha": false, "passivo": false }
-    ],
-    "inventario": [ { "nome": "", "slots": 1, "quantidade": 1 } ],
-    "armas": [ { "nome": "", "ref": "", "atributo": "forca", "aptidao": "armamento", "especializacao": "", "nivelAptidao": 1, "impacto": 2, "manuseio": 1, "tempoExtra": 1, "dano": ["cortante"], "palavrasChave": "" } ],
-    "absorcao": { "geral": 0, "fisico": 0, "elemental": 0 },
-    "recursos": {
-      "vida": 0, "sanidade": 0, "pontosEspeciais": 0, "conjuracao": 0, "heroicos": 0,
-      "cansaco": 0, "grauMorte": 0, "sucessosMorte": 0, "portasDaMorte": false, "morto": false
+    "dados": {
+      "altura": "",
+      "peso": "",
+      "idade": "",
+      "familia": "",
+      "dinheiro": "",
+      "idiomaNativo": ""
     },
-    "condicoes": { "sangramento": 2 },
-    "notas": { "personagem": "", "historia": "" }
+    "progressao": {
+      "inicial": 10,
+      "ganhos": 0
+    },
+    "dominios": {
+      "fortitude": 1,
+      "resiliencia": 1,
+      "mental": 1,
+      "controle": 0
+    },
+    "atributos": {
+      "forca": 0,
+      "destreza": 0,
+      "vitalidade": 0,
+      "ritmo": 0,
+      "raciocinio": 0,
+      "instinto": 0,
+      "potencia": 0,
+      "reserva": 0
+    },
+    "determinacao": "raciocinio",
+    "aptidoes": [
+      {
+        "id": "idiomas",
+        "especializacao": "Nativo",
+        "nivel": 3,
+        "nativo": true
+      }
+    ],
+    "virtudes": [
+      {
+        "nome": "",
+        "usada": false
+      }
+    ],
+    "falhas": [
+      {
+        "nome": "",
+        "usada": false
+      }
+    ],
+    "habilidades": [
+      {
+        "ref": "humana-postura-de-combate",
+        "nivel": 1,
+        "tipo": "habilidade"
+      }
+    ],
+    "poderes": [
+      {
+        "nome": "",
+        "nivel": 1,
+        "duracao": "",
+        "alcance": "",
+        "componentes": "",
+        "aptidao": "",
+        "descricao": "",
+        "variantes": "",
+        "falha": false,
+        "passivo": false
+      }
+    ],
+    "inventario": [
+      {
+        "nome": "",
+        "slots": 1,
+        "quantidade": 1
+      }
+    ],
+    "armas": [
+      {
+        "nome": "Espada Longa",
+        "ref": "espada-longa",
+        "atributo": "forca",
+        "aptIndex": 1,
+        "aptExigida": 1,
+        "impacto": 2,
+        "brutal": 2,
+        "letal": 2,
+        "bloqueio": 0,
+        "manuseio": 2,
+        "tempoExtra": 1,
+        "dano": "cortante",
+        "alcance": "distante",
+        "distancia": null,
+        "palavrasChave": "Alcance distante · Letal(2) Brutal(2)"
+      }
+    ],
+    "armaduras": [
+      {
+        "nome": "Couraça de Couro",
+        "ref": "couraca-de-couro",
+        "peso": "leve",
+        "imobilidade": 1,
+        "absorcao": {
+          "cortante": 7,
+          "contundente": 7,
+          "perfurante": 7,
+          "lacerante": 7
+        },
+        "equipada": true
+      }
+    ],
+    "absorcao": {
+      "geral": 0,
+      "fisico": 0,
+      "elemental": 0
+    },
+    "recursos": {
+      "vida": 0,
+      "sanidade": 0,
+      "pontosEspeciais": 0,
+      "conjuracao": 0,
+      "heroicos": 0,
+      "cansaco": 0,
+      "grauMorte": 0,
+      "sucessosMorte": 0,
+      "portasDaMorte": false,
+      "morto": false
+    },
+    "condicoes": {},
+    "notas": {
+      "personagem": "",
+      "historia": ""
+    }
   },
   "derivados": {
-    "nivel": 1, "categoria": "basico", "pontosGastos": 0, "pontosReserva": 0,
-    "vidaMax": 0, "sanidadeMax": 0, "pontosTempoMax": 0, "pontosCriticosMax": 3, "evasao": 0,
-    "resistenciaGeral": 0, "resistenciaMental": 0, "pontosEspeciaisMax": 0, "conjuracaoMax": 0,
-    "slotsMax": 5, "slotsUsados": 0, "heroicosMax": 2, "dados": { "fortitude": "d12" }, "avisos": []
+    "nivel": 1,
+    "categoria": "basico",
+    "pontosGastos": 0,
+    "pontosReserva": 0,
+    "vidaMax": 0,
+    "sanidadeMax": 0,
+    "pontosTempoMax": 0,
+    "pontosCriticosMax": 3,
+    "evasao": 0,
+    "resistenciaGeral": 0,
+    "resistenciaMental": 0,
+    "pontosEspeciaisMax": 0,
+    "conjuracaoMax": 0,
+    "slotsMax": 5,
+    "slotsUsados": 0,
+    "heroicosMax": 2,
+    "dados": {
+      "fortitude": "d12"
+    },
+    "avisos": [],
+    "imobilidade": 1,
+    "movimentoPT": 1
   }
 }

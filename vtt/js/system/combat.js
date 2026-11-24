@@ -1,6 +1,6 @@
 // Regras de combate: dano, sanidade, morte, pontos de tempo e processamento de início de rodada.
 import { CONFIG } from './config.js';
-import { prepareDerived, absorptionFor, rollBase } from './actor.js';
+import { prepareDerived, absorptionFor, rollBase, fatigueForPenalties, hasSkill } from './actor.js';
 import { rollPool } from './dice.js';
 
 const num = v => Number(v) || 0;
@@ -102,10 +102,14 @@ export function heal(actor, amount) {
 export function loseSanity(actor, amount) {
   const r = actor.system.recursos, d = prepareDerived(actor), s = actor.system;
   const antes = num(r.sanidade);
+  const menteDeFerro = hasSkill(actor, 'fator-mente-de-ferro');
+  if (menteDeFerro && num(amount) > 0) amount = Math.max(1, num(amount) - 1);
   r.sanidade = antes - Math.max(0, num(amount));
-  const msgs = [`Perdeu ${amount} de Sanidade (${r.sanidade}/${d.sanidadeMax}).`];
+  const msgs = [`Perdeu ${amount} de Sanidade (${r.sanidade}/${d.sanidadeMax})${menteDeFerro ? ' — Mente de Ferro: −1 na perda' : ''}.`];
   if (s.condicoes.concentracao) { delete s.condicoes.concentracao; msgs.push('Perder sanidade <b>quebra a concentração</b>.'); }
-  if (antes > d.metadeSanidade && r.sanidade <= d.metadeSanidade)
+  if (antes > d.metadeSanidade && r.sanidade <= d.metadeSanidade && menteDeFerro)
+    msgs.push('Sanidade caiu a 50% ou menos, mas <b>Mente de Ferro</b> evita o trauma.');
+  else if (antes > d.metadeSanidade && r.sanidade <= d.metadeSanidade)
     msgs.push('Sanidade caiu a 50% ou menos: <b>trauma permanente</b> (role na tabela de traumas).');
   if (r.sanidade <= 0) msgs.push('Sanidade 0: <b>loucura completa</b> — o jogador perde o controle do personagem.');
   return msgs;
@@ -135,7 +139,7 @@ export function deathRoll(actor, ajudaMedicina = 0) {
 
 /** Custo da próxima ação: nº de ações já feitas na rodada + 1 + extra (+1 se Atordoado). */
 export function actionCost(combatant, actor, extra = 0) {
-  const atordoado = actor.system.condicoes.atordoado || num(actor.system.recursos.cansaco) >= 5;
+  const atordoado = actor.system.condicoes.atordoado || fatigueForPenalties(actor) >= 5;
   return num(combatant.acoes) + 1 + num(extra) + (atordoado ? 1 : 0);
 }
 
@@ -205,4 +209,47 @@ export function processRoundStart(combatant, actor) {
     msgs.push('Rolagem de morte: ' + death.result.successes + ' sucesso(s). ' + death.msgs.join(' '));
   }
   return { msgs, death };
+}
+
+/** Estado de saúde (livro 2.7): leve (> 50%), grave (≤ 50%, sem dano de morte/sanidade negativa) ou letal. */
+export function healthState(cur, max, letal) {
+  if (letal) return 'letal';
+  return num(cur) > Math.floor(max / 2) ? 'leve' : 'grave';
+}
+
+/**
+ * Recuperação (livro 2.7). tipo: rapida | curta | prolongada | sessao.
+ * Rápida: leve +1 Vida/Sanidade; cansaço 1–2 → −1.
+ * Curta: grave +1, leve +3, letal não recupera; cansaço 4 → 3, cansaço ≤ 3 → 0; Pontos Especiais = Controle (−1 grave, −2 letal).
+ */
+export function rest(actor, tipo) {
+  const r = actor.system.recursos, d = prepareDerived(actor), msgs = [];
+  const fis = healthState(r.vida, d.vidaMax, r.portasDaMorte);
+  const men = healthState(r.sanidade, d.sanidadeMax, num(r.sanidade) < 0);
+  if (tipo === 'sessao') { r.heroicos = d.heroicosMax; return [`Pontos Heroicos restaurados (${d.heroicosMax}).`]; }
+  if (tipo === 'prolongada') {
+    const horas = 12 * (Math.max(0, d.vidaMax - r.vida) + Math.max(0, d.sanidadeMax - r.sanidade) + num(r.cansaco));
+    Object.assign(r, { vida: d.vidaMax, sanidade: d.sanidadeMax, cansaco: 0, pontosEspeciais: d.pontosEspeciaisMax,
+      conjuracao: d.conjuracaoMax, portasDaMorte: false, grauMorte: 0, sucessosMorte: 0 });
+    delete actor.system.condicoes.inconsciente; delete actor.system.condicoes.estabilizado;
+    return [`Recuperação prolongada: tudo restaurado (≈ ${horas} h).`];
+  }
+  const ganho = tipo === 'rapida' ? { leve: 1, grave: 0, letal: 0 } : { leve: 3, grave: 1, letal: 0 };
+  const gv = Math.min(ganho[fis], d.vidaMax - r.vida), gs = Math.min(ganho[men], d.sanidadeMax - r.sanidade);
+  if (gv > 0) { r.vida += gv; msgs.push(`+${gv} Vida.`); }
+  if (gs > 0) { r.sanidade += gs; msgs.push(`+${gs} Sanidade.`); }
+  if (tipo === 'curta' && fis === 'letal') msgs.push('Estado físico letal: não recupera Vida em recuperação curta.');
+  if (tipo === 'curta' && men === 'letal') msgs.push('Estado mental letal: não recupera Sanidade em recuperação curta.');
+  const c = num(r.cansaco);
+  if (tipo === 'rapida' && (c === 1 || c === 2)) { r.cansaco = c - 1; msgs.push('−1 Cansaço.'); }
+  if (tipo === 'curta') {
+    if (c === 4) { r.cansaco = 3; msgs.push('−1 Cansaço.'); }
+    else if (c > 0 && c <= 3) { r.cansaco = 0; msgs.push('Cansaço zerado.'); }
+    const ctrl = num(actor.system.dominios.controle);
+    const mana = Math.max(0, ctrl - (fis === 'grave' ? 1 : fis === 'letal' ? 2 : 0));
+    const gm = Math.min(mana, d.pontosEspeciaisMax - num(r.pontosEspeciais));
+    if (gm > 0) { r.pontosEspeciais = num(r.pontosEspeciais) + gm; msgs.push(`+${gm} Pontos Especiais.`); }
+  }
+  if (!msgs.length) msgs.push('Nada recuperado neste estado.');
+  return msgs;
 }

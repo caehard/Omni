@@ -22,7 +22,7 @@ export function seedDemo() {
       habilidades: [{ ref: 'humana-postura-de-combate', nivel: 1 }],
       armas: [{ nome: 'Espada Longa', ref: 'espada-longa', atributo: 'forca', aptIndex: 1, aptExigida: 1, impacto: 2, brutal: 2, letal: 2, bloqueio: 0, manuseio: 2, tempoExtra: 1, dano: 'cortante', palavrasChave: 'Alcance distante' }],
       inventario: [{ nome: 'Mochila', quantidade: 1, slots: 2 }, { nome: 'Kit de primeiros socorros (comum)', quantidade: 1, slots: 1 }],
-      absorcao: { geral: 0, fisico: 0, elemental: 0, cortante: 1 },
+      armaduras: [{ nome: 'Couraça de Couro', ref: 'couraca-de-couro', peso: 'leve', imobilidade: 1, absorcao: { cortante: 7, contundente: 7, perfurante: 7, lacerante: 7 }, equipada: true }],
     },
   });
   const npc = createActor({

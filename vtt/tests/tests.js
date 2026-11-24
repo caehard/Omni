@@ -2,7 +2,8 @@
 import { loadConfig } from '../js/system/config.js';
 import { rollPool, setRandom, applyMaestria, dieForDomain, addHeroicDie, applyVirtue, applyFlaw } from '../js/system/dice.js';
 import { createActor, prepareDerived, spentPoints, levelFromPoints } from '../js/system/actor.js';
-import { applyDamage, deathRoll, spendAction, processRoundStart, roundDurationSeconds, loseSanity } from '../js/system/combat.js';
+import { applyDamage, deathRoll, spendAction, processRoundStart, roundDurationSeconds, loseSanity, rest, actionCost } from '../js/system/combat.js';
+import { absorptionFor } from '../js/system/actor.js';
 
 const results = [];
 const eq = (name, got, exp) => results.push({ name, ok: JSON.stringify(got) === JSON.stringify(exp), got, exp });
@@ -107,6 +108,44 @@ eq('duração: rodadas 1,2,3,5,7', [1, 2, 3, 5, 7].map(roundDurationSeconds), [5
 b.system.recursos.sanidade = 2; b.system.condicoes.concentracao = 1;
 const sm = loseSanity(b, 1);
 eq('perder sanidade quebra concentração', !!b.system.condicoes.concentracao, false);
+
+// --- armaduras (valor fixo) ---
+const c = createActor({ system: { dominios: { fortitude: 1, resiliencia: 1, mental: 1, controle: 0 } } });
+c.system.absorcao.cortante = 2;
+c.system.armaduras = [{ nome: 'Couraça', peso: 'leve', imobilidade: 1, absorcao: { cortante: 7, perfurante: 7 }, equipada: true }];
+eq('armadura substitui absorção menor (7 > 2)', absorptionFor(c, 'cortante'), 7);
+eq('armadura não cobre fogo', absorptionFor(c, 'fogo'), 0);
+eq('imobilidade da armadura', prepareDerived(c).imobilidade, 1);
+c.system.armaduras[0].equipada = false;
+eq('armadura desequipada não conta', absorptionFor(c, 'cortante'), 2);
+
+// --- recuperação ---
+const e = createActor({ system: { dominios: { fortitude: 1, resiliencia: 2, mental: 1, controle: 0 }, atributos: { vitalidade: 3, raciocinio: 3 } } });
+let dm = prepareDerived(e); // vida 9, sanidade 4
+e.system.recursos.vida = 3; e.system.recursos.sanidade = 4;
+rest(e, 'curta');
+eq('curta em estado grave: +1 vida', e.system.recursos.vida, 4);
+e.system.recursos.vida = 6; rest(e, 'curta');
+eq('curta em estado leve: +3 vida', e.system.recursos.vida, 9);
+e.system.recursos.vida = 0; e.system.recursos.portasDaMorte = true; rest(e, 'curta');
+eq('curta em estado letal: não recupera', e.system.recursos.vida, 0);
+e.system.recursos.portasDaMorte = false; e.system.recursos.vida = 3; rest(e, 'rapida');
+eq('rápida em estado grave: não recupera', e.system.recursos.vida, 3);
+e.system.recursos.vida = 7; e.system.recursos.cansaco = 2; rest(e, 'rapida');
+eq('rápida em leve: +1 vida e −1 cansaço', [e.system.recursos.vida, e.system.recursos.cansaco], [8, 1]);
+e.system.recursos.cansaco = 4; rest(e, 'curta');
+eq('curta: cansaço 4 → 3', e.system.recursos.cansaco, 3);
+
+// --- Grande Guerreiro e Mente de Ferro ---
+const g = createActor({ system: { dominios: { fortitude: 1, resiliencia: 1, mental: 1, controle: 0 }, atributos: { ritmo: 2 } } });
+g.system.recursos.cansaco = 5;
+g.system.habilidades.push({ ref: 'humana-grande-guerreiro', nivel: 4 });
+eq('Grande Guerreiro ignora redução de PT do cansaço', prepareDerived(g).pontosTempoMax, 4);
+eq('Grande Guerreiro ignora Atordoado do cansaço 5', actionCost({ acoes: 0 }, g), 1);
+g.system.habilidades.push({ ref: 'fator-mente-de-ferro' });
+g.system.recursos.sanidade = 1;
+const mf = loseSanity(g, 3);
+eq('Mente de Ferro perde 1 a menos', g.system.recursos.sanidade, -1);
 
 // --- saída ---
 const fails = results.filter(x => !x.ok);

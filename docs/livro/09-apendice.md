@@ -96,7 +96,7 @@ Por pontos de criação você pode adicionar as palavras chave abaixo em sua arm
 - **Letal**: Custa 1 ponto de criação por nível.
 - **Brutal**: Custa 1 ponto de criação por nível.
 - **Bloqueio:** Custa 1 ponto de criação por nível, armas comuns e incomuns não podem apresentar bloqueio maior do que o impacto da arma, armas raras não podem apresentar um bloqueio maior do que o valor de impacto mais 1 da arma, não existe limitações para armas míticas.
-- **Enriste:** Só pode ser adicionado se a arma for média ou pesada e tiver ataque(-1) ou ataque(-2), custa 2 pontos de criação.
+- **Enriste:** Só pode ser adicionado se a arma for média ou pesada; custa 2 pontos de criação.
 - **Arremesso:** por 1 ponto de criação pode ser adicionada a uma arma média ou pesada, armas leves não precisam.
 - **Adicionando Aptidão**
 
@@ -126,7 +126,7 @@ Após isso, determina-se o valor de **proteção base**, de acordo com o peso da
 
 - **Escolha dos Tipos de dano de absorção**
 
-Você gasta 1 ponto de criação para que a proteção base se aplique a 2 tipos de dano físico, alternativamente, você pode gastar 1 ponto de criação para que a proteção base +1 se aplique a 1 tipo de dano físico. Você pode gastar 2 pontos de criação a partir da raridade rara para que a proteção base se aplique a um tipo de dano elemental. Ou gastar 3 pontos de criação para que a proteção base se aplique a um dano especial, a partir da raridade mítica.
+Sem gastar pontos aqui, a proteção base **não se aplica a nenhum tipo de dano** — por coerência, toda armadura deve gastar pelo menos 1 ponto de criação nesta etapa. Você gasta 1 ponto de criação para que a proteção base se aplique a 2 tipos de dano físico, alternativamente, você pode gastar 1 ponto de criação para que a proteção base +1 se aplique a 1 tipo de dano físico. Você pode gastar 2 pontos de criação a partir da raridade rara para que a proteção base se aplique a um tipo de dano elemental. Ou gastar 3 pontos de criação para que a proteção base se aplique a um dano especial, a partir da raridade mítica.
 
 - **Adicione Habilidade Especiais**
 

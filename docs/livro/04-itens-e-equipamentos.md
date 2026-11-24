@@ -126,63 +126,102 @@ Na tabela abaixo, segue um compilado de uma série de armas e armaduras criadas 
 
 ### Tabela de Armas e Armaduras
 
-> Campos marcados com “—” ainda não foram definidos no livro (ver `docs/pendencias.md`).
+Todos os itens abaixo seguem o **Criador de Equipamentos** (Apêndice 4.3) e gastam exatamente os pontos de criação da sua raridade.
 
-#### Comum — Manuseio(1)
+<!-- tabela-equipamentos:inicio (gerado por tools/equipamentos.py — edite data/equipamentos.json) -->
+
+> Alcance: **Curto** = mesma zona curta; **Distante** = até a zona Distante; **Distância(zonas)** = zonas ideais (Desvantagem(1) por zona de diferença). Impacto pelo peso: Leve 1 · Média 2 · Pesada 3. Atributo: Leve = Destreza; Média/Pesada = Força.
+
+#### Comum — Manuseio(1) · 3 pontos de criação
 
 | Arma | Alcance | Peso | Dano | Palavras-Chave | Aptidão |
 |---|---|---|---|---|---|
 | Adaga | Curto | Leve | Perfurante | Letal(2) | 0 |
 | Nunchaku | Curto | Leve | Contundente | Brutal(4) | 2 |
-| Bastão | Distante | Médio | Contundente | Brutal(1) Bloqueio(1) | 1 |
+| Bastão | Distante | Média | Contundente | Brutal(1) Bloqueio(1) | 1 |
 | Kunai | Curto | Leve | Perfurante | Letal(2) Brutal(1) | 1 |
 | Kunai com Corrente | Distante | Leve | Perfurante | Letal(2) Brutal(1) | 2 |
-| Lança curta | — | — | — | — | — |
-| Azagaia | — | — | — | — | — |
-| Funda | — | — | — | — | — |
-| Arco curto | — | — | — | — | — |
-| Machado de guerra | — | — | — | — | — |
-| Maça | — | — | — | — | — |
-| Arcabuz | — | — | — | — | — |
-| Mosquete | — | — | — | — | — |
-| Revólver | — | — | — | — | — |
+| Lança Curta | Distante | Média | Perfurante | Letal(1) Arremesso | 1 |
+| Azagaia | Curto | Média | Perfurante | Letal(2) Arremesso | 1 |
+| Funda | Distância | Leve | Contundente | Distância(D, L) Recarga(1) Brutal(2) | 1 |
+| Arco Curto | Distância | Leve | Perfurante | Distância(L) Recarga(1) Letal(2) Brutal(1) | 1 |
+| Machadinha | Curto | Leve | Cortante | Letal(1) Brutal(2) | 1 |
+| Maça | Curto | Média | Contundente | Brutal(3) | 1 |
+| Porrete | Curto | Média | Contundente | Brutal(2) | 0 |
+| Foice | Curto | Média | Cortante | Letal(2) Brutal(1) | 1 |
+| Soco-Inglês | Curto | Leve | Contundente | Brutal(2) | 0 |
+| Broquel | Curto | Leve | Contundente | Brutal(1) Bloqueio(1) | 0 |
 
-**Armaduras e escudos (estatísticas a definir):** Broquel, Túnica acolchoada, Couraça de couro, Gibão reforçado.
+| Armadura | Peso | Imobilidade | Absorção | Especial |
+|---|---|---|---|---|
+| Túnica Acolchoada | Leve | 0 | Contundente, Compressão (7) | — |
+| Couraça de Couro | Leve | 1 | Cortante, Contundente, Perfurante, Lacerante (7) | — |
+| Gibão Reforçado | Média | 1 | Cortante, Perfurante, Contundente, Lacerante (8) | — |
 
-#### Incomum — Manuseio(2)
+#### Incomum — Manuseio(2) · 5 pontos de criação
 
 | Arma | Alcance | Peso | Dano | Palavras-Chave | Aptidão |
 |---|---|---|---|---|---|
-| Gládio | — | — | — | — | 0 |
-| Katana | Distante | Médio | Cortante | Letal(3) Brutal(1) | 1 |
-| Sabre | — | — | — | — | 0 |
-| Espada longa | Distante | Médio | Cortante | Letal(2) Brutal(2) | 1 |
+| Gládio | Curto | Leve | Perfurante, Cortante | Letal(2) Brutal(1) | 0 |
+| Katana | Distante | Média | Cortante | Letal(3) Brutal(1) | 1 |
+| Sabre | Distante | Média | Cortante | Letal(2) Brutal(1) | 0 |
+| Espada Longa | Distante | Média | Cortante | Letal(2) Brutal(2) | 1 |
 | Rapieira | Distante | Leve | Perfurante | Letal(3) Brutal(1) | 1 |
-| Mangual | — | — | — | — | 1 |
-| Machado de Guerra | Distante | Pesado | Cortante | Letal (2) Brutal(3) | 2 |
-| Pike | — | — | — | — | — |
-| Glaive | — | — | — | — | — |
-| Tomahawk | — | — | — | — | — |
-| Arco longo | — | — | — | — | — |
-| Besta pesada | — | — | — | — | — |
-| Escopeta | — | — | — | — | — |
-| Rifle de assalto | — | — | — | — | — |
-| Kusarigama | Distante | Médio | Cortante, Contundente | Letal (2) Brutal (2) | 2 |
+| Mangual | Curto | Média | Contundente, Perfurante | Brutal(4) | 1 |
+| Machado de Guerra | Distante | Pesada | Cortante | Letal(2) Brutal(3) | 2 |
+| Kusarigama | Distante | Média | Cortante, Contundente | Letal(2) Brutal(2) | 2 |
+| Pique | Distante | Pesada | Perfurante | Letal(2) Enriste | 1 |
+| Glaive | Distante | Pesada | Cortante | Letal(2) Brutal(3) | 2 |
+| Tomahawk | Curto | Leve | Cortante, Contundente | Letal(2) Brutal(2) | 1 |
+| Arco Longo | Distância | Média | Perfurante | Distância(ML) Recarga(1) Letal(2) Brutal(2) | 1 |
+| Besta Pesada | Distância | Pesada | Perfurante | Distância(L) Recarga(1) Letal(2) Brutal(2) | 0 |
+| Arcabuz | Distância | Média | Perfurante | Distância(D) Recarga(1) Arma de Fogo(10) Disparo(4) Letal(2) Brutal(1) | 1 |
+| Mosquete | Distância | Pesada | Perfurante | Distância(L) Recarga(1) Arma de Fogo(15) Disparo(3) Letal(2) Brutal(2) | 1 |
+| Revólver | Distância | Leve | Perfurante | Distância(D) Recarga(6) Arma de Fogo(10) Disparo(4) | 1 |
+| Escopeta | Distância | Média | Perfurante | Distância(C) Recarga(1) Arma de Fogo(15) Disparo(3) Letal(2) Brutal(3) | 1 |
+| Rifle de Assalto | Distância | Média | Perfurante | Distância(L) Recarga(6) Arma de Fogo(20) Disparo(2) Letal(1) | 1 |
+| Escudo Torre | Curto | Pesada | Contundente | Bloqueio(3) Enriste | 1 |
+| Pavês | Curto | Pesada | Contundente | Brutal(1) Bloqueio(3) Enriste | 2 |
 
-**Armaduras e escudos (estatísticas a definir):** Escudo torre, Pavês, Cota de malha, Brigandina, Corselete de aço, Armadura lamelar, Colete balístico.
+| Armadura | Peso | Imobilidade | Absorção | Especial |
+|---|---|---|---|---|
+| Cota de Malha | Média | 1 | Cortante, Lacerante, Contundente, Compressão (10) | — |
+| Brigandina | Média | 2 | Cortante, Perfurante, Contundente, Lacerante (11) | — |
+| Corselete de Aço | Pesada | 2 | Cortante, Perfurante, Contundente, Lacerante (13) | — |
+| Armadura Lamelar | Média | 2 | Compressão (11); Cortante, Perfurante, Contundente, Lacerante (10) | — |
+| Colete Balístico | Leve | 1 | Perfurante, Contundente (10) | — |
 
-#### Raro — Manuseio(3)
+#### Raro — Manuseio(3) · 8 pontos de criação
 
 | Arma | Alcance | Peso | Dano | Palavras-Chave | Aptidão |
 |---|---|---|---|---|---|
-| Machado dinamarquês | — | — | — | — | — |
-| Montante | — | — | — | — | — |
-| Alabarda | — | — | — | — | — |
-| Rifle laser | — | — | — | — | — |
+| Machado Dinamarquês | Distante | Pesada | Cortante | Letal(3) Brutal(4) | 1 |
+| Montante | Distante | Pesada | Cortante | Letal(3) Brutal(3) Bloqueio(1) | 1 |
+| Alabarda | Distante | Pesada | Cortante, Perfurante | Letal(2) Brutal(3) Enriste | 2 |
+| Arco Composto | Distância | Média | Perfurante | Distância(ML) Recarga(3) Letal(3) Brutal(2) | 1 |
+| Rifle de Precisão | Distância | Média | Perfurante | Distância(EL) Recarga(1) Arma de Fogo(25) Disparo(1) Letal(3) Brutal(2) | 1 |
+| Rifle Laser | Distância | Média | Fogo | Distância(L) Arma de Fogo(20) Disparo(2) Brutal(1) | 1 |
+| Escudo Balístico | Curto | Média | Contundente | Brutal(1) Bloqueio(3) Enriste<br>*Cobertura móvel:* Enquanto empunhado, concede meia cobertura contra ataques à distância vindos da frente. | 1 |
 
-**Armaduras e escudos (estatísticas a definir):** Armadura de placas, Escudo balístico, Exotraje tático.
+| Armadura | Peso | Imobilidade | Absorção | Especial |
+|---|---|---|---|---|
+| Armadura de Placas | Pesada | 2 | Compressão (16); Cortante, Perfurante, Contundente, Lacerante (15) | — |
+| Exotraje Tático | Média | 0 | Perfurante, Contundente, Cortante, Lacerante, Fogo (10) | — |
 
-#### Mítico — Manuseio(5)
+#### Mítico — Manuseio(5) · 12 pontos de criação
 
-*Nenhum equipamento mítico listado ainda.*
+| Arma | Alcance | Peso | Dano | Palavras-Chave | Aptidão |
+|---|---|---|---|---|---|
+| Lâmina do Crepúsculo | Distante | Média | Alma | Letal(3) Brutal(3)<br>*Sede:* Ao reduzir um alvo a 0 de Vida, o portador recupera 1 Ponto de Tempo nesta rodada. | 2 |
+| Martelo Trovejante | Curto | Pesada | Elétrico | Brutal(6) Bloqueio(2) Arremesso<br>*Retorno:* Após ser arremessado, volta à mão do portador no fim da ação. | 1 |
+| Arco do Vendaval | Distância | Média | Perfurante | Distância(ML) Letal(3) Brutal(2)<br>*Vento guia:* Os ataques não recebem Desvantagem por zona de distância diferente da ideal. | 1 |
+| Égide | Curto | Média | Contundente | Brutal(2) Bloqueio(5) Enriste<br>*Escudo absoluto:* Bloqueios com a Égide também funcionam contra dano elemental. | 1 |
 
+| Armadura | Peso | Imobilidade | Absorção | Especial |
+|---|---|---|---|---|
+| Manto Etéreo | Leve | 0 | Cortante, Perfurante, Contundente, Lacerante, Alma, Fogo, Gélido (8) | — |
+| Placas do Titã | Pesada | 1 | Compressão (17); Cortante, Perfurante, Contundente, Lacerante (16) | *Inabalável:* O portador não pode ser empurrado nem derrubado por efeitos não mágicos. |
+
+Os escudos são armas (bloqueiam com o próprio Impacto + Bloqueio). As absorções de armadura são **valor fixo**: substituem a absorção do personagem naquele tipo se forem maiores.
+
+<!-- tabela-equipamentos:fim -->

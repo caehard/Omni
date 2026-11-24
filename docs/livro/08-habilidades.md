@@ -113,7 +113,7 @@ A memória do seu personagem é excelente, beirando o impossível, com essa mem�
 
 #### Mente de Ferro (Vantagem)
 
-Você evita receber cansaço ao chegar a 50% de sanidade, além disso, sempre que você for perder pontos de sanidade, perca aquela quantidade menos um com mínimo de um ponto.
+Você evita receber trauma ao chegar a 50% de sanidade, além disso, sempre que você for perder pontos de sanidade, perca aquela quantidade menos um com mínimo de um ponto.
 
 #### Loucura Genial (Traço)
 
@@ -161,11 +161,11 @@ Recebe **vantagem(2)** em disputas de desarme em que o personagem segurando esta
 
 ##### Ataque Otimizado
 
-Ao realizar um ataque você pode gastar 1 ponto de combate ou 1 ponto de tempo adicional para adicionar manuseio(+1), isso pode ser feito 1 vez por ataque.
+Ao realizar um ataque você pode gastar 1 ponto de combate ou 1 ponto de tempo adicional para adicionar Maestria(+1), isso pode ser feito 1 vez por ataque.
 
 **Nível 2**: Aumenta para até 2 vezes por ataque.
 
-**Nível 3**: Você agora adiciona ataque(2).
+**Nível 3**: Cada uso agora adiciona Maestria(+2).
 
 **Nível 4**: Você agora pode fazer até 3 vezes por ataque, a primeira vez que você faz confere vantagem(1) ao ataque.
 
@@ -275,7 +275,7 @@ Você é um líder estrategista militar que governa sobre um exército que confi
 
 ##### Grande Guerreiro
 
-Você não pode desmaiar ou ficar fora de si por qualquer efeito que não seja mágico e não sofre os efeitos negativos do cansaço, a única coisa que pode te parar é o cansaço, os efeitos de morte e teste contra a morte do cansaço(6) e cansaço(7) ainda são aplicados.
+Você não pode desmaiar ou ficar fora de si por qualquer efeito que não seja mágico e ignora os efeitos dos níveis 1 a 5 de cansaço (redução de Pontos de Tempo, Desvantagem(1) e Atordoado). Ainda assim, o cansaço continua sendo acumulado normalmente e o nível 6 de cansaço — os testes contra a morte — ainda se aplica.
 
 ##### Eu sou a Lenda
 
