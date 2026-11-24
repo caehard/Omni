@@ -1,7 +1,7 @@
 // Conexão com o servidor da mesa (servidor.py).
 // Recebe o estado e as mudanças dos outros por SSE (/eventos) e envia as mudanças locais por POST (/ops).
 // A lógica de convergência fica em sync-client.js.
-import { state, setSyncHook, notify } from './store.js';
+import { state, setSyncHook, notify, remoteApplied } from './store.js';
 import { SyncClient } from './sync-client.js';
 
 export const net = {
@@ -63,11 +63,13 @@ export function connect({ sala, nome, info }) {
         if (msg.tipo === 'estado') {
           setStatus('conectado');
           if (first) { first = false; const existed = sync.start(msg); pump(); resolve(existed); }
-          else { sync.resync(msg); notify(); pump(); }
+          else { sync.resync(msg); remoteApplied(null); notify(); pump(); }
         } else if (msg.tipo === 'ops') {
           const r = sync.receive(msg);
           if (r === 'lacuna') reopen(); // o servidor reenvia o estado inteiro ao reconectar
-          else if (r === 'aplicado') { notify(); pump(); }
+          else if (r === 'aplicado') { remoteApplied(msg.ops); notify(); pump(); }
+        } else if (msg.tipo === 'evento') {
+          if (msg.origem !== net.cliente) emitEvent(msg.dados, msg.origem);
         } else if (msg.tipo === 'presenca') {
           net.jogadores = msg.jogadores || [];
           changed();
@@ -77,6 +79,27 @@ export function connect({ sala, nome, info }) {
     reopen = () => { es?.close(); open(); };
     open();
   });
+}
+
+// ---- eventos passageiros (ping no mapa etc.): vão para todos, mas não ficam salvos ----
+const eventListeners = new Set();
+/** `fn(dados, origem)` para cada evento recebido (inclusive os enviados por este jogador). */
+export function onEvent(fn) { eventListeners.add(fn); return () => eventListeners.delete(fn); }
+function emitEvent(dados, origem) { for (const fn of eventListeners) fn(dados, origem); }
+
+/** Envia um evento a todos da mesa (no modo local, só para este navegador). */
+export function sendEvent(dados) {
+  emitEvent(dados, net.cliente);
+  if (!net.online) return;
+  fetch(api('/evento'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ cliente: net.cliente, dados }) })
+    .catch(() => { /* evento perdido: não tem importância */ });
+}
+
+/** Cor estável para um nome de jogador (pings, presença). */
+export function playerColor(nome = '') {
+  let h = 0;
+  for (const c of nome) h = (h * 31 + c.codePointAt(0)) % 360;
+  return `hsl(${h} 65% 45%)`;
 }
 
 function schedule() {

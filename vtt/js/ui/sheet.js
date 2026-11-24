@@ -4,7 +4,7 @@ import { prepareDerived, aptidaoLabel } from '../system/actor.js';
 import { applyDamage, heal, loseSanity, deathRoll, spendAction, rest } from '../system/combat.js';
 import { blockDistance, zoneForBlocks } from './board.js';
 import { rollFormula } from '../system/dice.js';
-import { state, local, update, getActor, subscribe } from '../core/store.js';
+import { state, local, scene, update, getActor, subscribe } from '../core/store.js';
 import { makeWindow, esc, getPath, setPath, toast, closeWindow, readFile, pickFile } from './dom.js';
 import { openRollDialog } from './roll-dialog.js';
 import { post, postSystem } from './chat.js';
@@ -407,7 +407,8 @@ function armorFromCatalog(ref) {
 
 /** Zona entre os tokens do atacante e do alvo (ou null se algum não estiver no mapa). */
 function zoneBetween(a, b) {
-  const ta = state.cena.tokens.find(t => t.atorId === a.id), tb = b && state.cena.tokens.find(t => t.atorId === b.id);
+  const tokens = scene().tokens;
+  const ta = tokens.find(t => t.atorId === a.id), tb = b && tokens.find(t => t.atorId === b.id);
   if (!ta || !tb) return null;
   return zoneForBlocks(blockDistance(ta, tb));
 }

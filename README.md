@@ -66,7 +66,10 @@ Toda mudança passa por `store.update()`. O cliente compara o estado com a últi
 - **Catálogo** de 46 armas e 12 armaduras; armaduras equipadas aplicam absorção (valor fixo) e imobilidade.
 - **Dano/cura/sanidade** com Resistência e Absorção por tipo, 50% da vida, Portas da Morte, grau de morte, Letal → Sangramento, Concentração.
 - **Combate**: rodadas com duração, custo crescente de ação, Pontos Críticos, cansaço, sangramento, combustão, cicatrizes arcanas, recuperação de conjuração e rolagens de morte automáticas.
-- **Mapa** com imagem de fundo, grade em blocos 2×2, tokens arrastáveis e **medição em zonas** (regra do Apêndice 4.1).
+- **Cenas**: várias por mesa, cada uma com mapa, grade e tokens. Uma é a dos jogadores; o mestre pode preparar outra sem tirá-los de onde estão.
+- **Mapa** com imagem de fundo, grade em blocos 2×2 e **medição em zonas** (regra do Apêndice 4.1; tokens grandes contam da borda).
+- **Tokens** de 1×1 a 4×4 com barra de vida, ícones de condição, marcas de alvo, Portas da Morte e morte; menu rápido do token selecionado (vida, sanidade, condições, tamanho, ficha, dano/cura); seleção múltipla com caixa e Shift; setas movem.
+- **Ping** no mapa (Alt+clique; com Shift leva a visão de todos) e **desfazer/refazer** (Ctrl+Z / Ctrl+Y).
 - **Descanso** rápido, curto e prolongado. Regras opcionais ligáveis.
 - **Multiplayer** por link (veja acima), com lista de quem está conectado e reconexão automática.
 - Mesa salva no servidor (ou no navegador, no modo local); **Exportar/Importar** a mesa em JSON.

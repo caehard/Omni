@@ -43,6 +43,54 @@ if (!ping?.omni) {
   doc('b').getElementById('btn-new-npc').click();
   ok('NPC criado por B aparece em A', await wait(() => names('a').length === antes + 1), names('a').join(', '));
 
+  // ---- interação com o mapa (eventos sintéticos de ponteiro) ----
+  const win = id => document.getElementById(id).contentWindow;
+  const omni = id => win(id).omni;
+  const pointer = (id, type, x, y, o = {}) => {
+    const c = doc(id).getElementById('board'), r = c.getBoundingClientRect();
+    c.dispatchEvent(new (win(id).PointerEvent)(type, { clientX: r.left + x, clientY: r.top + y, button: o.button ?? 0, buttons: type === 'pointerup' ? 0 : 1,
+      bubbles: true, pointerId: 1, isPrimary: true, altKey: !!o.alt, shiftKey: !!o.shift }));
+  };
+  const tokenScreen = (id, t) => { const o = omni(id), q = o.scene().tamanhoQuadrado, s = t.tamanho || 1; return o.board.worldToScreen((t.x + s / 2) * q, (t.y + s / 2) * q); };
+  const click = (id, p, o) => { pointer(id, 'pointerdown', p.x, p.y, o); pointer(id, 'pointerup', p.x, p.y, o); };
+  const tokB = id => omni('b').scene().tokens.find(t => t.id === id);
+
+  const t0 = omni('a').scene().tokens[0], ator = omni('a').state.atores.find(a => a.id === t0.atorId);
+  click('a', tokenScreen('a', t0));
+  const hud = doc('a').querySelector('.token-hud');
+  ok('clicar no token abre o menu dele', await wait(() => !hud.hidden && hud.textContent.includes(ator.nome)), hud.textContent.slice(0, 60));
+  const vida0 = ator.system.recursos.vida;
+  hud.querySelector('[data-act="res-"][data-res="vida"]').click();
+  ok('menu: −1 de vida chega a B', await wait(() => omni('b').state.atores.find(a => a.id === ator.id).system.recursos.vida === vida0 - 1));
+  hud.querySelector('[data-field="nova-cond"]').value = 'sangramento';
+  hud.querySelector('[data-field="nova-cond"]').dispatchEvent(new Event('change', { bubbles: true }));
+  ok('menu: condição adicionada chega a B', await wait(() => omni('b').state.atores.find(a => a.id === ator.id).system.condicoes.sangramento === 1));
+
+  // arrastar 2 quadrados para a direita
+  const x0 = t0.x, p = tokenScreen('a', t0), passo = omni('a').scene().tamanhoQuadrado * omni('a').board.getView().zoom;
+  pointer('a', 'pointerdown', p.x, p.y);
+  pointer('a', 'pointermove', p.x + passo, p.y);
+  pointer('a', 'pointermove', p.x + passo * 2, p.y);
+  pointer('a', 'pointerup', p.x + passo * 2, p.y);
+  ok('arrastar o token move para B também', await wait(() => tokB(t0.id)?.x === x0 + 2), `x em B: ${tokB(t0.id)?.x}, esperado ${x0 + 2}`);
+  doc('a').body.dispatchEvent(new (win('a').KeyboardEvent)('keydown', { key: 'z', ctrlKey: true, bubbles: true }));
+  ok('Ctrl+Z desfaz o movimento (em B também)', await wait(() => tokB(t0.id)?.x === x0), `x em B: ${tokB(t0.id)?.x}`);
+
+  // caixa de seleção pegando todos os tokens
+  const sc = omni('a').scene(), q = sc.tamanhoQuadrado, w2s = omni('a').board.worldToScreen;
+  const c1 = w2s(0.2 * q, 0.2 * q), c2 = w2s((sc.colunas - 0.2) * q, (sc.linhas - 0.2) * q);
+  pointer('a', 'pointerdown', c1.x, c1.y); pointer('a', 'pointermove', c2.x, c2.y); pointer('a', 'pointerup', c2.x, c2.y);
+  ok('caixa de seleção pega todos os tokens', omni('a').board.getSelection().length === sc.tokens.length, `${omni('a').board.getSelection().length}/${sc.tokens.length}`);
+
+  // cenas: A cria e prepara uma cena sem tirar B de onde está, depois leva B
+  const cenaB = omni('b').scene().id;
+  doc('a').querySelector('#scenes [data-act="nova"]').click();
+  ok('nova cena: A passa a vê-la', await wait(() => omni('a').scene().id !== cenaB && !doc('a').getElementById('scene-banner').hidden));
+  ok('nova cena: B continua na cena dos jogadores', await wait(() => omni('b').state.cenas.length === 2) && omni('b').scene().id === cenaB);
+  const nova = omni('a').scene().id;
+  doc('a').querySelector('#scene-banner [data-act="ativar"]').click();
+  ok('“levar jogadores” muda a cena de B', await wait(() => omni('b').scene().id === nova));
+
   // A recarrega a página e continua com tudo
   await load('a', `/vtt/?mesa=${sala}`);
   ok('após recarregar, A mantém o NPC e o chat', await wait(() => names('a').length === antes + 1 && chatText('a').includes('simultânea B')));

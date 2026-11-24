@@ -85,6 +85,42 @@ input[type=number]::-webkit-inner-spin-button { opacity: .5; }
 .tools .sep { width: 1px; height: 22px; background: var(--line-soft); margin: 0 4px; }
 .round-badge { margin-left: auto; font-weight: 600; color: var(--accent); }
 
+/* ---------- menu do token ---------- */
+.token-hud { position: absolute; left: 12px; bottom: 12px; z-index: 5; width: 292px; max-height: calc(100% - 24px); overflow: auto; background: var(--paper); border: var(--stroke) solid var(--line);
+  border-radius: 14px; box-shadow: var(--shadow); padding: 8px 10px; font-size: 13px; display: flex; flex-direction: column; gap: 6px; }
+.token-hud header { display: flex; align-items: center; gap: 6px; }
+.token-hud header small { margin-left: auto; color: var(--muted); }
+.token-hud .dot { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--line); flex: none; }
+.hud-res { display: grid; grid-template-columns: 62px auto 44px auto auto 1fr; align-items: center; gap: 2px; }
+.hud-res input { width: 44px; text-align: center; -moz-appearance: textfield; appearance: textfield; }
+.hud-res input::-webkit-inner-spin-button, .hud-res input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.hud-res .muted { font-size: 12px; }
+.hud-res .bar { width: auto; margin-left: 6px; }
+.hud-label { font-size: 12px; font-weight: 500; }
+.hud-conds { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.hud-conds .chip { display: inline-flex; align-items: center; gap: 2px; font-size: 12px; padding: 1px 2px 1px 8px; }
+.hud-conds .icon-btn { padding: 0 4px; font-size: 12px; line-height: 1.2; }
+.hud-conds select { font-size: 12px; padding: 1px 4px; }
+.hud-row label { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+.hud-actions { display: flex; flex-wrap: wrap; gap: 4px; }
+.hud-actions button { padding: 2px 10px; font-size: 12px; }
+
+/* ---------- cenas ---------- */
+.scene-list { list-style: none; padding: 0; margin: 0 0 10px; }
+.scene-list li { display: grid; grid-template-columns: 56px 1fr; grid-template-areas: "thumb name" "thumb actions"; gap: 2px 8px; align-items: center;
+  padding: 6px; border: 1.5px solid var(--line-soft); border-radius: 12px; margin-bottom: 6px; cursor: pointer; background: var(--paper); }
+.scene-list li:hover { border-color: var(--line); }
+.scene-list li.vendo { border-color: var(--line); box-shadow: inset 3px 0 0 var(--accent); }
+.scene-list li.ativa .scene-thumb { outline: 2px solid var(--ok); outline-offset: 1px; }
+.scene-thumb { grid-area: thumb; width: 56px; height: 40px; border-radius: 6px; border: 1.5px solid var(--line-soft); background: var(--board-paper) center / cover no-repeat; }
+.scene-list .name { grid-area: name; font-weight: 500; display: flex; flex-direction: column; min-width: 0; }
+.scene-list .name small { color: var(--muted); font-weight: 300; font-size: 11px; }
+.scene-list .name small b { color: var(--ok); font-weight: 600; }
+.scene-list .actions { grid-area: actions; display: flex; gap: 2px; }
+.scene-banner { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 4; display: flex; align-items: center; gap: 8px;
+  background: var(--ink); color: var(--paper); padding: 6px 8px 6px 14px; border-radius: 999px; box-shadow: var(--shadow); font-size: 13px; white-space: nowrap; }
+.scene-banner button { padding: 2px 10px; font-size: 12px; }
+
 /* ---------- mesa compartilhada ---------- */
 .net-badge { font-size: 12px; }
 .net-badge[data-status="conectado"] { border-color: var(--ok); color: var(--ok); }

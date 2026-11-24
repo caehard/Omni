@@ -220,6 +220,11 @@ class Mesa:
             self._difundir(json.dumps({'tipo': 'ops', 'v': self.v, 'origem': cliente, 'lote': lote, 'ops': aplicadas}, ensure_ascii=False))
             return self.v
 
+    def evento(self, cliente, dados):
+        """Repassa a todos sem guardar nem mudar a versão (ping no mapa etc.)."""
+        with self.lock:
+            self._difundir(json.dumps({'tipo': 'evento', 'origem': cliente, 'dados': dados}, ensure_ascii=False))
+
     def salvar(self):
         with self.lock:
             if not self.suja:
@@ -278,7 +283,8 @@ def enderecos_locais():
     return sorted(ip for ip in ips if not ip.startswith('127.'))
 
 
-ROTA_MESA = re.compile(r'^/api/mesa/([^/]+)/(eventos|ops)$')
+ROTA_MESA = re.compile(r'^/api/mesa/([^/]+)/(eventos|ops|evento)$')
+LIMITE_EVENTO = 64 * 1024  # eventos passageiros (ping etc.) são pequenos
 
 
 def caminho_publico(caminho_url):
@@ -337,14 +343,24 @@ class Handler(SimpleHTTPRequestHandler):
     def do_POST(self):
         url = urlparse(self.path)
         m = ROTA_MESA.match(url.path)
-        if not (m and m.group(2) == 'ops'):
+        if not (m and m.group(2) in ('ops', 'evento')):
             return self._json(404, {'erro': 'rota desconhecida'})
         try:
             tamanho = int(self.headers.get('Content-Length', 0))
         except ValueError:
             return self._json(400, {'erro': 'Content-Length inválido'})
-        if tamanho > LIMITE_CORPO:
-            return self._json(413, {'erro': f'envio maior que {LIMITE_CORPO // (1024 * 1024)} MB'})
+        limite = LIMITE_EVENTO if m.group(2) == 'evento' else LIMITE_CORPO
+        if tamanho > limite:
+            return self._json(413, {'erro': f'envio maior que {limite // 1024} KB'})
+        if m.group(2) == 'evento':
+            try:
+                dados = json.loads(self.rfile.read(tamanho).decode('utf-8'))
+                cliente = str(dados['cliente'])[:64]
+                evento = dados['dados']
+            except (ValueError, KeyError, TypeError, UnicodeDecodeError) as e:
+                return self._json(400, {'erro': f'pedido inválido: {e}'})
+            mesa(nome_mesa(unquote(m.group(1)))).evento(cliente, evento)
+            return self._json(200, {'ok': True})
         try:
             dados = json.loads(self.rfile.read(tamanho).decode('utf-8'))
             cliente, lote, ops = str(dados['cliente'])[:64], int(dados['lote']), dados['ops']

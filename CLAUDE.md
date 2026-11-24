@@ -19,12 +19,15 @@ Sistema de RPG **autoral** (em testes) + **mesa virtual própria ("TTS")** para 
 | `vtt/` | Protótipo do TTS: HTML/CSS/JS puro (ES modules), sem build |
 | `vtt/js/system/` | Lógica de regras, independente da UI (`dice.js`, `actor.js`, `combat.js`, `config.js`) — pensada para portar ao Foundry VTT |
 | `vtt/js/ui/` | Interface (ficha, chat, diálogo de rolagem, mapa, painel lateral) |
-| `vtt/js/core/store.js` | Estado único (`state`, compartilhado) + `local` (só deste jogador, ex.: alvo). Offline salva em localStorage; online chama o hook de sincronização |
+| `vtt/js/core/store.js` | Estado único (`state`, compartilhado) + `local` (só deste jogador: alvo, cena vista). `scene()` = cena mostrada. `migrate()` converte mesas antigas (v1 `cena` → v2 `cenas[]` + `cenaAtiva`). Offline salva em localStorage; online chama o hook de sincronização |
+| `vtt/js/core/history.js` | Ctrl+Z/Ctrl+Y: guarda as operações inversas das mudanças locais (não do chat nem dos outros jogadores) |
+| `vtt/js/ui/board.js` | Mapa: tokens com `tamanho` 1–4, seleção (caixa/Shift), arrasto em grupo, ping (evento passageiro `/evento`), zonas |
+| `vtt/js/ui/token-hud.js` · `ui/scenes.js` | Menu do token selecionado (canto do mapa) · aba Cenas e aviso de “vendo outra cena” |
 | `vtt/js/core/sync-ops.js` | `diff`/`applyOps` do estado (set/del/ins; listas com `id`/`atorId` comparadas por identificador). **Espelhado em `servidor.py`** — mudou um, mude o outro e rode os dois testes |
 | `vtt/js/core/sync-client.js` | Lógica de convergência sem rede (lotes pendentes, eco do próprio lote, reconexão) |
 | `vtt/js/core/net.js` | Rede: SSE `/api/mesa/<nome>/eventos` + POST `/ops`, presença, status |
 | `servidor.py` | Servidor da mesa (stdlib): serve só `vtt/`, `data/`, `docs/`; mesas em `mesas/<nome>.json` (gitignored) |
-| `vtt/tests/` | `index.html`: regras + sincronização (101 passando) · `multiplayer.html`: duas mesas em iframes (7 passando, precisa do servidor) · casos compartilhados JS/Python em `sync-casos.json` |
+| `vtt/tests/` | `index.html`: regras, sincronização, cenas, desfazer (116 passando) · `multiplayer.html`: duas mesas em iframes, inclusive cliques e arrastos sintéticos no mapa (16 passando, precisa do servidor; usa `window.omni`) · casos compartilhados JS/Python em `sync-casos.json` |
 | `tools/testar_servidor.py` | Testes do servidor (operações, protocolo, arquivos bloqueados) |
 | `tools/extrair_habilidades.py` | Livro (cap. 08) → `data/habilidades.json`. Rode após editar habilidades |
 | `tools/equipamentos.py` | Valida `data/equipamentos.json` pelos pontos de criação e regenera a tabela do livro (cap. 04, entre marcadores). Rode após editar equipamentos |
@@ -56,9 +59,15 @@ python tools/testar_servidor.py
 - **Multiplayer por link** (2026-11-24): `servidor.py` + SSE/POST, várias mesas (`?mesa=`), nome do jogador, presença, convite com links da rede local, reconexão. Alvo virou por jogador. Sem permissões ainda (qualquer um edita tudo). Jogar pela internet = túnel (cloudflared) ou Tailscale, documentado no README.
 - **Nenhuma pendência de regra aberta.** Adiados pelo autor: magias (tipos Mahi/Logi/Centi), Investigação e Exploração, Uso de Classes, Cidades.
 
+- **Melhorias do VTT** (pedido do autor: ficar “fluido e completo como Roll20/Foundry”, mantendo o visual atual refinado). Plano em 4 pacotes, nesta ordem:
+  1. ✅ Mapa e tokens: cenas, tamanhos, menu do token, ícones de condição, seleção múltipla, ping, desfazer.
+  2. Desenho e medição: desenho livre/formas/texto, áreas de efeito (círculo, cone, linha) mostrando zonas, régua com vários pontos.
+  3. Mestre × jogador e névoa: papel de mestre, dono de cada ficha, tokens/fichas ocultos, névoa de guerra, rolagens ocultas e sussurros. Vai exigir o servidor filtrar o estado por jogador (hoje todos recebem tudo).
+  4. Fluxo de jogo: barra de ações rápidas, turno ativo destacado, diário/handouts, música ambiente.
+
 ## Próximos passos possíveis
 
-1. Visão mestre × jogador: papel de mestre, dono de cada ficha, fichas/tokens/rolagens ocultos. Vai exigir o servidor filtrar o estado por jogador (hoje todos recebem tudo).
+1. Continuar os pacotes 2–4 acima.
 2. Catálogo de magias quando o autor definir o sistema.
 3. Futuro: portar `vtt/js/system` + `data/` para um sistema do Foundry VTT.
 

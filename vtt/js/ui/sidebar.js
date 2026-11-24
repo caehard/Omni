@@ -1,5 +1,5 @@
 // Painel lateral: lista de atores e rastreador de combate.
-import { state, update, getActor, subscribe } from '../core/store.js';
+import { state, scene, update, getActor, subscribe } from '../core/store.js';
 import { createActor, prepareDerived } from '../system/actor.js';
 import { processRoundStart, roundDurationSeconds, spendAction, actionCost } from '../system/combat.js';
 import { esc } from './dom.js';
@@ -100,7 +100,7 @@ function onActorsClick(e) {
   if (act === 'dup') { const a = structuredClone(getActor(id)); a.id = Math.random().toString(36).slice(2, 10); a.nome += ' (cópia)'; update(s => s.atores.push(a)); }
   if (act === 'del' && confirm(`Excluir “${getActor(id).nome}”?`)) update(s => {
     s.atores = s.atores.filter(a => a.id !== id);
-    s.cena.tokens = s.cena.tokens.filter(t => t.atorId !== id);
+    for (const c of s.cenas) c.tokens = c.tokens.filter(t => t.atorId !== id);
     s.combate.combatentes = s.combate.combatentes.filter(c => c.atorId !== id);
   });
 }
@@ -111,7 +111,7 @@ function onCombatClick(e) {
   const act = b.dataset.act, c = state.combate;
   const li = b.closest('[data-i]'), cb = li ? c.combatentes[+li.dataset.i] : null, a = cb && getActor(cb.atorId);
   if (act === 'start') {
-    if (!c.combatentes.length) for (const t of state.cena.tokens) if (!c.combatentes.some(x => x.atorId === t.atorId)) c.combatentes.push({ atorId: t.atorId, acoes: 0, ptGastos: 0, criticosUsados: 0 });
+    if (!c.combatentes.length) for (const t of scene().tokens) if (!c.combatentes.some(x => x.atorId === t.atorId)) c.combatentes.push({ atorId: t.atorId, acoes: 0, ptGastos: 0, criticosUsados: 0 });
     update(s => { s.combate.ativo = true; s.combate.rodada = 1; s.combate.combatentes.forEach(x => Object.assign(x, { acoes: 0, ptGastos: 0, criticosUsados: 0 })); });
     postSystem('<b>Combate iniciado.</b> Rodada 1 (5 s).');
   }

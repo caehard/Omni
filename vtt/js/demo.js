@@ -1,5 +1,5 @@
 // Mesa de exemplo criada no primeiro acesso.
-import { state } from './core/store.js';
+import { state, scene } from './core/store.js';
 import { createActor, uid } from './system/actor.js';
 
 export function seedDemo() {
@@ -35,7 +35,7 @@ export function seedDemo() {
     },
   });
   state.atores.push(pj, npc);
-  state.cena.tokens.push({ id: uid(), atorId: pj.id, x: 4, y: 6 }, { id: uid(), atorId: npc.id, x: 10, y: 7 });
+  scene().tokens.push({ id: uid(), atorId: pj.id, x: 4, y: 6, tamanho: 1 }, { id: uid(), atorId: npc.id, x: 10, y: 7, tamanho: 1 });
   state.chat.push({ id: uid(), ts: Date.now(), tipo: 'sistema', autor: 'Omni',
     html: 'Bem-vindo ao TTS do <b>Omni</b>! Esta é uma mesa de exemplo. Clique em <b>?</b> para ver os atalhos.' });
 }

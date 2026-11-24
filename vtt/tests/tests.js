@@ -7,7 +7,9 @@ import { absorptionFor } from '../js/system/actor.js';
 import { parseExtra } from '../js/ui/roll-dialog.js';
 import { diff, applyOps, clone, keyOf } from '../js/core/sync-ops.js';
 import { SyncClient } from '../js/core/sync-client.js';
-import { emptyState } from '../js/core/store.js';
+import { emptyState, migrate, state, update, replaceState, setSyncHook, remoteApplied } from '../js/core/store.js';
+import { initHistory, undo, redo, checkpoint } from '../js/core/history.js';
+import { blockDistance } from '../js/ui/board.js';
 
 const results = [];
 const eq = (name, got, exp) => results.push({ name, ok: JSON.stringify(got) === JSON.stringify(exp), got, exp });
@@ -203,7 +205,7 @@ const join = (srv, cliente) => { const c = new SyncClient({}, cliente); c.start(
   const A = new SyncClient(emptyState(), 'A');
   eq('mesa nova: cliente envia o estado inicial', A.start({ v: 0, estado: null }), false);
   sendAll(srv, A); deliver(srv, A);
-  A.state.cena.tokens.push({ id: 't1', atorId: 'a1', x: 0, y: 0 }); A.flush(); sendAll(srv, A); deliver(srv, A);
+  A.state.cenas[0].tokens.push({ id: 't1', atorId: 'a1', x: 0, y: 0 }); A.flush(); sendAll(srv, A); deliver(srv, A);
   const B = join(srv, 'B');
   same('quem entra recebe a mesa', B.state, A.state);
 
@@ -217,16 +219,16 @@ const join = (srv, cliente) => { const c = new SyncClient({}, cliente); c.start(
   same('mensagens simultâneas: B igual ao servidor', B.state, srv.estado);
 
   // mesmo campo: o último que chega ao servidor vale para todos
-  A.state.cena.tokens[0].x = 3; A.flush();
-  B.state.cena.tokens[0].x = 5; B.flush();
+  A.state.cenas[0].tokens[0].x = 3; A.flush();
+  B.state.cenas[0].tokens[0].x = 5; B.flush();
   sendAll(srv, A); sendAll(srv, B);
-  B.state.cena.tokens[0].y = 2; // B continua mexendo antes de receber A
+  B.state.cenas[0].tokens[0].y = 2; // B continua mexendo antes de receber A
   deliver(srv, B);
-  eq('B mantém a própria mudança pendente ao receber a de A', B.state.cena.tokens[0].x, 5);
+  eq('B mantém a própria mudança pendente ao receber a de A', B.state.cenas[0].tokens[0].x, 5);
   B.flush(); sendAll(srv, B); deliver(srv, A); deliver(srv, B);
   same('conflito no mesmo campo: A converge', A.state, srv.estado);
   same('conflito no mesmo campo: B converge', B.state, srv.estado);
-  eq('conflito no mesmo campo: vale o último recebido pelo servidor', [srv.estado.cena.tokens[0].x, srv.estado.cena.tokens[0].y], [5, 2]);
+  eq('conflito no mesmo campo: vale o último recebido pelo servidor', [srv.estado.cenas[0].tokens[0].x, srv.estado.cenas[0].tokens[0].y], [5, 2]);
 
   // lote devolvido só sai da fila; reenvio duplicado é ignorado pelo servidor
   A.state.regras.teste = true; const lote = A.flush();
@@ -245,6 +247,47 @@ const join = (srv, cliente) => { const c = new SyncClient({}, cliente); c.start(
   same('reconexão: A converge', A.state, srv.estado);
   same('reconexão: B converge', B.state, srv.estado);
   eq('mensagem fora de ordem pede o estado inteiro', A.receive({ tipo: 'ops', v: A.v + 2, ops: [] }), 'lacuna');
+}
+
+// --- cenas e tokens ---
+{
+  const velha = { versao: 1, atores: [], cena: { fundo: 'x', tamanhoQuadrado: 40, colunas: 10, linhas: 8, tokens: [{ id: 't', atorId: 'a', x: 1, y: 1 }], alvoId: 'a' }, chat: [] };
+  const m = migrate(structuredClone(velha));
+  eq('mesa antiga: vira uma cena só', [m.cenas.length, m.cenas[0].fundo, m.cenas[0].tokens.length, m.cenas[0].colunas], [1, 'x', 1, 10]);
+  eq('mesa antiga: cena ativa definida e campos antigos removidos', [m.cenaAtiva === m.cenas[0].id, 'cena' in m, 'alvoId' in m.cenas[0]], [true, false, false]);
+  eq('migrar de novo não muda nada', canon(migrate(structuredClone(m))), canon(m));
+}
+eq('distância: tokens 1×1 vizinhos de bloco', blockDistance({ x: 0, y: 0 }, { x: 2, y: 0 }), 1);
+eq('distância: token 2×2 conta da borda', blockDistance({ x: 0, y: 0, tamanho: 2 }, { x: 2, y: 0 }), 1);
+eq('distância: token 4×4 encostado = mesmo bloco (Curto)', blockDistance({ x: 0, y: 0, tamanho: 4 }, { x: 3, y: 3 }), 0);
+eq('distância: token 4×4 até 2 blocos à direita', blockDistance({ x: 0, y: 0, tamanho: 4 }, { x: 6, y: 1 }), 2);
+
+// --- desfazer / refazer ---
+{
+  setSyncHook(() => {}); // não salvar nada no navegador durante os testes
+  replaceState(emptyState());
+  initHistory();
+  const sc = () => state.cenas[0];
+  update(() => sc().tokens.push({ id: 'h1', atorId: 'a', x: 0, y: 0, tamanho: 1 })); checkpoint();
+  update(() => { sc().tokens[0].x = 5; }); checkpoint();
+  update(() => state.chat.push({ id: 'c1', texto: 'rolagem' }));
+  // mudança de outro jogador: não entra no meu desfazer
+  const remota = [{ op: 'set', path: ['regras', 'remota'], value: true }];
+  applyOps(state, remota); remoteApplied(remota);
+  undo();
+  eq('desfazer: volta a posição do token', sc().tokens[0]?.x, 0);
+  undo();
+  eq('desfazer de novo: remove o token adicionado', sc().tokens.length, 0);
+  eq('desfazer não apaga o chat', state.chat.length, 1);
+  eq('desfazer não mexe no que outro jogador mudou', state.regras.remota, true);
+  eq('nada mais para desfazer', undo(), false);
+  redo(); redo();
+  eq('refazer: token volta na posição nova', [sc().tokens.length, sc().tokens[0]?.x], [1, 5]);
+  update(() => { sc().tokens[0].y = 3; });
+  eq('mudança nova limpa o refazer', redo(), false);
+  update(() => { sc().tokens[0].y = 4; }); // junta com a anterior (digitação/arrasto seguidos)
+  undo();
+  eq('mudanças seguidas viram um passo só', sc().tokens[0].y, 0);
 }
 
 // --- saída ---

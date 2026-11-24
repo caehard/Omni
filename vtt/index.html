@@ -19,7 +19,7 @@
         <span class="sep"></span>
         <button id="btn-map" title="Carregar imagem de mapa">🗺 Mapa</button>
         <button id="btn-ruler" aria-pressed="false" title="Régua de zonas (ou Ctrl+arrastar)">📏 Régua</button>
-        <button id="btn-center" title="Centralizar">⌖</button>
+        <button id="btn-center" title="Ver a cena inteira">⌖</button>
         <button id="btn-scene" title="Configurar cena e grade">⚙ Cena</button>
         <span class="sep"></span>
         <button id="btn-rules">Regras</button>
@@ -34,13 +34,18 @@
     <aside class="left">
       <div class="panel-tabs" role="tablist">
         <button data-panel="actors" aria-selected="true" role="tab">Fichas</button>
+        <button data-panel="scenes" aria-selected="false" role="tab">Cenas</button>
         <button data-panel="combat" aria-selected="false" role="tab">Combate</button>
       </div>
       <div id="actors" class="panel"></div>
+      <div id="scenes" class="panel" hidden></div>
       <div id="combat" class="panel" hidden></div>
     </aside>
 
-    <main class="board-wrap"><canvas id="board" aria-label="Mapa da cena"></canvas></main>
+    <main class="board-wrap">
+      <canvas id="board" aria-label="Mapa da cena"></canvas>
+      <div id="scene-banner" class="scene-banner" hidden></div>
+    </main>
 
     <aside class="right">
       <h3 class="chat-title">Registro</h3>

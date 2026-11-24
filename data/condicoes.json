@@ -1,10 +1,11 @@
 {
  "versao": 1,
- "observacao": "maxNivel 0 = condição sem nível; 99 = nível acumulável sem teto.",
+ "observacao": "maxNivel 0 = condição sem nível; 99 = nível acumulável sem teto. icone: símbolo mostrado no token.",
  "condicoes": [
   {
    "id": "deitado",
    "nome": "Deitado/Agachado",
+   "icone": "⤓",
    "maxNivel": 0,
    "descricao": "Move-se como em terreno difícil. −1 ND de evasão contra ataques de Longe ou mais; Vantagem(1) em furtividade; Imobilidade(1) contra ataques de Distante ou mais perto.",
    "automacao": {}
@@ -12,6 +13,7 @@
   {
    "id": "sangramento",
    "nome": "Sangramento",
+   "icone": "🩸",
    "maxNivel": 99,
    "descricao": "No início de cada rodada perde Vida igual ao nível; depois o nível cai 1. Cumulativo.",
    "automacao": {
@@ -24,6 +26,7 @@
   {
    "id": "combustao",
    "nome": "Combustão",
+   "icone": "🔥",
    "maxNivel": 99,
    "descricao": "No início de cada rodada sofre dano de fogo igual ao nível; depois o nível cai 1. Cumulativo.",
    "automacao": {
@@ -37,6 +40,7 @@
   {
    "id": "terreno-dificil",
    "nome": "Terreno Difícil",
+   "icone": "⛰",
    "maxNivel": 99,
    "descricao": "Imobilidade(1) por nível.",
    "automacao": {
@@ -46,6 +50,7 @@
   {
    "id": "paralisado",
    "nome": "Paralisado",
+   "icone": "⛔",
    "maxNivel": 0,
    "descricao": "Não pode agir; evasão anulada (todo dado acerta).",
    "automacao": {
@@ -55,6 +60,7 @@
   {
    "id": "distraido",
    "nome": "Distraído",
+   "icone": "💫",
    "maxNivel": 0,
    "descricao": "Desvantagem(1) em esquiva, bloqueio, ataque de oportunidade e percepção.",
    "automacao": {}
@@ -62,6 +68,7 @@
   {
    "id": "aterrorizado",
    "nome": "Aterrorizado",
+   "icone": "😱",
    "maxNivel": 4,
    "descricao": "1: Desv.(1) no domínio Mental · 2: Desv.(1) em tudo · 3: Atordoado, −1 Sanidade · 4: Paralisado, trauma, −3 Sanidade. Cai 1 por turno sem a fonte do medo.",
    "automacao": {}
@@ -69,6 +76,7 @@
   {
    "id": "cercado",
    "nome": "Cercado",
+   "icone": "◎",
    "maxNivel": 0,
    "descricao": "Não pode sair do cerco com movimento (salvo rota livre). Ataques contra ele são de oportunidade.",
    "automacao": {}
@@ -76,6 +84,7 @@
   {
    "id": "atordoado",
    "nome": "Atordoado",
+   "icone": "💥",
    "maxNivel": 0,
    "descricao": "+1 ponto de tempo em todas as ações e Desvantagem(1) em todas as rolagens.",
    "automacao": {
@@ -86,6 +95,7 @@
   {
    "id": "restringido",
    "nome": "Restringido",
+   "icone": "⛓",
    "maxNivel": 3,
    "descricao": "1: não pode se mover · 2: + Desv.(1) em ataques, esquivas e bloqueios · 3: Paralisado.",
    "automacao": {}
@@ -93,6 +103,7 @@
   {
    "id": "danificado",
    "nome": "Danificado",
+   "icone": "🦴",
    "maxNivel": 0,
    "descricao": "Ataques/testes com o membro: Desv.(1). Perna: todo terreno é difícil. Cabeça: teste de Vitalidade com Resistência a Condições.",
    "automacao": {}
@@ -100,6 +111,7 @@
   {
    "id": "inutilizado",
    "nome": "Inutilizado",
+   "icone": "✖",
    "maxNivel": 0,
    "descricao": "Membro não pode ser usado. Torso ou cabeça: morte instantânea.",
    "automacao": {}
@@ -107,6 +119,7 @@
   {
    "id": "envenenado",
    "nome": "Envenenado",
+   "icone": "☠",
    "maxNivel": 0,
    "descricao": "Teste de Vitalidade (Resiliência) com aptidão em Venenos a cada período do veneno.",
    "automacao": {}
@@ -114,6 +127,7 @@
   {
    "id": "cego",
    "nome": "Cego",
+   "icone": "🙈",
    "maxNivel": 3,
    "descricao": "1: Desv.(1) para enxergar além de Curto · 2: Desv.(1) para enxergar · 3: Desv.(2) para enxergar.",
    "automacao": {}
@@ -121,6 +135,7 @@
   {
    "id": "inconsciente",
    "nome": "Inconsciente",
+   "icone": "💤",
    "maxNivel": 0,
    "descricao": "Sem sucesso na rolagem de morte.",
    "automacao": {}
@@ -128,6 +143,7 @@
   {
    "id": "estabilizado",
    "nome": "Estabilizado",
+   "icone": "✚",
    "maxNivel": 0,
    "descricao": "Sucessos de morte ≥ grau de morte; para de rolar.",
    "automacao": {}
@@ -135,6 +151,7 @@
   {
    "id": "cicatriz-arcana",
    "nome": "Cicatriz Arcana",
+   "icone": "✴",
    "maxNivel": 99,
    "descricao": "No início da rodada deixa de recuperar pontos de conjuração igual ao nível; depois remove 1.",
    "automacao": {
@@ -147,6 +164,7 @@
   {
    "id": "concentracao",
    "nome": "Concentração",
+   "icone": "🎯",
    "maxNivel": 99,
    "descricao": "Paga conjuração = nível no início da rodada e por ponto de vida perdido. Perder sanidade quebra.",
    "automacao": {}

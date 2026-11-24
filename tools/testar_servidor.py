@@ -137,6 +137,24 @@ class Protocolo(unittest.TestCase):
         self.assertEqual(conn.getresponse().status, 413)
         conn.close()
 
+    def test_evento_passageiro(self):
+        a = Sse(self.porta, 'ping', 'cA', 'Ana')
+        try:
+            a.proxima('estado')
+            dados = {'tipo': 'ping', 'x': 10, 'y': 20}
+            self.assertEqual(self.req('POST', '/api/mesa/ping/evento', {'cliente': 'cB', 'dados': dados})[0], 200)
+            m = a.proxima('evento')
+            self.assertEqual((m['origem'], m['dados']), ('cB', dados))
+            self.assertEqual(servidor.mesa('ping').v, 0)  # não muda a versão nem é salvo
+        finally:
+            a.fechar()
+        conn = http.client.HTTPConnection('127.0.0.1', self.porta, timeout=5)
+        conn.putrequest('POST', '/api/mesa/ping/evento')
+        conn.putheader('Content-Length', str(servidor.LIMITE_EVENTO + 1))
+        conn.endheaders()
+        self.assertEqual(conn.getresponse().status, 413)
+        conn.close()
+
     def test_pedido_invalido(self):
         self.assertEqual(self.req('POST', '/api/mesa/x/ops', {'ops': []})[0], 400)
 

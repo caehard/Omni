@@ -1,11 +1,14 @@
 // Ponto de entrada do TTS Omni.
 import { loadConfig, CONFIG } from './system/config.js';
-import { state, update, load, replaceState, subscribe, readLocalSave, emptyState } from './core/store.js';
+import { state, local, scene, update, load, replaceState, subscribe, readLocalSave, emptyState, migrate } from './core/store.js';
 import { net, probe, connect, onNetChange, cleanRoom } from './core/net.js';
+import { initHistory, undo, redo } from './core/history.js';
+import { initTokenHud } from './ui/token-hud.js';
+import { initScenes } from './ui/scenes.js';
 import { fillResources } from './system/actor.js';
 import { rollFormula } from './system/dice.js';
 import { initChat, postText, postSystem } from './ui/chat.js';
-import { initBoard, setRulerMode, centerView } from './ui/board.js';
+import { initBoard, setRulerMode, centerView, focusView, worldToScreen, getView, getSelection, selectTokens } from './ui/board.js';
 import { initSidebar, newActor } from './ui/sidebar.js';
 import { openSheet } from './ui/sheet.js';
 import { makeWindow, toast, downloadFile, pickFile, readFile, esc } from './ui/dom.js';
@@ -22,18 +25,34 @@ async function boot() {
   const info = await probe(); // servida pelo servidor.py? então a mesa é compartilhada
   if (info) await bootOnline(info);
   else if (!load()) seedDemo();
+  migrate(state); // mesas antigas (uma cena só) viram o formato com várias cenas
   applyDefaults();
-  delete state.cena.alvoId; // o alvo agora é de cada jogador (store.local)
   state.atores.forEach(fillResources);
 
   initChat(document.getElementById('chat-log'));
   initBoard(document.getElementById('board'), { openSheet });
+  initTokenHud(document.querySelector('.board-wrap'), { onOpenSheet: openSheet });
+  initScenes({ list: document.getElementById('scenes'), banner: document.getElementById('scene-banner') });
   initSidebar({ actors: document.getElementById('actors'), combat: document.getElementById('combat'), onOpenSheet: openSheet });
 
   bindToolbar();
   bindChatInput();
   bindNet();
-  update(); // primeira renderização
+  bindShortcuts();
+  initHistory();
+  update(undefined, { historico: false }); // primeira renderização
+  focusView();
+  // para depurar no console do navegador (e para os testes de interface)
+  window.omni = { state, local, scene, update, CONFIG, net, board: { worldToScreen, getView, getSelection, selectTokens } };
+}
+
+function bindShortcuts() {
+  addEventListener('keydown', e => {
+    if (!(e.ctrlKey || e.metaKey) || e.target.closest?.('input, textarea, select, [contenteditable]')) return;
+    const k = e.key.toLowerCase();
+    if (k === 'z' && !e.shiftKey) { e.preventDefault(); if (!undo()) toast('Nada para desfazer.'); }
+    else if (k === 'y' || (k === 'z' && e.shiftKey)) { e.preventDefault(); if (!redo()) toast('Nada para refazer.'); }
+  });
 }
 
 function applyDefaults() {
@@ -161,9 +180,10 @@ function bindToolbar() {
     const url = await readFile(f, 'dataURL');
     const img = new Image();
     img.onload = () => {
-      const q = state.cena.tamanhoQuadrado;
-      update(s => { s.cena.fundo = url; s.cena.colunas = Math.max(8, Math.round(img.width / q)); s.cena.linhas = Math.max(8, Math.round(img.height / q)); });
-      toast('Mapa carregado. Ajuste a grade em ⚙ Cena.');
+      const sc = scene(), q = sc.tamanhoQuadrado;
+      update(() => { sc.fundo = url; sc.colunas = Math.max(8, Math.round(img.width / q)); sc.linhas = Math.max(8, Math.round(img.height / q)); });
+      centerView();
+      toast(`Mapa carregado em “${sc.nome}”. Ajuste a grade em ⚙ Cena.`);
     };
     img.src = url;
   });
@@ -212,18 +232,27 @@ function bindChatInput() {
 }
 
 function openSceneDialog() {
-  const w = makeWindow('scene', 'Cena', { width: 320 });
-  const sc = state.cena;
+  const sc = scene();
+  const w = makeWindow('scene', `Cena — ${sc.nome}`, { width: 320 });
   w.body.innerHTML = `<form class="roll-form">
+    <label class="full">Nome <input name="nome" maxlength="60" value="${esc(sc.nome)}"></label>
     <label>Colunas <input type="number" name="colunas" min="4" value="${sc.colunas}"></label>
     <label>Linhas <input type="number" name="linhas" min="4" value="${sc.linhas}"></label>
     <label class="full">Tamanho do quadrado (px) <input type="number" name="q" min="16" max="160" value="${sc.tamanhoQuadrado}"></label>
     <p class="hint full">Cada bloco (linhas grossas) = 2×2 quadrados. Zonas: 0 blocos Curto · 1 Distante · 2–3 Longe · 4–7 Muito Longe · 8–15 Extremamente Longe · 16+ Fora de Cena.</p>
     <div class="row full"><button class="primary">Aplicar</button><button type="button" data-clear>Remover mapa</button><button type="button" data-tokens>Limpar tokens</button></div></form>`;
   const f = w.body.querySelector('form');
-  f.addEventListener('submit', e => { e.preventDefault(); update(s => { s.cena.colunas = +f.colunas.value; s.cena.linhas = +f.linhas.value; s.cena.tamanhoQuadrado = +f.q.value; }); w.close(); });
-  w.body.querySelector('[data-clear]').onclick = () => update(s => { s.cena.fundo = ''; });
-  w.body.querySelector('[data-tokens]').onclick = () => confirm('Remover todos os tokens do mapa?') && update(s => { s.cena.tokens = []; });
+  f.addEventListener('submit', e => {
+    e.preventDefault();
+    update(() => {
+      sc.nome = f.nome.value.trim().slice(0, 60) || sc.nome;
+      sc.colunas = Math.max(4, +f.colunas.value || sc.colunas); sc.linhas = Math.max(4, +f.linhas.value || sc.linhas);
+      sc.tamanhoQuadrado = Math.max(16, Math.min(160, +f.q.value || sc.tamanhoQuadrado));
+    });
+    w.close();
+  });
+  w.body.querySelector('[data-clear]').onclick = () => update(() => { sc.fundo = ''; });
+  w.body.querySelector('[data-tokens]').onclick = () => confirm(`Remover todos os tokens de “${sc.nome}”?`) && update(() => { sc.tokens = []; });
 }
 
 function openRulesDialog() {
@@ -249,14 +278,19 @@ function openRulesDialog() {
 }
 
 function openHelp() {
-  const w = makeWindow('help', 'Como usar', { width: 460 });
+  const w = makeWindow('help', 'Como usar', { width: 480 });
   w.body.innerHTML = `<div class="help">
-    <h4>Mapa</h4><ul>
-      <li>Arraste um personagem da lista para o mapa (ou use ⬚).</li>
-      <li>Clique e arraste tokens para mover. Duplo clique abre a ficha.</li>
-      <li>Botão direito em um token marca o <b>alvo</b> (a Evasão dele vira o ND do ataque).</li>
-      <li>Token selecionado mostra a <b>zona</b> até os demais. <b>Ctrl+arrastar</b> ou 📏 mede distâncias.</li>
-      <li>Arraste o fundo (ou botão do meio / espaço) para mover; roda do mouse para zoom. Delete remove o token.</li></ul>
+    <h4>Mapa e tokens</h4><ul>
+      <li>Arraste um personagem da lista para o mapa (ou use ⬚). Duplo clique no token abre a ficha.</li>
+      <li><b>Clique</b> seleciona e mostra o menu do token (vida, sanidade, condições, tamanho). <b>Shift+clique</b> soma à seleção; <b>arrastar no vazio</b> seleciona vários.</li>
+      <li>Arraste para mover os selecionados; <b>setas</b> movem 1 quadrado (Shift: 1 bloco). <b>Delete</b> remove. <b>Esc</b> limpa a seleção.</li>
+      <li><b>Botão direito</b> num token marca o alvo (a Evasão dele vira o ND do ataque). Arrastar com o botão direito, o do meio ou com <b>espaço</b> move o mapa; roda do mouse dá zoom.</li>
+      <li>Token selecionado mostra a <b>zona</b> até os demais (tokens grandes contam da borda). <b>Ctrl+arrastar</b> ou 📏 mede distâncias.</li>
+      <li><b>Alt+clique</b> faz um ping para todos; <b>Alt+Shift+clique</b> também leva a visão de todos até lá.</li>
+      <li><b>Ctrl+Z</b> desfaz e <b>Ctrl+Y</b> refaz o que você mudou (o chat não entra).</li></ul>
+    <h4>Cenas</h4><ul>
+      <li>Na aba <b>Cenas</b>: a marcada “jogadores aqui” é a que todos veem. Clicar em outra mostra só para você; ▶ leva os jogadores para ela.</li>
+      <li>🗺 Mapa e ⚙ Cena mexem na cena que você está vendo.</li></ul>
     <h4>Rolagens</h4><ul>
       <li>Na ficha, clique no nome de um atributo ou aptidão para rolar.</li>
       <li>No chat: <code>/r 2d10</code> rola dados comuns.</li>
