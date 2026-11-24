@@ -14,6 +14,7 @@ O Omni é um sistema de parada de dados: rola-se **Atributo + 1** dados, cujo ti
 | [`data/`](data/) | Regras em JSON (lido pelo TTS): sistema, aptidões, habilidades, condições, palavras-chave, tipos de dano, equipamentos, tabelas |
 | [`vtt/`](vtt/) | Protótipo da mesa virtual (HTML + CSS + JavaScript puro, sem instalação) |
 | [`servidor.py`](servidor.py) | Servidor da mesa: serve o TTS e sincroniza a mesa entre os jogadores (só biblioteca padrão do Python) |
+| [`gerador.py`](gerador.py) | Ponte entre a mesa e o gerador de imagens local (ComfyUI) |
 | [`tools/`](tools/) | Scripts de manutenção: `extrair_habilidades.py` (livro → `data/habilidades.json`), `equipamentos.py` (valida armas/armaduras pelos pontos de criação e regenera a tabela do livro) e `testar_servidor.py` (testes do servidor) |
 | [`original/`](original/) | Arquivos originais (livro `.docx` V4 e ficha antiga em PDF) |
 
@@ -29,7 +30,7 @@ jogar-online.bat      # Windows, com link pela internet (ou: python servidor.py 
 
 Abra **http://localhost:8000/vtt/**. Na primeira vez, uma mesa de exemplo é criada.
 Testes: **/vtt/tests/** (regras e sincronização) e **/vtt/tests/multiplayer.html** (duas mesas abertas conversando);
-o servidor tem os seus em `python tools/testar_servidor.py`.
+o servidor tem os seus em `python tools/testar_servidor.py` e o gerador/biblioteca em `python tools/testar_gerador.py` (com um ComfyUI de mentira).
 
 > Abrir o `index.html` direto pelo arquivo (`file://`) não funciona: o navegador bloqueia o carregamento dos módulos e dos JSON.
 > Servido por `python -m http.server`, o TTS funciona como antes, só neste navegador (sem multiplayer).
@@ -68,6 +69,29 @@ O link muda a cada vez que o servidor abre. Sem o cloudflared, `serve.bat` funci
 - **Mesas separadas**: `?mesa=nome` no endereço (ex.: uma por campanha). Cada uma fica salva em `mesas/<nome>.json` (fora do git).
 - **Mesa nova**: o TTS oferece usar a mesa que você já tinha salva no navegador (modo local); senão, começa com o exemplo. Um jogador que chega antes do mestre espera ele abrir.
 - Só as pastas `vtt/`, `data/` e `docs/` são servidas (o resto do repositório não fica exposto), e o HTML das mensagens é filtrado (nada de scripts vindos de outros jogadores).
+
+## Biblioteca e gerador de imagens
+
+- **Biblioteca** (aba comum a todos): imagens, personagens, músicas e PDFs. Cada um envia o que quiser e mexe no que é seu; o mestre mexe em tudo e decide o que os jogadores veem. Os arquivos ficam em `mesas/arquivos/<mesa>/` (a mesa guarda só o endereço, então mapas e retratos não pesam na sincronização).
+- **Criação de token** (Biblioteca › Personagens): a ilustração recortada em círculo ou quadrado, com borda metálica (simples, dupla ou ornamentada, em 9 cores). Vai para a biblioteca e pode ser aplicada direto numa ficha.
+- **Música**: o mestre toca uma música da biblioteca para todos (todos ouvem o mesmo trecho); cada um tem o próprio volume no ♪ do topo.
+- **Gerador de imagens** (aba só do mestre), local, no PC do mestre:
+
+| Modo | Modelo | Tempo (RTX 3060 12 GB) |
+|---|---|---|
+| Cenário (vista ou mapa visto de cima) | SDXL — DreamShaper XL Lightning | ~10 s (a 1ª ~30 s) |
+| Personagem (corpo inteiro ou busto) | SDXL — DreamShaper XL Lightning | ~10 s |
+| Cenário e personagem: cite `@Nome` de personagens da biblioteca (+ um cenário opcional) | Qwen-Image-Edit-2511 (lê até 3 imagens de referência) | ~1–2 min |
+
+  O texto pode ser escrito em português: um glossário (`data/gerador.json`) traduz para o SDXL, e o Qwen entende português. A calibração (tamanhos, passos, textos-base, estilos) fica toda em `data/gerador.json`. As imagens geradas chegam **ocultas** na biblioteca.
+
+**Instalar o gerador** (uma vez; ~37 GB em `C:\Users\<você>\Omni-Gerador`; precisa de placa NVIDIA com 12 GB):
+
+```
+powershell -ExecutionPolicy Bypass -File tools\instalar-gerador.ps1
+```
+
+Depois, na aba **✨ Gerador de imagens**: **Ligar gerador** (abre o ComfyUI sem janela; ~20 s) e **Desligar** quando quiser liberar a memória. O registro do ComfyUI fica em `mesas/comfyui.log`.
 
 ### Como a sincronização funciona
 

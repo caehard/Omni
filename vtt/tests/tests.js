@@ -12,6 +12,8 @@ import { sanitize } from '../js/ui/chat.js';
 import { insideArea, tokensInArea, areaExtent, pathBlocks, tokenVisible, hitDrawing, zoneBlocks, fixedArea } from '../js/ui/layers.js';
 import { initHistory, undo, redo, checkpoint } from '../js/core/history.js';
 import { blockDistance } from '../js/ui/board.js';
+import { traduzir, mencoes, trocarMencoes, montarPedido } from '../js/system/prompt.js';
+import { desenharToken } from '../js/ui/token-maker.js';
 
 const results = [];
 const eq = (name, got, exp) => results.push({ name, ok: JSON.stringify(got) === JSON.stringify(exp), got, exp });
@@ -320,6 +322,52 @@ eq('distância: token 4×4 até 2 blocos à direita', blockDistance({ x: 0, y: 0
   eq('névoa: token só aparece com algum quadrado revelado', [tokenVisible(nv, tok(3, 3)), tokenVisible(nv, tok(2, 2, 2)), tokenVisible(nv, tok(5, 5)), tokenVisible({ ativa: false }, tok(5, 5))], [true, true, false, true]);
   eq('borracha acerta a linha perto e erra longe', [hitDrawing({ tipo: 'linha', a: { x: 0, y: 0 }, b: { x: 4, y: 0 } }, { x: 2, y: 0.2 }), hitDrawing({ tipo: 'linha', a: { x: 0, y: 0 }, b: { x: 4, y: 0 } }, { x: 2, y: 1 })], [true, false]);
   eq('borracha no desenho livre', hitDrawing({ tipo: 'livre', pts: [0, 0, 1, 1, 2, 1] }, { x: 1.5, y: 1.1 }), true);
+}
+
+// --- gerador de imagens: texto do pedido ---
+{
+  const cal = (await import('../js/system/config.js')).CONFIG.gerador;
+  eq('glossário: português vira inglês, nomes ficam', traduzir('Taverna escura com lareira acesa, Valdric e mesas de madeira', cal.glossario),
+    'tavern dark with fireplace lit, Valdric and tables wooden');
+  eq('glossário: expressões primeiro e plural/feminino', traduzir('elfa arqueira de cabelo prateado no pôr do sol. Floresta sombria', cal.glossario),
+    'elf woman archer hair silver in sunset, dark forest');
+  eq('glossário: plural de substantivo, adjetivo não', traduzir('elfas guerreiras, lobos cinzentos e ruínas antigas', cal.glossario), 'elf women warriors, wolves grey and ruins ancient');
+  const pers = [{ id: 'p1', nome: 'Aria', url: '/a.png', descricao: 'elfa de capa verde.' }, { id: 'p2', nome: 'Bandido Caolho', url: '/b.png' }, { id: 'p3', nome: 'Ari', url: '/c.png' }];
+  eq('menções: @Nome com espaço, sem confundir Ari com Aria', mencoes('@Aria luta com @bandido caolho e @Ari; e-mail@x', pers).map(p => p.id), ['p1', 'p2', 'p3']);
+  eq('trocar menções', trocarMencoes('@Aria e @Bandido Caolho', pers, p => `[${p.id}]`), '[p1] e [p2]');
+  const cen = montarPedido({ modo: 'cenario', texto: 'taverna escura', estilo: 'aquarela', quantidade: 2 }, cal);
+  eq('cenário: SDXL em paisagem com o texto-base', [cen.pedido.modelo, cen.pedido.largura, cen.pedido.altura, cen.pedido.quantidade, cen.pedido.positivo.startsWith('fantasy environment concept art, wide establishing shot of tavern dark'), /watercolor/.test(cen.pedido.positivo), /people/.test(cen.pedido.negativo)],
+    ['sdxl', 1344, 768, 2, true, true, true]);
+  const mapa = montarPedido({ modo: 'cenario', enquadramento: 'mapa', texto: 'masmorra' }, cal);
+  eq('cenário › mapa visto de cima: quadrado e vista de cima', [mapa.pedido.largura, mapa.pedido.altura, /top-down battle map/.test(mapa.pedido.positivo)], [1024, 1024, true]);
+  const per = montarPedido({ modo: 'personagem', texto: 'anão ferreiro', nome: 'Borin' }, cal);
+  eq('personagem: retrato, vira item "personagem" com a aparência', [per.pedido.modelo, per.pedido.altura > per.pedido.largura, per.item.tipo, per.item.nome, per.item.descricao, /plain light grey background/.test(per.pedido.positivo)],
+    ['sdxl', true, 'personagem', 'Borin', 'anão ferreiro', true]);
+  const sem = montarPedido({ modo: 'cena', texto: 'uma batalha', personagens: pers }, cal);
+  eq('cena sem referência: usa o SDXL', sem.pedido.modelo, 'sdxl');
+  const cena = montarPedido({ modo: 'cena', texto: '@Aria enfrenta @Bandido Caolho na ponte', personagens: pers, cenarioRef: { id: 'i1', nome: 'Ponte', url: '/p.png' } }, cal);
+  eq('cena com @: Qwen, refs na ordem e cenário por último', [cena.pedido.modelo, cena.pedido.refs, cena.pedido.passos, cena.pedido.cfg], ['qwen', ['/a.png', '/b.png', '/p.png'], 4, 1]);
+  eq('cena com @: o texto cita cada imagem', [/Picture 1 shows Aria \(elfa de capa verde\)/.test(cena.pedido.positivo), /Bandido Caolho \(the character in Picture 2\)/.test(cena.pedido.positivo),
+    /Picture 3 shows the location/.test(cena.pedido.positivo), /Keep each character's face/.test(cena.pedido.positivo)], [true, true, true, true]);
+  const muitos = montarPedido({ modo: 'cena', texto: '@Aria @Ari @Bandido Caolho', personagens: pers, cenarioRef: { id: 'i1', url: '/p.png' } }, cal);
+  eq('cena: no máximo 3 imagens (2 personagens + cenário)', [muitos.pedido.refs.length, muitos.avisos.length], [3, 1]);
+  eq('texto final editado à mão vale', montarPedido({ modo: 'cenario', texto: 'x', positivoFinal: 'my own prompt' }, cal).pedido.positivo, 'my own prompt');
+  eq('semente fixa', montarPedido({ modo: 'cenario', texto: 'x', semente: '42' }, cal).pedido.semente, 42);
+}
+
+// --- criação de token ---
+{
+  const c = document.createElement('canvas'); c.width = c.height = 128;
+  const ctx = c.getContext('2d');
+  const img = document.createElement('canvas'); img.width = 40; img.height = 80;
+  const ic = img.getContext('2d'); ic.fillStyle = '#00ff00'; ic.fillRect(0, 0, 40, 80);
+  Object.assign(img, { naturalWidth: 40, naturalHeight: 80 }); // como se fosse uma <img> carregada
+  desenharToken(ctx, 128, img, { forma: 'circulo', estilo: 'ornada', cor: 'ouro', espessura: 0.08, zoom: 1, dx: 0, dy: 0, fundo: '#000' });
+  const px = (x, y) => [...ctx.getImageData(x, y, 1, 1).data];
+  eq('token: centro mostra a imagem', px(64, 64).slice(0, 3), [0, 255, 0]);
+  eq('token: canto fica transparente (fora do círculo)', px(2, 2)[3], 0);
+  const borda = px(64, 3);
+  eq('token: a borda é opaca e dourada', [borda[3], borda[0] > borda[2]], [255, true]);
 }
 
 // --- desfazer / refazer ---

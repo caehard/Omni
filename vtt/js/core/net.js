@@ -26,6 +26,10 @@ const changed = () => { for (const fn of listeners) fn(net); };
 const setStatus = s => { if (net.status !== s) { net.status = s; changed(); } };
 
 const api = path => `/api/mesa/${encodeURIComponent(net.sala)}${path}`;
+/** Endereço de uma rota desta mesa (arquivos, gerador). */
+export const mesaApi = api;
+/** Quem está pedindo (o servidor decide se é mestre pela chave/localhost). */
+export const quemPede = () => ({ jogador: net.jogador, ...(net.chaveUsada && { chave: net.chaveUsada }), ...(net.como && { como: net.como }) });
 
 let sync = null, es = null, timer = null, sending = false, reopen = null;
 

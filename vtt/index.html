@@ -27,6 +27,7 @@
         <button id="btn-help" title="Ajuda">?</button>
       </nav>
       <span id="round-badge" class="round-badge" aria-live="polite"></span>
+      <button id="btn-musica" class="music-badge" hidden></button>
       <span id="papel-badge" class="papel-badge" hidden></span>
       <button id="btn-net" class="net-badge" hidden title="Mesa compartilhada"></button>
     </header>
@@ -37,9 +38,15 @@
         <button data-panel="scenes" class="so-mestre" aria-selected="false" role="tab">Cenas</button>
         <button data-panel="combat" aria-selected="false" role="tab">Combate</button>
       </div>
+      <div class="panel-tabs panel-tabs-2" role="tablist">
+        <button data-panel="biblioteca" aria-selected="false" role="tab">📚 Biblioteca</button>
+        <button data-panel="gerador" class="so-mestre" aria-selected="false" role="tab">✨ Gerador de imagens</button>
+      </div>
       <div id="actors" class="panel"></div>
       <div id="scenes" class="panel" hidden></div>
       <div id="combat" class="panel" hidden></div>
+      <div id="biblioteca" class="panel" hidden></div>
+      <div id="gerador" class="panel" hidden></div>
     </aside>
 
     <main class="board-wrap">

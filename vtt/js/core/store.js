@@ -29,6 +29,8 @@ export function emptyState() {
     combate: { ativo: false, rodada: 0, combatentes: [] }, // { atorId, acoes, ptGastos, criticosUsados }
     chat: [],                       // mensagens
     regras: {},                     // regras opcionais ligadas/desligadas
+    biblioteca: [],                 // { id, tipo: imagem|personagem|musica|outro, nome, url, mini?, token?, descricao?, de, oculto?, origem? }
+    musica: null,                   // { url, nome, itemId, tocando, desde, pausadoEm, volume, repetir } — tocando para todos
   };
 }
 
@@ -49,6 +51,8 @@ export function migrate(s) {
     c.desenhos ||= [];
     c.nevoa ||= { ativa: false, revelado: {} };
   }
+  if (!Array.isArray(s.biblioteca)) s.biblioteca = [];
+  if (s.musica === undefined) s.musica = null;
   s.versao = 2;
   return s;
 }
@@ -137,3 +141,8 @@ export function replaceState(obj) {
 }
 
 export const getActor = id => state.atores.find(a => a.id === id);
+export const library = () => state.biblioteca || [];
+/** Pode mudar/apagar este item da biblioteca? (quem pôs ou o mestre) */
+export const ownsItem = it => !!it && (local.mestre || it.de === local.jogadorId);
+/** Endereço seguro para src/href (nada de javascript: vindo de outro jogador). */
+export const safeUrl = u => (typeof u === 'string' && (/^\/api\/mesa\/[\w-]+\/arquivos\/[0-9a-f]{24}\.[a-z0-9]{2,4}$/.test(u) || /^data:(image|audio)\/[\w.+-]+;base64,/.test(u) || /^https?:\/\//.test(u))) ? u : '';

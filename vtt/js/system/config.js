@@ -10,6 +10,7 @@ const FILES = {
   tiposDano: 'tipos-dano.json',
   equipamentos: 'equipamentos.json',
   tabelas: 'tabelas.json',
+  gerador: 'gerador.json', // calibração do gerador de imagens (aba do mestre)
 };
 
 export async function loadConfig(base = '../data/') {

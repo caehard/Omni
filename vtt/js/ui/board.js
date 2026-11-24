@@ -203,11 +203,22 @@ function drawToken(t, a, q, isSel, isTarget, isHover) {
   ctx.save();
   if (rec.morto) ctx.globalAlpha = 0.55;
   if (oculto) ctx.globalAlpha = 0.4;
+  const tokImg = a.token ? image(a.token) : null;
+  const temToken = tokImg && tokImg.complete && tokImg.naturalWidth;
   ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.closePath();
-  ctx.fillStyle = a.cor || '#333'; ctx.fill();
-  if (a.imagem) {
-    const img = image(a.imagem);
-    if (img.complete && img.naturalWidth) { ctx.save(); ctx.clip(); ctx.drawImage(img, cx - r, cy - r, r * 2, r * 2); ctx.restore(); }
+  if (temToken) { // token com borda própria (Biblioteca > Criação de token): desenha inteiro, sem recorte
+    const k = r0 * 0.96;
+    ctx.drawImage(tokImg, cx - k, cy - k, k * 2, k * 2);
+  } else {
+    ctx.fillStyle = a.cor || '#333'; ctx.fill();
+  }
+  const img = !temToken && a.imagem ? image(a.imagem) : null;
+  if (temToken) { /* a borda já está na imagem */ } else if (img) {
+    if (img.complete && img.naturalWidth) { // recorta sem esticar; retrato em pé mostra a parte de cima (rosto)
+      const iw = img.naturalWidth, ih = img.naturalHeight, lado = Math.min(iw, ih);
+      const sy = ih > iw * 1.2 ? (ih - lado) * 0.12 : (ih - lado) / 2;
+      ctx.save(); ctx.clip(); ctx.drawImage(img, (iw - lado) / 2, sy, lado, lado, cx - r, cy - r, r * 2, r * 2); ctx.restore();
+    }
   } else {
     ctx.fillStyle = '#fff'; ctx.font = `600 ${r * 0.8}px ${cssVar('--font-ui')}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText(initials(a.nome), cx, cy + 1);
@@ -215,7 +226,7 @@ function drawToken(t, a, q, isSel, isTarget, isHover) {
   ctx.lineWidth = (isSel ? 4 : isHover ? 3 : 2) / view.zoom;
   ctx.strokeStyle = isSel ? cssVar('--accent') : cssVar('--ink');
   if (oculto) ctx.setLineDash([5 / view.zoom, 4 / view.zoom]);
-  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+  if (!temToken || isSel || isHover || oculto) { ctx.beginPath(); ctx.arc(cx, cy, temToken ? r0 * 0.98 : r, 0, Math.PI * 2); ctx.stroke(); }
   ctx.setLineDash([]);
   ctx.globalAlpha = 1;
   if (oculto) badge(t.x * q + Math.max(7, q * 0.17), t.y * q + q * s - Math.max(7, q * 0.17), Math.max(7, q * 0.17), '👁');

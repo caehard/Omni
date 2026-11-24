@@ -8,6 +8,8 @@ import { state, local, scene, update, getActor, subscribe, ownsActor, sheetAcces
 import { makeWindow, esc, getPath, setPath, toast, closeWindow, readFile, pickFile } from './dom.js';
 import { openRollDialog } from './roll-dialog.js';
 import { post, postSystem } from './chat.js';
+import { guardarImagem } from '../core/files.js';
+import { adicionar as addToLibrary } from './library.js';
 
 const sheets = new Map(); // actorId -> { w, tab, sig, unsub }
 
@@ -399,7 +401,16 @@ function onClick(actorId, e) {
     case 'dano': openDamageDialog(actorId); break;
     case 'descanso': openRestDialog(actorId); break;
     case 'death-roll': update(() => { const r = deathRoll(actor); post({ tipo: 'roll', atorId: actorId, roll: r.result, titulo: 'Rolagem de Morte — Vitalidade (Resiliência)', extraHtml: `<div class="effect">${r.msgs.join(' ')}</div>` }); }); break;
-    case 'imagem': pickFile('image/*').then(f => f && readFile(f, 'dataURL').then(url => update(() => { actor.imagem = url; }))); break;
+    case 'imagem': // o retrato também entra na Biblioteca > Personagens (de onde sai o token)
+      pickFile('image/png,image/jpeg,image/webp,image/gif').then(async f => {
+        if (!f) return;
+        try {
+          const { url, mini } = await guardarImagem(f);
+          addToLibrary({ tipo: 'personagem', nome: actor.nome, url, mini, mime: f.type });
+          update(() => { actor.imagem = url; });
+        } catch (e) { toast('Não consegui enviar a imagem: ' + e.message); }
+      });
+      break;
   }
 }
 

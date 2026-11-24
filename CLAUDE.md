@@ -30,7 +30,14 @@ Sistema de RPG **autoral** (em testes) + **mesa virtual própria ("TTS")** para 
 | `vtt/js/core/net.js` | Rede: SSE `/api/mesa/<nome>/eventos` + POST `/ops`, presença, status |
 | `servidor.py` | Servidor da mesa (stdlib): serve só `vtt/`, `data/`, `docs/`; mesas em `mesas/<nome>.json` (gitignored, com a chave do mestre). **Papéis**: mestre = localhost sem cabeçalho de proxy, ou `chave`; jogador recebe `vista_jogador()` (sem ocultos, só a cena ativa, sem sussurros alheios) e cada op passa por `pode()`; recusa → o jogador recebe o estado de novo. Tem `diff` em Python (espelho do JS, casos em `vtt/tests/diff-casos.json`). `--online` abre túnel do cloudflared e expõe o link em `/api/ping` (`publico`) |
 | `jogar-online.bat` / `.sh` | `servidor.py --online` |
-| `vtt/tests/` | `index.html`: regras, sincronização, cenas, desfazer, permissões, filtro de HTML, geometria de áreas/névoa (146 passando) · `multiplayer.html`: dois mestres + um jogador (`?como=jogador&jid=`) em iframes, com cliques e arrastos sintéticos (36 passando, precisa do servidor; usa `window.omni`) · casos JS/Python em `sync-casos.json` e `diff-casos.json` |
+| `gerador.py` | Ponte com o **ComfyUI local** (gerador de imagens): liga/desliga o processo (pasta em `gerador.local.json`, gitignored, gravado pelo instalador), monta os fluxos (`fluxo_sdxl`, `fluxo_qwen` — mesmo encadeamento do modelo oficial do Qwen-Image-Edit-2511), põe na fila, acompanha `/history` e devolve as imagens; o `servidor.py` as grava como itens **ocultos** da biblioteca (`Mesa.adicionar_biblioteca`). Rotas `/api/mesa/<m>/gerador/estado|trabalho|ligar|desligar|gerar`, só mestre |
+| `data/gerador.json` | Calibração do gerador: modelos, amostragem (SDXL Lightning 6 passos/CFG 2/DPM++ SDE Karras; Qwen Lightning 4 passos/CFG 1/shift 3,1), proporções, modos (Cenário, Personagem, Cenário e personagem) com enquadramentos e textos-base, estilos e o **glossário PT→EN** (substantivos, adjetivos, expressões) |
+| `vtt/js/system/prompt.js` | Monta o pedido (puro, testado): `traduzir` (glossário), `mencoes`/`trocarMencoes` (`@Nome` → personagens da biblioteca), `montarPedido` (SDXL sem referência; Qwen com até 3 imagens: personagens citados + cenário opcional) |
+| `vtt/js/core/files.js` | Arquivos da mesa: online vão para `POST /api/mesa/<m>/arquivos` (servidor confere tipo e assinatura; nome = hash; GET aceita Range); offline viram `data:` (até 8 MB). `guardarImagem` também faz a miniatura |
+| `vtt/js/ui/library.js` · `token-maker.js` · `generator.js` · `music.js` | Abas **Biblioteca** (todos; `state.biblioteca[]`, seções Imagens/Personagens/Músicas/Outros, janela do item com mostrar a todos = evento `mostrar`, mapa, retrato, token, gerador) · **Criação de token** (`desenharToken`, PNG transparente; `ator.token` é desenhado inteiro no mapa) · **Gerador de imagens** (só mestre) · música para todos (`state.musica`, volume por jogador) |
+| `tools/instalar-gerador.ps1` | Baixa ComfyUI portátil + ComfyUI-GGUF + modelos (~37 GB em `~/Omni-Gerador`) e grava `gerador.local.json` |
+| `tools/testar_gerador.py` | Testes do gerador e da biblioteca com um **ComfyUI de mentira** (fluxos, fila → biblioteca oculta, referências enviadas, erros legíveis, arquivos/Range/tipos recusados, permissões) — 15 passando |
+| `vtt/tests/` | `index.html`: regras, sincronização, cenas, desfazer, permissões, filtro de HTML, geometria de áreas/névoa, texto do gerador, desenho do token (169 passando) · `multiplayer.html`: dois mestres + um jogador (`?como=jogador&jid=`) em iframes, com cliques e arrastos sintéticos (36 passando, precisa do servidor; usa `window.omni`) · casos JS/Python em `sync-casos.json` e `diff-casos.json` |
 | `tools/testar_servidor.py` | Testes do servidor (operações, diff, vista do jogador, névoa, desenhos, permissões, papéis via túnel/chave, protocolo, arquivos bloqueados) — 19 passando |
 | `tools/extrair_habilidades.py` | Livro (cap. 08) → `data/habilidades.json`. Rode após editar habilidades |
 | `tools/equipamentos.py` | Valida `data/equipamentos.json` pelos pontos de criação e regenera a tabela do livro (cap. 04, entre marcadores). Rode após editar equipamentos |
@@ -41,6 +48,7 @@ Sistema de RPG **autoral** (em testes) + **mesa virtual própria ("TTS")** para 
 ```sh
 ./serve.sh   # ou: python servidor.py  (Windows: serve.bat)
 python tools/testar_servidor.py
+python tools/testar_gerador.py
 ```
 - TTS: http://localhost:8000/vtt/ · Testes: /vtt/tests/ e /vtt/tests/multiplayer.html
 - Com `python -m http.server` o TTS roda em modo local (sem `/api/ping` → sem multiplayer).
@@ -69,6 +77,7 @@ python tools/testar_servidor.py
   2. ✅ Desenho e medição: quadro branco, áreas de efeito (tamanho em zonas, atingidos), régua com vários pontos compartilhada.
   3. ✅ Mestre × jogador e névoa: papéis, donos, ocultos, sussurros, rolagens secretas, névoa (servidor filtra por jogador).
   4. Fluxo de jogo: ✅ dados animados. Falta: barra de ações rápidas, turno ativo destacado, diário/handouts, música ambiente.
+- **Biblioteca + gerador de imagens local** (2026-11-24, pedido do autor): aba Biblioteca (todos) com Criação de token; aba Gerador de imagens (mestre) com 3 modos calibrados; ComfyUI instalado em `C:\Users\caean\Omni-Gerador` (RTX 3060 12 GB, 16 GB RAM). Testado de verdade: SDXL ~10 s por imagem (1ª ~30 s com carga do modelo).
 - **D37** (era P1): zona → blocos usa sempre o limite de cima (C 0, D 1, L 3, ML 7, EL 15). A ferramenta de área tem o tamanho em zona (`fixedArea` em `ui/layers.js`) ou livre.
 
 ## Próximos passos possíveis

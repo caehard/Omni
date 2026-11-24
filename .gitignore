@@ -7,3 +7,4 @@ node_modules/
 
 # mesas salvas pelo servidor.py (dados das sessões)
 mesas/
+gerador.local.json

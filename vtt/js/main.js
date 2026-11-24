@@ -14,6 +14,10 @@ import { initDiceTray } from './ui/dice-tray.js';
 import { initSidebar, newActor } from './ui/sidebar.js';
 import { openSheet } from './ui/sheet.js';
 import { makeWindow, toast, downloadFile, pickFile, readFile, esc } from './ui/dom.js';
+import { initLibrary, adicionar as addToLibrary, usarComoMapa } from './ui/library.js';
+import { initGenerator } from './ui/generator.js';
+import { initMusic } from './ui/music.js';
+import { guardarImagem } from './core/files.js';
 import { seedDemo } from './demo.js';
 
 async function boot() {
@@ -42,6 +46,9 @@ async function boot() {
   subscribe(refreshPalette);
   initScenes({ list: document.getElementById('scenes'), banner: document.getElementById('scene-banner') });
   initSidebar({ actors: document.getElementById('actors'), combat: document.getElementById('combat'), onOpenSheet: openSheet });
+  initLibrary(document.getElementById('biblioteca'));
+  initGenerator(document.getElementById('gerador'));
+  initMusic(document.getElementById('btn-musica'));
 
   bindToolbar();
   bindChatInput();
@@ -219,22 +226,17 @@ function bindToolbar() {
   on('btn-new-pc', () => newActor('personagem'));
   on('btn-new-npc', () => newActor('npc'));
   on('btn-map', async () => {
-    const f = await pickFile('image/*');
+    const f = await pickFile('image/png,image/jpeg,image/webp,image/gif');
     if (!f) return;
-    const url = await readFile(f, 'dataURL');
-    const img = new Image();
-    img.onload = () => {
-      const sc = scene(), q = sc.tamanhoQuadrado;
-      update(() => { sc.fundo = url; sc.colunas = Math.max(8, Math.round(img.width / q)); sc.linhas = Math.max(8, Math.round(img.height / q)); });
-      centerView();
-      toast(`Mapa carregado em “${sc.nome}”. Ajuste a grade em ⚙ Cena.`);
-    };
-    img.src = url;
+    try { // o mapa vai para a biblioteca; a cena guarda só o endereço
+      const { url, mini } = await guardarImagem(f);
+      await usarComoMapa(addToLibrary({ tipo: 'imagem', nome: f.name.replace(/\.\w+$/, '').slice(0, 80), url, mini, mime: f.type }));
+    } catch (e) { toast('Não consegui carregar o mapa: ' + e.message, 5000); }
   });
   on('btn-center', centerView);
   on('btn-scene', openSceneDialog);
   on('btn-rules', openRulesDialog);
-  on('btn-export', () => downloadFile(`omni-mesa-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(state, null, 1)));
+  on('btn-export', exportTable);
   on('btn-import', async () => {
     const f = await pickFile('application/json,.json');
     if (!f) return;
@@ -247,11 +249,32 @@ function bindToolbar() {
   });
   on('btn-help', openHelp);
 
-  // abas do painel esquerdo
+  // abas do painel esquerdo (Biblioteca e Gerador alargam o painel)
   document.querySelectorAll('[data-panel]').forEach(b => b.addEventListener('click', () => {
     document.querySelectorAll('[data-panel]').forEach(x => x.setAttribute('aria-selected', x === b));
     document.querySelectorAll('.panel').forEach(p => (p.hidden = p.id !== b.dataset.panel));
+    document.getElementById('app').classList.toggle('painel-largo', ['biblioteca', 'gerador'].includes(b.dataset.panel));
+    redraw();
   }));
+}
+
+/** Exporta a mesa em JSON com as imagens embutidas (os endereços do servidor não funcionariam em outro lugar). */
+async function exportTable() {
+  const copia = JSON.parse(JSON.stringify(state));
+  const cache = new Map();
+  const embutir = async u => {
+    if (!cache.has(u)) cache.set(u, fetch(u).then(r => r.blob()).then(b => new Promise(res => { const f = new FileReader(); f.onload = () => res(f.result); f.readAsDataURL(b); })).catch(() => u));
+    return cache.get(u);
+  };
+  const imagem = /^\/api\/mesa\/[\w-]+\/arquivos\/[0-9a-f]{24}\.(png|jpg|webp|gif)$/;
+  const andar = async o => {
+    for (const [k, v] of Object.entries(o)) {
+      if (typeof v === 'string' && imagem.test(v)) o[k] = await embutir(v);
+      else if (v && typeof v === 'object') await andar(v);
+    }
+  };
+  if (net.online) { toast('Preparando a exportação (com as imagens)…'); await andar(copia); }
+  downloadFile(`omni-mesa-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(copia, null, 1));
 }
 
 function bindChatInput() {
@@ -343,6 +366,17 @@ function openHelp() {
       <li><b>A</b> área de efeito (círculo, quadrado, cone de 45°, linha): arraste da origem; mostra o tamanho em zonas e destaca quem é atingido.</li>
       <li><b>F</b> névoa de guerra (mestre): arraste para revelar ou cobrir; os jogadores não recebem tokens que estão no escuro.</li>
       <li>🎲 no Registro liga/desliga os dados animados.</li></ul>
+    <h4>Biblioteca (todos)</h4><ul>
+      <li>Imagens, personagens, músicas e PDFs da mesa. <b>＋ Adicionar</b> ou arraste arquivos para a aba. Mapas e retratos enviados entram aqui sozinhos.</li>
+      <li>Clique num item para: mostrar a todos (mestre), usar como mapa, usar como retrato da ficha, criar token, baixar.</li>
+      <li><b>Personagens › Criação de token</b>: escolha a ilustração, arraste e use a roda do mouse para enquadrar, escolha forma e borda e salve (pode aplicar direto numa ficha).</li>
+      <li><b>Músicas</b>: o mestre toca para todos; cada um ajusta o próprio volume no ♪ do topo.</li>
+      <li>O que o mestre gera chega oculto (🔒); “Visível para todos” ou “Mostrar a todos” libera.</li></ul>
+    <h4>Gerador de imagens (mestre)</h4><ul>
+      <li>Roda no PC do mestre (ComfyUI). <b>Ligar gerador</b> na aba; <b>Desligar</b> libera a memória da placa.</li>
+      <li><b>Cenário</b> (vista ou mapa visto de cima) e <b>Personagem</b> (corpo inteiro ou busto): ~10 s por imagem. Escreva em português.</li>
+      <li><b>Cenário e personagem</b>: cite personagens da biblioteca com <b>@Nome</b> (e um cenário opcional); o modelo lê as ilustrações e põe os personagens na cena (~1–2 min).</li>
+      <li><b>Ctrl+Enter</b> gera. “Avançado” mostra (e deixa editar) o texto enviado ao modelo.</li></ul>
     <h4>Cenas</h4><ul>
       <li>Na aba <b>Cenas</b>: a marcada “jogadores aqui” é a que todos veem. Clicar em outra mostra só para você; ▶ leva os jogadores para ela.</li>
       <li>🗺 Mapa e ⚙ Cena mexem na cena que você está vendo.</li></ul>

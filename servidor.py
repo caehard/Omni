@@ -16,11 +16,16 @@ Protocolo (usado por vtt/js/core/net.js):
                                         -> SSE: {"tipo":"estado"}, depois "ops", "presenca" e "evento"
     POST /api/mesa/<nome>/ops           <- {"cliente", "lote", "ops": [...], "jogador", "chave"?, "como"?}
     POST /api/mesa/<nome>/evento        <- {"cliente", "dados"}   (repassado a todos, não é salvo)
+    POST /api/mesa/<nome>/arquivos      <- bytes (Content-Type: imagem, áudio ou PDF) -> {"url"}
+    GET  /api/mesa/<nome>/arquivos/<hash>.<ext>   (imagens, músicas... da biblioteca; aceita Range)
+    GET  /api/mesa/<nome>/gerador/estado|trabalho?id=  ·  POST .../gerador/ligar|desligar|gerar   (só o mestre)
 
 Papéis: o mestre recebe e muda tudo. Cada jogador recebe só a sua vista (vista_jogador) e só pode
 mudar o que é dele (pode); o servidor confere cada operação.
 """
 import argparse
+import base64
+import hashlib
 import json
 import os
 import posixpath
@@ -38,8 +43,21 @@ from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, unquote, urlparse
 
+import gerador as _gerador
+
 RAIZ = os.path.dirname(os.path.abspath(__file__))
 PASTA_MESAS = os.path.join(RAIZ, 'mesas')
+PASTA_ARQUIVOS = os.path.join(PASTA_MESAS, 'arquivos')  # arquivos/<mesa>/<hash>.<ext>: biblioteca de cada mesa
+LIMITE_ARQUIVO = 40 * 1024 * 1024
+TIPOS_ARQUIVO = {
+    'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp', 'image/gif': 'gif',
+    'audio/mpeg': 'mp3', 'audio/ogg': 'ogg', 'audio/wav': 'wav', 'audio/x-wav': 'wav', 'audio/wave': 'wav',
+    'audio/mp4': 'm4a', 'audio/x-m4a': 'm4a', 'audio/aac': 'aac', 'audio/webm': 'weba', 'audio/flac': 'flac',
+    'application/pdf': 'pdf',
+}  # sem SVG nem HTML: um arquivo de jogador nunca roda script no navegador dos outros
+MIME_POR_EXT = {'png': 'image/png', 'jpg': 'image/jpeg', 'webp': 'image/webp', 'gif': 'image/gif', 'mp3': 'audio/mpeg',
+                'ogg': 'audio/ogg', 'wav': 'audio/wav', 'm4a': 'audio/mp4', 'aac': 'audio/aac', 'weba': 'audio/webm',
+                'flac': 'audio/flac', 'pdf': 'application/pdf'}
 PASTAS_PUBLICAS = ('vtt', 'data', 'docs')  # o resto do repositório (.git, mesas/, original/) não é servido
 LIMITE_CORPO = 32 * 1024 * 1024            # 32 MB por envio (mapas e retratos vão como imagem embutida)
 PING_SSE = 15                              # segundos entre "pings" para manter a conexão viva
@@ -316,6 +334,8 @@ def vista_jogador(estado, jogador):
                 vista[k].append(cena)
         elif k == 'chat':
             vista[k] = [_copia_rasa_profunda(m) for m in v or [] if mensagem_visivel(m, jogador)]
+        elif k == 'biblioteca':  # o que o mestre ainda não mostrou (ex.: imagens geradas) fica só com ele
+            vista[k] = [_copia_rasa_profunda(i) for i in v or [] if _eh_obj(i) and (not i.get('oculto') or i.get('de') == jogador)]
         elif k == 'combate' and _eh_obj(v):
             vista[k] = {ck: _copia_rasa_profunda(cv) for ck, cv in v.items() if ck != 'combatentes'}
             vista[k]['combatentes'] = [_copia_rasa_profunda(c) for c in v.get('combatentes') or []
@@ -327,6 +347,8 @@ def vista_jogador(estado, jogador):
 
 CAMPOS_SO_MESTRE = ('donos', 'oculto', 'permissao', 'id')
 TIPOS_DESENHO = ('livre', 'linha', 'retangulo', 'circulo', 'texto', 'area')
+TIPOS_BIBLIOTECA = ('imagem', 'personagem', 'musica', 'outro')
+CAMPOS_BIBLIOTECA_JOGADOR = ('nome', 'descricao', 'token', 'mini', 'tags')
 
 
 def pode(estado, jogador, op):
@@ -375,6 +397,18 @@ def pode(estado, jogador, op):
             if not tok or not _dono(estado, jogador, tok.get('atorId')):
                 return False
             return t == 'del' if len(p) == 4 else (len(p) == 5 and p[4] in ('x', 'y', 'tamanho'))
+        return False
+    if raiz == 'biblioteca':  # comum a todos: cada um põe o que quiser e só mexe no que é seu
+        if t == 'ins' and len(p) == 1 and _eh_obj(op.get('value')) and op.get('key') == 'id':
+            v = op['value']
+            v['de'], v['oculto'] = jogador, False
+            novo = not _achar_id(estado.get('biblioteca'), 'id', v.get('id'))  # "ins" com id repetido substituiria o de outro
+            return novo and v.get('tipo') in TIPOS_BIBLIOTECA and isinstance(v.get('id'), str)
+        if len(p) >= 2 and _eh_obj(p[1]):
+            item = _achar_id(estado.get('biblioteca'), 'id', p[1].get('id'))
+            if not item or item.get('de') != jogador:
+                return False
+            return t == 'del' if len(p) == 2 else p[2] in CAMPOS_BIBLIOTECA_JOGADOR
         return False
     if raiz == 'combate' and len(p) >= 2 and p[1] == 'combatentes':
         if t == 'ins' and len(p) == 2 and _eh_obj(op.get('value')):
@@ -539,6 +573,110 @@ class Mesa:
         os.replace(tmp, self.arquivo)
 
 
+    def adicionar_biblioteca(self, itens):
+        """Põe itens na biblioteca pelo servidor (imagens que o gerador terminou, mesmo com a aba do mestre fechada)."""
+        with self.lock:
+            if not _eh_obj(self.estado):
+                return
+            ops = [] if isinstance(self.estado.get('biblioteca'), list) else [{'op': 'set', 'path': ['biblioteca'], 'value': []}]
+            ultimo = next((x.get('id') for x in reversed(self.estado.get('biblioteca') or []) if _eh_obj(x)), None)
+            for it in itens:
+                ops.append({'op': 'ins', 'path': ['biblioteca'], 'key': 'id', 'value': it, 'after': ultimo})
+                ultimo = it['id']
+            self._lote_servidor(ops)
+
+
+# ---------------------------------------------------------------------------
+# Arquivos da biblioteca (imagens, músicas, PDFs): mesas/arquivos/<mesa>/<hash>.<ext>
+# ---------------------------------------------------------------------------
+
+ROTA_ARQUIVO = re.compile(r'^/api/mesa/([^/]+)/arquivos(?:/([0-9a-f]{24}\.[a-z0-9]{2,4}))?$')
+ASSINATURAS = {  # começo do arquivo de cada tipo de imagem/PDF (o resto é conferido pelo Content-Type)
+    'png': (b'\x89PNG',), 'jpg': (b'\xff\xd8\xff',), 'gif': (b'GIF8',), 'pdf': (b'%PDF',),
+    'webp': (b'RIFF',),
+}
+
+
+def tipo_do_envio(mime, dados):
+    """Extensão do arquivo enviado, ou None se o tipo não é aceito ou o conteúdo não bate com o tipo."""
+    ext = TIPOS_ARQUIVO.get((mime or '').split(';')[0].strip().lower())
+    if not ext or not dados:
+        return None
+    assin = ASSINATURAS.get(ext)
+    if assin and not any(dados.startswith(a) for a in assin):
+        return None
+    if ext == 'webp' and dados[8:12] != b'WEBP':
+        return None
+    return ext
+
+
+def guardar_arquivo(nome, dados, ext):
+    """Grava (se ainda não existe) e devolve o endereço. O nome é o hash do conteúdo: o mesmo arquivo não duplica."""
+    pasta = os.path.join(PASTA_ARQUIVOS, nome)
+    os.makedirs(pasta, exist_ok=True)
+    arq = f'{hashlib.sha256(dados).hexdigest()[:24]}.{ext}'
+    destino = os.path.join(pasta, arq)
+    if not os.path.exists(destino):
+        tmp = destino + '.tmp'
+        with open(tmp, 'wb') as f:
+            f.write(dados)
+        os.replace(tmp, destino)
+    return f'/api/mesa/{nome}/arquivos/{arq}'
+
+
+def ler_arquivo(url):
+    """(bytes, mime) de um endereço da biblioteca ou de uma imagem embutida (data:), ou None."""
+    url = str(url or '')
+    if url.startswith('data:'):
+        try:
+            cab, b64 = url[5:].split(',', 1)
+            return base64.b64decode(b64), cab.split(';')[0] or 'image/png'
+        except (ValueError, TypeError):
+            return None
+    m = ROTA_ARQUIVO.match(urlparse(url).path)
+    if not m or not m.group(2):
+        return None
+    caminho = os.path.join(PASTA_ARQUIVOS, nome_mesa(unquote(m.group(1))), m.group(2))
+    if not os.path.isfile(caminho):
+        return None
+    with open(caminho, 'rb') as f:
+        return f.read(), MIME_POR_EXT.get(m.group(2).rsplit('.', 1)[1], 'application/octet-stream')
+
+
+# ---------------------------------------------------------------------------
+# Gerador de imagens (ComfyUI local; ver gerador.py)
+# ---------------------------------------------------------------------------
+
+GERADOR = _gerador.Gerador()
+ROTA_GERADOR = re.compile(r'^/api/mesa/([^/]+)/gerador/(estado|ligar|desligar|gerar|trabalho)$')
+
+
+def gerar_para_mesa(ms, pedido, item, jogador):
+    """Põe o pedido na fila; quando as imagens ficam prontas, viram itens ocultos na biblioteca da mesa."""
+    item = item if _eh_obj(item) else {}
+    tipo = item.get('tipo') if item.get('tipo') in TIPOS_BIBLIOTECA else 'imagem'
+    nome = str(item.get('nome') or 'Imagem gerada')[:80]
+
+    def ao_terminar(trabalho, imagens):
+        urls, itens = [], []
+        for i, (dados, _mime) in enumerate(imagens):
+            url = guardar_arquivo(ms.nome, dados, 'png')
+            urls.append(url)
+            itens.append({
+                'id': uuid_curto(), 'tipo': tipo, 'nome': nome if len(imagens) == 1 else f'{nome} ({i + 1})',
+                'url': url, 'mime': 'image/png', 'de': jogador, 'criado': int(time.time() * 1000), 'oculto': True,
+                'descricao': str(item.get('descricao') or '')[:2000],
+                'origem': {**(item.get('origem') if _eh_obj(item.get('origem')) else {}), 'semente': trabalho['semente'] + (i if trabalho['modelo'] == 'qwen' else 0), 'gerado': True},
+            })
+        ms.adicionar_biblioteca(itens)
+        return urls
+    return GERADOR.gerar(pedido, ler_arquivo, ao_terminar)
+
+
+def uuid_curto():
+    return secrets.token_hex(6)
+
+
 MESAS = {}
 _lock_mesas = threading.Lock()
 
@@ -635,6 +773,19 @@ class Handler(SimpleHTTPRequestHandler):
         m = ROTA_MESA.match(url.path)
         if m and m.group(2) == 'eventos':
             return self._eventos(nome_mesa(unquote(m.group(1))), parse_qs(url.query))
+        m = ROTA_ARQUIVO.match(url.path)
+        if m and m.group(2):
+            return self._servir_arquivo(nome_mesa(unquote(m.group(1))), m.group(2))
+        m = ROTA_GERADOR.match(url.path)
+        if m and m.group(2) in ('estado', 'trabalho'):
+            qs = parse_qs(url.query)
+            arg = lambda k: (qs.get(k) or [''])[0]
+            if not self._eh_mestre(mesa(nome_mesa(unquote(m.group(1)))), arg('chave'), arg('como')):
+                return self._json(403, {'erro': 'só o mestre usa o gerador'})
+            if m.group(2) == 'estado':
+                return self._json(200, GERADOR.estado())
+            t = GERADOR.trabalho(arg('id'))
+            return self._json(200, t) if t else self._json(404, {'erro': 'pedido não encontrado (o servidor reiniciou?)'})
         if url.path.startswith('/api/'):
             return self._json(404, {'erro': 'rota desconhecida'})
         if url.path in ('/', ''):
@@ -651,8 +802,105 @@ class Handler(SimpleHTTPRequestHandler):
             return self.send_error(404, 'Nao encontrado')
         return super().do_HEAD()
 
+    def _servir_arquivo(self, nome, arq):
+        caminho = os.path.join(PASTA_ARQUIVOS, nome, arq)
+        if not os.path.isfile(caminho):
+            return self._json(404, {'erro': 'arquivo não encontrado'})
+        tam = os.path.getsize(caminho)
+        ini, fim, codigo = 0, tam - 1, 200
+        rng = re.match(r'bytes=(\d*)-(\d*)$', self.headers.get('Range') or '')
+        if rng and (rng.group(1) or rng.group(2)):  # música: o navegador pede pedaços para começar do meio
+            if rng.group(1):
+                ini, fim = int(rng.group(1)), int(rng.group(2)) if rng.group(2) else tam - 1
+            else:
+                ini = max(0, tam - int(rng.group(2)))
+            fim = min(fim, tam - 1)
+            if ini > fim:
+                self.send_response(416)
+                self.send_header('Content-Range', f'bytes */{tam}')
+                self.send_header('Content-Length', '0')
+                self.end_headers()
+                return
+            codigo = 206
+        self.send_response(codigo)
+        self.send_header('Content-Type', MIME_POR_EXT.get(arq.rsplit('.', 1)[1], 'application/octet-stream'))
+        self.send_header('Content-Length', str(fim - ini + 1))
+        self.send_header('Accept-Ranges', 'bytes')
+        self.send_header('Cache-Control', 'public, max-age=31536000, immutable')  # o nome é o hash: nunca muda
+        self.send_header('X-Content-Type-Options', 'nosniff')
+        if codigo == 206:
+            self.send_header('Content-Range', f'bytes {ini}-{fim}/{tam}')
+        self.end_headers()
+        try:
+            with open(caminho, 'rb') as f:
+                f.seek(ini)
+                falta = fim - ini + 1
+                while falta > 0:
+                    bloco = f.read(min(256 * 1024, falta))
+                    if not bloco:
+                        break
+                    self.wfile.write(bloco)
+                    falta -= len(bloco)
+        except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
+            pass
+
+    def _ler_corpo(self, limite):
+        """Lê o corpo do POST. Devolve bytes, ou None depois de já ter respondido com o erro."""
+        try:
+            tamanho = int(self.headers.get('Content-Length', 0))
+        except ValueError:
+            self._json(400, {'erro': 'Content-Length inválido'})
+            return None
+        if tamanho > limite:
+            self._json(413, {'erro': f'envio maior que {limite // (1024 * 1024) or 1} MB'})
+            return None
+        return self.rfile.read(tamanho)
+
+    def _post_arquivo(self, nome):
+        dados = self._ler_corpo(LIMITE_ARQUIVO)
+        if dados is None:
+            return
+        ext = tipo_do_envio(self.headers.get('Content-Type'), dados)
+        if not ext:
+            return self._json(415, {'erro': 'tipo de arquivo não aceito (imagens PNG/JPG/WebP/GIF, áudio ou PDF)'})
+        try:
+            return self._json(200, {'url': guardar_arquivo(nome, dados, ext)})
+        except OSError as e:
+            return self._json(500, {'erro': f'não consegui gravar: {e}'})
+
+    def _post_gerador(self, nome, acao):
+        corpo = self._ler_corpo(64 * 1024)
+        if corpo is None:
+            return
+        try:
+            dados = json.loads(corpo.decode('utf-8') or '{}')
+        except (ValueError, UnicodeDecodeError):
+            return self._json(400, {'erro': 'pedido inválido'})
+        ms = mesa(nome)
+        if not self._eh_mestre(ms, dados.get('chave'), dados.get('como')):
+            return self._json(403, {'erro': 'só o mestre usa o gerador'})
+        if acao == 'ligar':
+            return self._json(200, {'ligar': GERADOR.ligar()})
+        if acao == 'desligar':
+            return self._json(200, {'desligar': GERADOR.desligar()})
+        if acao != 'gerar':
+            return self._json(404, {'erro': 'rota desconhecida'})
+        try:
+            tid = gerar_para_mesa(ms, dados.get('pedido'), dados.get('item'), str(dados.get('jogador') or 'mestre')[:64])
+        except ValueError as e:
+            return self._json(400, {'erro': str(e)})
+        except OSError as e:
+            return self._json(503, {'erro': f'o gerador não respondeu ({e}). Ligue-o na aba Gerador.'})
+        return self._json(200, {'id': tid})
+
     def do_POST(self):
         url = urlparse(self.path)
+        m = ROTA_ARQUIVO.match(url.path)
+        if m and not m.group(2):
+            return self._post_arquivo(nome_mesa(unquote(m.group(1))))
+        m = ROTA_GERADOR.match(url.path)
+        if m and m.group(2) in ('ligar', 'desligar', 'gerar'):
+            return self._post_gerador(nome_mesa(unquote(m.group(1))), m.group(2))
         m = ROTA_MESA.match(url.path)
         if not (m and m.group(2) in ('ops', 'evento')):
             return self._json(404, {'erro': 'rota desconhecida'})
@@ -791,6 +1039,7 @@ def main():
     finally:
         if TUNEL['proc']:
             TUNEL['proc'].terminate()
+        GERADOR.desligar()  # só se foi a mesa que ligou o ComfyUI
         salvar_todas()
         print('\nMesas salvas. Até a próxima!')
 
