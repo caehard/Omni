@@ -289,8 +289,13 @@
    "id": "humana-antidesarme",
    "nome": "Antidesarme",
    "pacote": "humana",
-   "descricao": "Recebe vantagem(2) em disputas de desarme em que o personagem segurando esta arma está tentando ser desarmado igual ao nível de desarme.",
-   "nivelMinimo": 1
+   "descricao": "Sua empunhadura é firme e treinada. Para desarmá-lo, o oponente precisa vencer a disputa de desarme por pelo menos 5 sucessos (em vez de 3).",
+   "niveis": {
+    "2": "O oponente precisa vencer por pelo menos 7 sucessos.",
+    "3": "Você não pode ser desarmado por meios não mágicos."
+   },
+   "nivelMinimo": 1,
+   "nivelMaximo": 3
   },
   {
    "id": "humana-ataque-otimizado",
@@ -725,11 +730,11 @@
    "id": "mistico-resistencia-elemental",
    "nome": "Resistência Elemental",
    "pacote": "mistico",
-   "descricao": "Escolha um tipo de dano elemental, para aquele elemento, receba resistência elemental (+2).",
+   "descricao": "Escolha um tipo de dano elemental (Gélido, Elétrico, Fogo ou Ácido); contra aquele tipo, receba Absorção (+2).",
    "niveis": {
-    "2": "receba resistência elemental (+4)",
-    "3": "receba resistência elemental (+6)",
-    "4": "receba imunidade ao dano elemental."
+    "2": "Absorção (+4) contra o tipo escolhido.",
+    "3": "Absorção (+6) contra o tipo escolhido.",
+    "4": "imunidade ao tipo de dano escolhido."
    },
    "nivelMinimo": 1,
    "nivelMaximo": 4

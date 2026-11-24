@@ -63,7 +63,7 @@ Além disso, para combate físico um personagem pode fazer uso de armas, além d
 **Alcance:** Uma arma pode ter 3 tipos de alcance, sendo eles:
 
 - **Curto**: O alvo deve estar na mesma zona curta que o seu personagem para conseguir ser atacado
-- **Longo**: O alvo pode estar até a zona distante em relação ao seu personagem para poder ser atacado
+- **Distante**: O alvo pode estar até a zona distante em relação ao seu personagem para poder ser atacado
 - **Distância**: Tem uma zona junto com a palavra que indica qual é a distância ideal de uso da arma, para qualquer queda ou aumento de zona em relação à zona ideal, o ataque recebe **Desvantagem(1)**.
 
 **Peso**: Já para o Peso temos as seguintes categorias, a ideia é que quanto mais pesado uma arma mais difícil é de usá-la porém seus golpes também causam mais estrago. O atributo de uma arma indica qual o atributo que é utilizado em ataques e bloqueios com aquela arma, isso é determinado pelo seu peso.
@@ -78,9 +78,9 @@ Por fim, a última informação relevante à respeito de armas é o tipo de dano
 
 **Armas Improvisadas:** Uma arma improvisada é qualquer objeto que não está sendo usado de forma convencional para combate ou que não foi feito para combater. armas improvisadas sempre possuem as seguintes estatísticas:
 
-- **Leve**: Impacto(1), Letal(+1), aptidão 0
-- **Media**: Impacto(2), Letal(+2), aptidão 1
-- **Pesada**: Impacto(3), Letal(+3), aptidão 2
+- **Leve**: Impacto(1), Letal(1), aptidão 0
+- **Media**: Impacto(2), Letal(2), aptidão 1
+- **Pesada**: Impacto(3), Letal(3), aptidão 2
 
 A menos que o personagem tenha uma habilidade que diga o contrário, é impossível ter aptidão em armas improvisadas. O tipo de dano de uma arma improvisada deve ser coerente com o objeto que está sendo utilizado.
 

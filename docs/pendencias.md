@@ -27,29 +27,28 @@ Este arquivo registra as **decisões já tomadas** sobre contradições do livro
 | D19 | Armaduras | Sem pontos gastos em cobertura, a proteção base **não se aplica a nenhum tipo de dano**; é obrigatório gastar ≥ 1 ponto | Apêndice 4.3 |
 | D20 | Tabela de armas/armaduras | Recriada: 46 armas e 12 armaduras, todas validadas pelo Criador de Equipamentos (`tools/equipamentos.py`) | 2.5 |
 | D21 | Magias e seções incompletas | Adiadas pelo autor (magias, Investigação e Exploração, Classes, Cidades) | — |
+| D22 | Extra(N) | Sem tipo de dado, os dados extras usam o **dado do domínio da rolagem** (texto da palavra-chave atualizado) | 2.6 |
+| D23 | Antidesarme | Para desarmá-lo, o oponente precisa vencer por **5 sucessos** (nível 2: 7; nível 3: não pode ser desarmado por meios não mágicos) | 3.1 Humanas |
+| D24 | Resistência Elemental | Termos atualizados: **Absorção (+2/+4/+6)** contra o tipo elemental escolhido; nível 4: imunidade | 3.1 Místico |
+| D25 | Pontos Heroicos | Só PJs gastam; o mestre só pela regra opcional | 2.2 |
+| D26 | Alcance de armas | “Longo” = **Distante** | 2.5 |
+| D27 | Armas improvisadas | Letal sem sinal: Letal(1)/(2)/(3) | 2.5 |
+| D28 | Dano de morte | Dano que passa de 0 de Vida no mesmo golpe conta como Dano de Morte | 2.3 |
+| D29 | Absorção por tipo | Geral + categoria + tipo específico, somadas; armadura equipada (valor fixo) substitui se for maior | 2.3 / 2.5 |
+| D30 | Ponto Heroico | O dado extra pode usar a Maestria que sobrou | 2.2 |
+| D31 | Virtude/Falha no TTS | Virtude no pior dado, Falha no melhor dado (escolha automática) | TTS |
+| D32 | Cobertura de armadura | Pode ser comprada mais de uma vez (os 5 tipos físicos custam 3 pontos) | Apêndice 4.3 |
+| D33 | Zonas ideais adicionais | Custam o valor da tabela + 1 | Apêndice 4.3 |
+| D34 | Escudos | São armas (bloqueiam com Impacto + Bloqueio) | 2.5 |
+| D35 | Catálogo | Arcabuz, Mosquete e Revólver em Incomum; Machadinha no lugar do Machado de Guerra comum; “Pike” → Pique | 2.5 |
+| D36 | Ficha | Campo explícito de Atributo de Determinação (Raciocínio/Instinto) | Ficha |
 
-## ❓ Pendências (precisam da sua decisão)
+## ❓ Pendências
 
-### Regras
-6. **Extra(N)** exige tipo de dado, mas Superforça (“extra(2)”, “extra(4)”) e Velocista não informam o dado. Usar o dado do domínio do personagem?
-7. **Antidesarme**: “Recebe vantagem(2)… igual ao nível de desarme” — texto confuso; qual o efeito por nível?
-8. **Resistência Elemental** (Místico) usa “resistência elemental (+2)”; pelo D6, deveria ser **Absorção Elemental (+2)** do tipo escolhido?
-9. **Pontos Heroicos** em Testes vs. Disputas: só podem ser gastos por PJs; o NPC do mestre usa a regra opcional. OK como está?
-10. **Armas — Alcance**: a seção define “Curto / Longo / Distância(zona)”, mas as tabelas usam “Distante”. Tratei “Longo” = “Distante”.
-11. **Armas improvisadas** usam “Letal(+1)” com sinal; nas demais armas é “Letal(N)”.
+Nenhuma pendência de regra aberta no momento.
 
 ### Adiado pelo autor
-13. Magias (“Pacotes > Magias”; tipos Mahi, Logi e Centi). 14. Investigação e Exploração. 15. Uso de Classes. 16. Cidades.
-
-### Interpretações provisórias (confirme)
-18. **Excesso de dano ao chegar a 0 de Vida**: o TTS conta o dano que passa de 0 no mesmo golpe como **Dano de Morte**.
-19. **Absorção por tipo** = Geral + categoria (Física/Elemental) + tipo específico, somadas; uma **armadura equipada** (valor fixo) substitui esse total se for maior.
-20. **Ponto Heroico** usa a Maestria que sobrou na rolagem para o dado extra.
-21. **Virtude** transforma o pior dado em crítico; **Falha** transforma o melhor dado em falha (escolha automática no TTS).
-22. **Cobertura de armadura** pode ser comprada mais de uma vez (ex.: 2 × “2 tipos físicos” = 4 tipos por 2 pontos; os 5 tipos físicos custam 3 pontos).
-23. **Zonas ideais adicionais** (Distância) custam o valor da tabela + 1; no catálogo só usei zonas adicionais Distante/Longe (custo 1), evitando a ambiguidade.
-24. **Escudos** foram criados como **armas** (bloqueiam com Impacto + Bloqueio), não como armaduras.
-25. **Ajustes no catálogo para obedecer às regras**: Arcabuz, Mosquete e Revólver foram para **Incomum** (arma de fogo só existe a partir de incomum); o Machado de Guerra comum virou **Machadinha** (o de guerra ficou só em Incomum); “Pike” virou **Pique**.
-
-### Ficha
-17. Adicionei **Atributo de Determinação** (Raciocínio/Instinto) como campo explícito na ficha nova — confirme.
+- Magias (“Pacotes > Magias”; tipos Mahi, Logi e Centi).
+- Regras de Investigação e Exploração.
+- Uso de Classes.
+- Cidades (nomes de atributos nos exemplos, descrição de Infraestrutura, pontos de criação × construção).

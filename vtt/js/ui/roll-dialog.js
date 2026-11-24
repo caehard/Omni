@@ -43,7 +43,7 @@ export function openRollDialog(actorId, preset = {}) {
     <label>Maestria extra <input type="number" name="maestriaExtra" value="${preset.manuseio ?? 0}" title="Manuseio do equipamento, habilidades..."></label>
     <label>Vantagem <input type="number" name="vantagem" min="0" value="${preset.vantagem ?? 0}"></label>
     <label>Desvantagem <input type="number" name="desvantagem" min="0" value="${preset.desvantagem ?? 0}"></label>
-    <label>Dados extras <input name="extra" placeholder="ex.: 2d4" value="${esc(preset.extra || '')}"></label>
+    <label>Dados extras <input name="extra" placeholder="ex.: 2 ou 2d4" title="Só o número = dado do domínio" value="${esc(preset.extra || '')}"></label>
     <p class="preview full" aria-live="polite"></p>
     <div class="row full"><button type="submit" class="primary">Rolar</button></div>
   </form>`;
@@ -61,7 +61,7 @@ export function openRollDialog(actorId, preset = {}) {
     const desvAptidao = Math.max(0, exig - aptLvl);
     // Manuseio só se aplica com a aptidão mínima
     const manuseio = desvAptidao > 0 ? 0 : Number(f.maestriaExtra.value) || 0;
-    const extra = parseExtra(f.extra.value);
+    const extra = parseExtra(f.extra.value, base.faces);
     const tipo = f.querySelector('[name=tipo]:checked').value;
     return {
       base, ap, aptLvl, exig, desvAptidao, auto, tipo, extra,
@@ -77,6 +77,7 @@ export function openRollDialog(actorId, preset = {}) {
     f.querySelector('.ns-field').style.visibility = c.tipo === 'teste' ? 'visible' : 'hidden';
     const parts = [`<b>${c.base.count}d${c.base.faces}</b>`, `ND ${c.nd}`];
     if (c.ns != null) parts.push(`NS ${c.ns}`);
+    if (c.extra.length) parts.push('Extra ' + c.extra.map(e => `${e.count}d${e.faces}`).join(' + '));
     if (c.maestria) parts.push(`Maestria ${c.maestria}`);
     if (c.vantagem) parts.push(`Vant. ${c.vantagem}`);
     if (c.desvantagem) parts.push(`Desv. ${c.desvantagem}`);
@@ -105,7 +106,13 @@ export function openRollDialog(actorId, preset = {}) {
   });
 }
 
-/** "2d4 + 1d6" -> [{count:2,faces:4},{count:1,faces:6}] */
-export function parseExtra(txt) {
-  return [...String(txt || '').matchAll(/(\d+)\s*d\s*(\d+)/gi)].map(m => ({ count: +m[1], faces: +m[2] }));
+/**
+ * Palavra-chave Extra: "2d4 + 1d6" -> [{count:2,faces:4},{count:1,faces:6}].
+ * Sem tipo de dado ("2"), usa o dado do domínio da rolagem (defaultFaces).
+ */
+export function parseExtra(txt, defaultFaces = 10) {
+  return String(txt || '').split(/[+,;]/).map(p => p.trim()).filter(Boolean).map(p => {
+    const m = p.match(/^(\d+)\s*(?:d\s*(\d+))?$/i);
+    return m ? { count: +m[1], faces: m[2] ? +m[2] : defaultFaces } : null;
+  }).filter(Boolean);
 }

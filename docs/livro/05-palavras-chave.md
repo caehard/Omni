@@ -12,7 +12,7 @@ São palavras que podem ser aplicadas a diferentes contextos no sistema, devendo
 
 **Desvantagem(Nível)**: Em uma disputa ou teste o seu personagem retira sucessos igual ao nível de desvantagem, desvantagem é acumulativa de modo que se duas fontes fornecem vantagem o nível total é a soma dos níveis individuais de desvantagem. Vantagem é o oposto de desvantagem, desse modo, cada 1 nível de desvantagem remove 1 nível de vantagem.
 
-**Extra(Valor)**: Indica que quando realizando uma rolagem você deve adicionar dados adicionais à rolagem igual ao valor de extra, o tipo de dado também deve ser especificado na palavra-chave.
+**Extra(Valor)**: Indica que quando realizando uma rolagem você deve adicionar dados adicionais à rolagem igual ao valor de extra, o tipo de dado pode ser especificado na palavra-chave (ex.: Extra(2d4)). **Quando o tipo de dado não for especificado (ex.: Extra(2)), os dados extras são do mesmo tipo definido pelo domínio da rolagem.**
 
 **Maestria(Valor)**: Ao realizar uma rolagem com maestria, você pode reduzir o valor de um ou mais dados da rolagem. A soma total dos valores reduzidos não pode exceder o nível de maestria. Dados reduzidos até o valor 1 dessa forma não são considerados críticos.
 

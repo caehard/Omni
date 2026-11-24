@@ -4,6 +4,7 @@ import { rollPool, setRandom, applyMaestria, dieForDomain, addHeroicDie, applyVi
 import { createActor, prepareDerived, spentPoints, levelFromPoints } from '../js/system/actor.js';
 import { applyDamage, deathRoll, spendAction, processRoundStart, roundDurationSeconds, loseSanity, rest, actionCost } from '../js/system/combat.js';
 import { absorptionFor } from '../js/system/actor.js';
+import { parseExtra } from '../js/ui/roll-dialog.js';
 
 const results = [];
 const eq = (name, got, exp) => results.push({ name, ok: JSON.stringify(got) === JSON.stringify(exp), got, exp });
@@ -146,6 +147,11 @@ g.system.habilidades.push({ ref: 'fator-mente-de-ferro' });
 g.system.recursos.sanidade = 1;
 const mf = loseSanity(g, 3);
 eq('Mente de Ferro perde 1 a menos', g.system.recursos.sanidade, -1);
+
+// --- Extra ---
+eq('Extra(2) sem dado usa o dado do domínio', parseExtra('2', 8), [{ count: 2, faces: 8 }]);
+eq('Extra(2d4) usa o dado indicado', parseExtra('2d4', 8), [{ count: 2, faces: 4 }]);
+eq('Extras combinados', parseExtra('1d6 + 2', 10), [{ count: 1, faces: 6 }, { count: 2, faces: 10 }]);
 
 // --- saída ---
 const fails = results.filter(x => !x.ok);

@@ -157,7 +157,11 @@ Ao realizar uma esquiva você pode gastar 1 ponto de combate ou 1 ponto de tempo
 
 ##### Antidesarme
 
-Recebe **vantagem(2)** em disputas de desarme em que o personagem segurando esta arma está tentando ser desarmado igual ao nível de desarme.
+Sua empunhadura é firme e treinada. Para desarmá-lo, o oponente precisa vencer a disputa de desarme por pelo menos **5 sucessos** (em vez de 3).
+
+**Nível 2**: O oponente precisa vencer por pelo menos 7 sucessos.
+
+**Nível 3**: Você não pode ser desarmado por meios não mágicos.
 
 ##### Ataque Otimizado
 
@@ -459,13 +463,13 @@ Permite que você utilize instinto no lugar de raciocínio em suas rolagens, des
 
 ##### Resistência Elemental
 
-Escolha um tipo de dano elemental, para aquele elemento, receba resistência elemental (+2).
+Escolha um tipo de dano elemental (Gélido, Elétrico, Fogo ou Ácido); contra aquele tipo, receba **Absorção (+2)**.
 
-**Nível 2**: receba resistência elemental (+4)
+**Nível 2**: Absorção (+4) contra o tipo escolhido.
 
-**Nível 3**: receba resistência elemental (+6)
+**Nível 3**: Absorção (+6) contra o tipo escolhido.
 
-**Nível 4**: receba imunidade ao dano elemental.
+**Nível 4**: imunidade ao tipo de dano escolhido.
 
 ##### Aura
 

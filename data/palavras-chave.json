@@ -27,7 +27,7 @@
    "nome": "Extra",
    "grupo": "geral",
    "temNivel": true,
-   "descricao": "Adiciona N dados (tipo especificado) à rolagem."
+   "descricao": "Adiciona N dados à rolagem. Se o tipo não for especificado (Extra(2)), usa o dado do domínio da rolagem; senão, o indicado (Extra(2d4))."
   },
   {
    "id": "maestria",
