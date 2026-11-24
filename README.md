@@ -13,21 +13,50 @@ O Omni é um sistema de parada de dados: rola-se **Atributo + 1** dados, cujo ti
 | [`docs/pendencias.md`](docs/pendencias.md) | Decisões de regra já tomadas e contradições ainda em aberto |
 | [`data/`](data/) | Regras em JSON (lido pelo TTS): sistema, aptidões, habilidades, condições, palavras-chave, tipos de dano, equipamentos, tabelas |
 | [`vtt/`](vtt/) | Protótipo da mesa virtual (HTML + CSS + JavaScript puro, sem instalação) |
-| [`tools/`](tools/) | Scripts de manutenção: `extrair_habilidades.py` (livro → `data/habilidades.json`) e `equipamentos.py` (valida armas/armaduras pelos pontos de criação e regenera a tabela do livro) |
+| [`servidor.py`](servidor.py) | Servidor da mesa: serve o TTS e sincroniza a mesa entre os jogadores (só biblioteca padrão do Python) |
+| [`tools/`](tools/) | Scripts de manutenção: `extrair_habilidades.py` (livro → `data/habilidades.json`), `equipamentos.py` (valida armas/armaduras pelos pontos de criação e regenera a tabela do livro) e `testar_servidor.py` (testes do servidor) |
 | [`original/`](original/) | Arquivos originais (livro `.docx` V4 e ficha antiga em PDF) |
 
 ## Como rodar o TTS
 
-Precisa apenas de Python 3 (já vem no Linux/macOS) e de um navegador.
+Precisa apenas de Python 3 e de um navegador (nada para instalar com `pip`).
 
 ```sh
-./serve.sh            # ou: python3 -m http.server 8000
+./serve.sh            # Linux/macOS  (ou: python3 servidor.py)
+serve.bat             # Windows      (ou: python servidor.py)
 ```
 
 Abra **http://localhost:8000/vtt/**. Na primeira vez, uma mesa de exemplo é criada.
-Os testes das regras ficam em **http://localhost:8000/vtt/tests/**.
+Testes: **/vtt/tests/** (regras e sincronização) e **/vtt/tests/multiplayer.html** (duas mesas abertas conversando);
+o servidor tem os seus em `python tools/testar_servidor.py`.
 
 > Abrir o `index.html` direto pelo arquivo (`file://`) não funciona: o navegador bloqueia o carregamento dos módulos e dos JSON.
+> Servido por `python -m http.server`, o TTS funciona como antes, só neste navegador (sem multiplayer).
+
+## Jogar online (multiplayer)
+
+Com o `servidor.py` rodando, a mesa é **compartilhada**: todos que abrirem o link veem e mexem nas mesmas fichas, mapa, combate e chat, atualizando na hora.
+
+1. O mestre roda o servidor e abre `http://localhost:8000/vtt/`. Na primeira vez o TTS pede o seu nome.
+2. O botão com o nome da mesa (canto superior direito) mostra quem está conectado e os **links de convite**.
+3. Cada jogador abre o link, informa o nome e entra.
+
+Como os jogadores chegam até o seu PC:
+
+| Situação | O que fazer |
+|---|---|
+| Mesma rede (Wi-Fi/cabo) | Use o link `http://192.168.x.x:8000/vtt/?mesa=...` mostrado no convite. No Windows, permita o Python no firewall quando ele perguntar. |
+| Pela internet (mais fácil) | Instale o [cloudflared](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads/) e rode `cloudflared tunnel --url http://localhost:8000`. Ele mostra um endereço `https://….trycloudflare.com`; envie `https://….trycloudflare.com/vtt/?mesa=principal`. Muda a cada execução. |
+| Grupo fixo | [Tailscale](https://tailscale.com/) (rede privada entre os PCs do grupo) ou redirecionamento da porta 8000 no roteador. |
+
+- **Mesas separadas**: `?mesa=nome` no endereço (ex.: uma por campanha). Cada uma fica salva em `mesas/<nome>.json` (fora do git).
+- **Mesa nova**: o TTS oferece usar a mesa que você já tinha salva no navegador (modo local); senão, começa com o exemplo.
+- **Alvo** (botão direito num token) é de cada jogador; o resto é compartilhado.
+- Ainda **não há permissões**: quem tem o link pode editar tudo. Só o servidor serve as pastas `vtt/`, `data/` e `docs/` (o resto do repositório não fica exposto). A visão mestre × jogador é o próximo passo.
+
+### Como a sincronização funciona
+
+Toda mudança passa por `store.update()`. O cliente compara o estado com a última versão enviada (`vtt/js/core/sync-ops.js`) e manda só as diferenças por `POST`; listas com `id` (fichas, tokens, chat) são comparadas pelo identificador, para duas pessoas poderem adicionar coisas ao mesmo tempo. O servidor define a ordem, guarda o estado e repassa as mudanças a todos por Server-Sent Events; cada cliente reaplica por cima as suas mudanças ainda não confirmadas (`sync-client.js`), e todos convergem para o estado do servidor. Em caso de conflito no mesmo campo, vale a última mudança recebida pelo servidor.
 
 ### O que o protótipo faz
 
@@ -39,7 +68,8 @@ Os testes das regras ficam em **http://localhost:8000/vtt/tests/**.
 - **Combate**: rodadas com duração, custo crescente de ação, Pontos Críticos, cansaço, sangramento, combustão, cicatrizes arcanas, recuperação de conjuração e rolagens de morte automáticas.
 - **Mapa** com imagem de fundo, grade em blocos 2×2, tokens arrastáveis e **medição em zonas** (regra do Apêndice 4.1).
 - **Descanso** rápido, curto e prolongado. Regras opcionais ligáveis.
-- Tudo salvo no navegador; **Exportar/Importar** a mesa em JSON.
+- **Multiplayer** por link (veja acima), com lista de quem está conectado e reconexão automática.
+- Mesa salva no servidor (ou no navegador, no modo local); **Exportar/Importar** a mesa em JSON.
 
 ## Rumo ao Foundry VTT
 
@@ -58,7 +88,6 @@ A lógica de regras (`vtt/js/system/`) não depende da interface, então poderá
 
 ## Próximos passos sugeridos
 
-1. Resolver as pendências de [`docs/pendencias.md`](docs/pendencias.md).
-2. Multiplayer (jogadores entrando por link) — o estado já passa por um único ponto (`vtt/js/core/store.js`), pronto para sincronizar via WebSocket.
-3. Catálogo de magias (quando o sistema de magias estiver pronto).
-4. Visão de jogador × mestre (fichas e tokens ocultos).
+1. Visão de jogador × mestre (fichas e tokens ocultos, permissões por ficha).
+2. Catálogo de magias (quando o sistema de magias estiver pronto).
+3. Portar para o Foundry VTT.

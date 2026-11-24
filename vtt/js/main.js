@@ -1,6 +1,7 @@
 // Ponto de entrada do TTS Omni.
 import { loadConfig, CONFIG } from './system/config.js';
-import { state, update, load, replaceState, subscribe } from './core/store.js';
+import { state, update, load, replaceState, subscribe, readLocalSave, emptyState } from './core/store.js';
+import { net, probe, connect, onNetChange, cleanRoom } from './core/net.js';
 import { fillResources } from './system/actor.js';
 import { rollFormula } from './system/dice.js';
 import { initChat, postText, postSystem } from './ui/chat.js';
@@ -18,9 +19,11 @@ async function boot() {
       <p>${esc(e.message)}</p><p>Abra o TTS por um servidor local (veja o README): <code>python3 -m http.server 8000</code> na raiz do repositório e acesse <code>http://localhost:8000/vtt/</code>.</p></div>`;
     return;
   }
-  const had = load();
-  for (const [k, r] of Object.entries(CONFIG.sistema.regrasOpcionais)) if (state.regras[k] == null) state.regras[k] = r.padrao;
-  if (!had) seedDemo();
+  const info = await probe(); // servida pelo servidor.py? então a mesa é compartilhada
+  if (info) await bootOnline(info);
+  else if (!load()) seedDemo();
+  applyDefaults();
+  delete state.cena.alvoId; // o alvo agora é de cada jogador (store.local)
   state.atores.forEach(fillResources);
 
   initChat(document.getElementById('chat-log'));
@@ -29,7 +32,123 @@ async function boot() {
 
   bindToolbar();
   bindChatInput();
+  bindNet();
   update(); // primeira renderização
+}
+
+function applyDefaults() {
+  for (const [k, r] of Object.entries(CONFIG.sistema.regrasOpcionais)) if (state.regras[k] == null) state.regras[k] = r.padrao;
+}
+
+// ---- multiplayer ----
+const NAME_KEY = 'omni-nome';
+const savedName = () => { try { return localStorage.getItem(NAME_KEY) || ''; } catch { return ''; } };
+const saveName = n => { try { localStorage.setItem(NAME_KEY, n); } catch { /* navegador sem armazenamento */ } };
+/** Autor das mensagens digitadas no chat. */
+const author = () => (net.online ? net.nome : 'Mestre');
+
+async function bootOnline(info) {
+  const params = new URLSearchParams(location.search);
+  const sala = cleanRoom(params.get('mesa'));
+  if (params.get('mesa') !== sala) history.replaceState(null, '', `?mesa=${sala}`);
+  const nome = savedName() || await askName();
+  const existed = await connect({ sala, nome, info });
+  if (existed) return;
+  // mesa nova no servidor: começa com a mesa deste navegador (se houver) ou com o exemplo
+  const saved = readLocalSave();
+  if (saved?.atores?.length && confirm(`A mesa “${sala}” é nova. Usar nela a mesa salva neste navegador (${saved.atores.length} ficha(s))?\n\nCancelar = começar com a mesa de exemplo.`)) Object.assign(state, saved);
+  else seedDemo();
+}
+
+function askName(atual = '') {
+  return new Promise(resolve => {
+    const w = makeWindow('name', 'Entrar na mesa', { width: 340, onClose: () => resolve(atual || 'Jogador') });
+    w.body.innerHTML = `<form class="roll-form">
+      <label class="full">Seu nome (aparece no chat e para os outros jogadores)
+        <input name="nome" maxlength="40" required value="${esc(atual)}" autofocus></label>
+      <div class="row full"><button class="primary">Entrar</button></div></form>`;
+    const f = w.body.querySelector('form');
+    f.nome.focus();
+    f.addEventListener('submit', e => {
+      e.preventDefault();
+      const n = f.nome.value.trim().slice(0, 40) || 'Jogador';
+      saveName(n);
+      atual = n;
+      w.close();
+    });
+  });
+}
+
+function bindNet() {
+  const btn = document.getElementById('btn-net');
+  const render = () => {
+    if (!net.online) return;
+    btn.hidden = false;
+    const n = net.jogadores.length;
+    const icons = { conectado: '●', conectando: '◌', reconectando: '◌' };
+    btn.dataset.status = net.status;
+    btn.textContent = net.status === 'conectado' ? `${icons.conectado} ${net.sala} · ${n} na mesa` : `${icons[net.status] || '○'} ${net.status}…`;
+    btn.title = `Mesa “${net.sala}” — ${net.jogadores.map(j => j.nome).join(', ') || 'ninguém'}\nClique para convidar jogadores`;
+    if (net.erro) { toast(net.erro, 5000); net.erro = null; }
+    if (document.getElementById('net-players')) fillPlayers();
+  };
+  onNetChange(render);
+  btn.addEventListener('click', openNetDialog);
+  render();
+}
+
+const fillPlayers = () => {
+  const el = document.getElementById('net-players');
+  el.innerHTML = net.jogadores.map(j => `<li>${esc(j.nome)}${j.cliente === net.cliente ? ' <small>(você)</small>' : ''}</li>`).join('') || '<li class="muted">Ninguém conectado.</li>';
+};
+
+function inviteLinks() {
+  const path = `/vtt/?mesa=${encodeURIComponent(net.sala)}`;
+  const links = [];
+  const isLocal = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
+  if (!isLocal) links.push({ url: location.origin + path, nota: 'endereço que você está usando' });
+  for (const ip of net.info?.enderecos || []) {
+    const url = `http://${ip}:${net.info.porta}${path}`;
+    if (!links.some(l => l.url === url)) links.push({ url, nota: 'mesma rede (Wi-Fi/cabo)' });
+  }
+  return links;
+}
+
+function openNetDialog() {
+  const w = makeWindow('net', 'Mesa compartilhada', { width: 460 });
+  const links = inviteLinks();
+  w.body.innerHTML = `<div class="net-dialog">
+    <p>Mesa <b>${esc(net.sala)}</b> · você é <b>${esc(net.nome)}</b></p>
+    <h4>Na mesa agora</h4><ul id="net-players" class="net-players"></ul>
+    <h4>Convidar</h4>
+    ${links.map(l => `<div class="invite"><input readonly value="${esc(l.url)}"><button data-copy>Copiar</button><small>${esc(l.nota)}</small></div>`).join('') || '<p class="muted">Nenhum endereço de rede encontrado.</p>'}
+    <p class="hint">Jogadores fora da sua rede: abra um túnel (ex.: <code>cloudflared tunnel --url http://localhost:${net.info?.porta || 8000}</code>) e envie o endereço que ele gerar, terminando em <code>/vtt/?mesa=${esc(net.sala)}</code>. Veja “Jogar online” no README.</p>
+    <form class="roll-form" data-room>
+      <label>Ir para outra mesa <input name="sala" placeholder="nome-da-mesa"></label>
+      <div class="row"><button>Entrar</button></div></form>
+    <form class="roll-form" data-name>
+      <label>Seu nome <input name="nome" maxlength="40" value="${esc(net.nome)}"></label>
+      <div class="row"><button>Trocar</button></div></form>
+  </div>`;
+  fillPlayers();
+  w.body.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', async () => {
+    const input = b.previousElementSibling;
+    try { await navigator.clipboard.writeText(input.value); }
+    catch { input.select(); document.execCommand('copy'); }
+    toast('Link copiado.');
+  }));
+  w.body.querySelector('[data-room]').addEventListener('submit', e => {
+    e.preventDefault();
+    const s = cleanRoom(e.target.sala.value);
+    location.search = `?mesa=${s}`;
+  });
+  w.body.querySelector('[data-name]').addEventListener('submit', e => {
+    e.preventDefault();
+    const n = e.target.nome.value.trim().slice(0, 40);
+    if (!n || n === net.nome) return;
+    saveName(n);
+    location.reload(); // reconecta com o novo nome
+  });
 }
 
 function bindToolbar() {
@@ -83,11 +202,11 @@ function bindChatInput() {
     if (m) {
       const n = +(m[1] || 1), f = +m[2], mod = Number((m[3] || '0').replace(/\s/g, ''));
       const r = rollFormula(n, f);
-      postSystem(`🎲 ${n}d${f}${mod ? (mod > 0 ? '+' : '') + mod : ''}: [${r.values.join(', ')}] = <b>${r.total + mod}</b>`, { autor: 'Mestre' });
+      postSystem(`🎲 ${n}d${f}${mod ? (mod > 0 ? '+' : '') + mod : ''}: [${r.values.join(', ')}] = <b>${r.total + mod}</b>`, { autor: author() });
     } else if (txt.startsWith('/')) {
       toast('Comando desconhecido. Use /r 2d10');
       return;
-    } else postText(txt, { autor: 'Mestre' });
+    } else postText(txt, { autor: author() });
     form.msg.value = '';
   });
 }
@@ -114,8 +233,18 @@ function openRulesDialog() {
     <div class="row"><button type="button" data-reset class="danger">Apagar mesa (recomeçar)</button></div></form>`;
   w.body.querySelector('form').addEventListener('change', e => update(s => { s.regras[e.target.name] = e.target.checked; }));
   w.body.querySelector('[data-reset]').onclick = () => {
+    if (net.online) {
+      if (!confirm(`Apagar todos os personagens, mapa e chat da mesa “${net.sala}” para TODOS os jogadores? Exporte antes se quiser guardar.`)) return;
+      replaceState(emptyState());
+      applyDefaults();
+      update();
+      w.close();
+      toast('Mesa apagada.');
+      return;
+    }
     if (!confirm('Apagar todos os personagens, mapa e chat deste navegador? Exporte antes se quiser guardar.')) return;
-    localStorage.clear(); location.reload();
+    try { localStorage.removeItem('omni-vtt-estado-v1'); } catch { /* sem armazenamento */ }
+    location.reload();
   };
 }
 
@@ -135,7 +264,11 @@ function openHelp() {
     <h4>Combate</h4><ul>
       <li>⚔ adiciona ao combate. “+ ação” cobra Pontos de Tempo (ações anteriores + 1 + extras).</li>
       <li>“Próxima rodada” processa cansaço por pontos críticos, sangramento, combustão, cicatrizes arcanas, conjuração e rolagens de morte.</li></ul>
-    <h4>Dados</h4><p>Tudo fica salvo neste navegador. Use <b>Exportar</b> para guardar/compartilhar a mesa em JSON.</p></div>`;
+    <h4>Mesa compartilhada</h4><ul>
+      <li>Rodando pelo <code>servidor.py</code>, a mesa é a mesma para todos que abrirem o link: fichas, mapa, combate e chat atualizam na hora.</li>
+      <li>O botão com o nome da mesa (no topo) mostra quem está conectado e os links de convite.</li>
+      <li>O alvo marcado (botão direito) é só seu.</li></ul>
+    <h4>Dados</h4><p>${net.online ? `A mesa fica salva no servidor (<code>mesas/${esc(net.sala)}.json</code>).` : 'Tudo fica salvo neste navegador.'} Use <b>Exportar</b> para guardar/compartilhar a mesa em JSON.</p></div>`;
 }
 
 subscribe(() => { document.getElementById('round-badge').textContent = state.combate.ativo ? `Rodada ${state.combate.rodada}` : ''; });

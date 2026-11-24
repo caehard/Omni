@@ -1,5 +1,5 @@
 // Tabuleiro: mapa, grade em blocos (2×2 quadrados, Apêndice 4.1), tokens e medição de zonas.
-import { state, update, getActor, subscribe } from '../core/store.js';
+import { state, local, update, notify, getActor, subscribe } from '../core/store.js';
 import { prepareDerived, uid } from '../system/actor.js';
 import { CONFIG } from '../system/config.js';
 
@@ -75,7 +75,7 @@ function draw() {
   for (const t of sc.tokens) {
     const a = getActor(t.atorId);
     if (!a) continue;
-    drawToken(t, a, q, t.id === selected, a.id === sc.alvoId);
+    drawToken(t, a, q, t.id === selected, a.id === local.alvoId);
     if (sel && t !== sel) {
       const n = blockDistance(sel, t), z = zoneForBlocks(n);
       label((t.x + 0.5) * q, (t.y - 0.15) * q, `${z.id} · ${n} bl`, cssVar('--accent'));
@@ -149,9 +149,10 @@ function onDown(e) {
   const c = toCell(e);
   // botão do meio/direito ou espaço: arrastar o mapa
   if (e.button === 1 || (e.button === 2 && !tokenAt(c)) || spaceDown) return pan(e);
-  if (e.button === 2) { // botão direito em token = marcar alvo
+  if (e.button === 2) { // botão direito em token = marcar alvo (cada jogador tem o seu; não é sincronizado)
     const t = tokenAt(c);
-    update(s => { s.cena.alvoId = s.cena.alvoId === t.atorId ? null : t.atorId; });
+    local.alvoId = local.alvoId === t.atorId ? null : t.atorId;
+    notify();
     return;
   }
   if (rulerMode || e.ctrlKey) {

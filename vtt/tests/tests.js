@@ -5,6 +5,9 @@ import { createActor, prepareDerived, spentPoints, levelFromPoints } from '../js
 import { applyDamage, deathRoll, spendAction, processRoundStart, roundDurationSeconds, loseSanity, rest, actionCost } from '../js/system/combat.js';
 import { absorptionFor } from '../js/system/actor.js';
 import { parseExtra } from '../js/ui/roll-dialog.js';
+import { diff, applyOps, clone, keyOf } from '../js/core/sync-ops.js';
+import { SyncClient } from '../js/core/sync-client.js';
+import { emptyState } from '../js/core/store.js';
 
 const results = [];
 const eq = (name, got, exp) => results.push({ name, ok: JSON.stringify(got) === JSON.stringify(exp), got, exp });
@@ -152,6 +155,97 @@ eq('Mente de Ferro perde 1 a menos', g.system.recursos.sanidade, -1);
 eq('Extra(2) sem dado usa o dado do domínio', parseExtra('2', 8), [{ count: 2, faces: 8 }]);
 eq('Extra(2d4) usa o dado indicado', parseExtra('2d4', 8), [{ count: 2, faces: 4 }]);
 eq('Extras combinados', parseExtra('1d6 + 2', 10), [{ count: 1, faces: 6 }, { count: 2, faces: 10 }]);
+
+// --- sincronização multiplayer ---
+const canon = v => JSON.stringify(v, (k, x) => (x && typeof x === 'object' && !Array.isArray(x) ? Object.fromEntries(Object.keys(x).sort().map(c => [c, x[c]])) : x));
+const same = (name, got, exp) => results.push({ name, ok: canon(got) === canon(exp), got, exp });
+
+// casos compartilhados com o servidor (tools/testar_servidor.py roda os mesmos em Python)
+const casos = await (await fetch('./sync-casos.json')).json();
+for (const c of casos) same(`sync: ${c.nome}`, applyOps(clone(c.inicial), c.ops), c.esperado);
+
+// diff + apply reproduz o estado novo
+{
+  const a = createActor({ nome: 'A' }), b = structuredClone(a);
+  b.nome = 'B'; b.system.recursos.vida = 3; b.system.aptidoes.push({ id: 'atletismo', especializacao: '', nivel: 2 }); delete b.system.dados;
+  const pares = [
+    [{ atores: [a], chat: [] }, { atores: [b], chat: [{ id: 'm1', texto: 'oi' }] }],
+    [{ l: [{ id: 'x' }, { id: 'y' }, { id: 'z' }] }, { l: [{ id: 'z' }, { id: 'x' }] }],          // reordenada: substitui
+    [{ l: [{ id: 'x', v: 1 }, { id: 'y' }] }, { l: [{ id: 'w' }, { id: 'x', v: 2 }, { id: 'q' }] }],
+    [{ l: [1, 2, 3] }, { l: [1, 5, 3, 4] }], [{ l: [{ v: 1 }, { v: 2 }] }, { l: [{ v: 1 }, { v: 3 }] }],
+    [{ x: 1, y: { z: [] } }, { x: null, y: 'texto' }],
+  ];
+  pares.forEach(([x, y], i) => same(`diff+apply par ${i + 1}`, applyOps(clone(x), diff(x, y)), y));
+  eq('sem mudança, sem operação', diff(clone(pares[0][1]), clone(pares[0][1])).length, 0);
+  const ops = diff({ cena: { tokens: [{ id: 't', x: 1, y: 1 }] } }, { cena: { tokens: [{ id: 't', x: 4, y: 1 }] } });
+  eq('mover token gera uma operação só no campo x', ops, [{ op: 'set', path: ['cena', 'tokens', { id: 't' }, 'x'], value: 4 }]);
+  eq('mensagem nova no chat vira inserção identificada', diff({ chat: [{ id: 'a' }] }, { chat: [{ id: 'a' }, { id: 'b' }] })[0].op, 'ins');
+  eq('ids repetidos: lista tratada por posição', keyOf([{ id: 'x' }, { id: 'x' }]), null);
+}
+
+// simulação de servidor + clientes (mesma regra do servidor.py)
+function simServer() { return { estado: null, v: 0, lotes: {}, log: [] }; }
+function srvReceive(srv, cliente, b) {
+  if (b.lote <= (srv.lotes[cliente] || 0)) return;
+  srv.lotes[cliente] = b.lote;
+  for (const op of b.ops) {
+    if (srv.estado == null) { if (op.op === 'set' && !op.path.length) srv.estado = clone(op.value); continue; }
+    applyOps(srv.estado, [op]);
+  }
+  b.enviado = true;
+  srv.log.push({ tipo: 'ops', v: ++srv.v, origem: cliente, lote: b.lote, ops: clone(b.ops) });
+}
+const sendAll = (srv, c) => { let b; while ((b = c.nextUnsent())) srvReceive(srv, c.cliente, b); };
+const deliver = (srv, c) => { while (c.v < srv.v) c.receive(srv.log[c.v]); };
+const join = (srv, cliente) => { const c = new SyncClient({}, cliente); c.start({ v: srv.v, estado: srv.estado }); return c; };
+{
+  const srv = simServer();
+  const A = new SyncClient(emptyState(), 'A');
+  eq('mesa nova: cliente envia o estado inicial', A.start({ v: 0, estado: null }), false);
+  sendAll(srv, A); deliver(srv, A);
+  A.state.cena.tokens.push({ id: 't1', atorId: 'a1', x: 0, y: 0 }); A.flush(); sendAll(srv, A); deliver(srv, A);
+  const B = join(srv, 'B');
+  same('quem entra recebe a mesa', B.state, A.state);
+
+  // os dois escrevem no chat ao mesmo tempo; o servidor recebe B antes de A
+  A.state.chat.push({ id: 'mA', texto: 'oi' }); A.flush();
+  B.state.chat.push({ id: 'mB', texto: 'olá' }); B.flush();
+  sendAll(srv, B); sendAll(srv, A);
+  deliver(srv, A); deliver(srv, B);
+  eq('mensagens simultâneas: nenhuma se perde', srv.estado.chat.map(m => m.id).sort(), ['mA', 'mB']);
+  same('mensagens simultâneas: A igual ao servidor', A.state, srv.estado);
+  same('mensagens simultâneas: B igual ao servidor', B.state, srv.estado);
+
+  // mesmo campo: o último que chega ao servidor vale para todos
+  A.state.cena.tokens[0].x = 3; A.flush();
+  B.state.cena.tokens[0].x = 5; B.flush();
+  sendAll(srv, A); sendAll(srv, B);
+  B.state.cena.tokens[0].y = 2; // B continua mexendo antes de receber A
+  deliver(srv, B);
+  eq('B mantém a própria mudança pendente ao receber a de A', B.state.cena.tokens[0].x, 5);
+  B.flush(); sendAll(srv, B); deliver(srv, A); deliver(srv, B);
+  same('conflito no mesmo campo: A converge', A.state, srv.estado);
+  same('conflito no mesmo campo: B converge', B.state, srv.estado);
+  eq('conflito no mesmo campo: vale o último recebido pelo servidor', [srv.estado.cena.tokens[0].x, srv.estado.cena.tokens[0].y], [5, 2]);
+
+  // lote devolvido só sai da fila; reenvio duplicado é ignorado pelo servidor
+  A.state.regras.teste = true; const lote = A.flush();
+  srvReceive(srv, 'A', lote); srvReceive(srv, 'A', { ...lote });
+  deliver(srv, A); deliver(srv, B);
+  eq('reenvio do mesmo lote não duplica', srv.log.filter(m => m.origem === 'A' && m.lote === lote.lote).length, 1);
+  eq('lote devolvido sai dos pendentes', A.pending.length, 0);
+
+  // reconexão: o servidor já tinha recebido o lote, mas a devolução se perdeu
+  B.state.atores.push({ id: 'n1', nome: 'NPC' }); const lb = B.flush(); srvReceive(srv, 'B', lb);
+  B.state.atores[0].nome = 'NPC 2'; B.flush(); // ainda não enviado
+  B.resync({ v: srv.v, estado: clone(srv.estado), lote: srv.lotes.B });
+  eq('reconexão: lote já recebido sai dos pendentes', B.pending.map(b => b.lote), [lb.lote + 1]);
+  eq('reconexão: mudança não enviada continua na tela', B.state.atores[0].nome, 'NPC 2');
+  sendAll(srv, B); deliver(srv, A); deliver(srv, B);
+  same('reconexão: A converge', A.state, srv.estado);
+  same('reconexão: B converge', B.state, srv.estado);
+  eq('mensagem fora de ordem pede o estado inteiro', A.receive({ tipo: 'ops', v: A.v + 2, ops: [] }), 'lacuna');
+}
 
 // --- saída ---
 const fails = results.filter(x => !x.ok);

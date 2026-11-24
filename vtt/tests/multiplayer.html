@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>Omni — Teste multiplayer</title>
+<style>body{font:14px system-ui;margin:20px;background:#fff;color:#111}.ok{color:#2a7a3a}.fail{color:#b00;font-weight:bold}pre{margin:0}
+iframe{width:49%;height:420px;border:1px solid #999}</style></head>
+<body><h1>Teste multiplayer</h1>
+<p>Precisa do <code>servidor.py</code>. Abre duas cópias da mesa numa mesa nova e confere se o que uma faz aparece na outra.</p>
+<div id="out">rodando…</div>
+<iframe id="a" title="Jogador A"></iframe><iframe id="b" title="Jogador B"></iframe>
+<script type="module">
+const results = [];
+const ok = (name, cond, extra = '') => results.push({ name, ok: !!cond, extra });
+const wait = async (fn, ms = 6000) => { const t = Date.now(); while (Date.now() - t < ms) { try { const v = fn(); if (v) return v; } catch {} await new Promise(r => setTimeout(r, 50)); } return null; };
+const doc = id => document.getElementById(id).contentDocument;
+const load = (id, url) => new Promise(r => { const f = document.getElementById(id); f.onload = r; f.src = url; });
+const names = id => [...doc(id).querySelectorAll('.actor-list .name')].map(n => n.firstChild.textContent.trim());
+const chatText = id => doc(id).getElementById('chat-log').textContent;
+
+const ping = await fetch('/api/ping').then(r => r.ok && r.json()).catch(() => null);
+if (!ping?.omni) {
+  document.getElementById('out').innerHTML = '<p class="fail">Servidor da mesa não encontrado. Rode <code>python servidor.py</code> e abra esta página por ele.</p>';
+} else {
+  localStorage.setItem('omni-nome', 'Teste');
+  localStorage.removeItem('omni-vtt-estado-v1'); // sem mesa local: a mesa nova começa com o exemplo
+  const sala = 'teste-' + Date.now().toString(36);
+  await load('a', `/vtt/?mesa=${sala}`);
+  ok('A carrega a mesa de exemplo', await wait(() => names('a').length >= 2), names('a').join(', '));
+  await load('b', `/vtt/?mesa=${sala}`);
+  ok('B vê as mesmas fichas', await wait(() => names('b').join() === names('a').join()), names('b').join(', '));
+  ok('presença: 2 na mesa (A)', await wait(() => doc('a').getElementById('btn-net').textContent.includes('2 na mesa')), doc('a').getElementById('btn-net').textContent);
+
+  // chat de A aparece em B
+  const fa = doc('a').getElementById('chat-form');
+  fa.msg.value = 'mensagem de teste A'; fa.requestSubmit();
+  ok('chat de A chega a B', await wait(() => chatText('b').includes('mensagem de teste A')));
+
+  // os dois escrevem ao mesmo tempo
+  const fb = doc('b').getElementById('chat-form');
+  fa.msg.value = 'simultânea A'; fb.msg.value = 'simultânea B'; fa.requestSubmit(); fb.requestSubmit();
+  ok('mensagens simultâneas chegam às duas mesas', await wait(() => ['a', 'b'].every(i => chatText(i).includes('simultânea A') && chatText(i).includes('simultânea B'))));
+
+  // B cria um NPC, A vê
+  const antes = names('a').length;
+  doc('b').getElementById('btn-new-npc').click();
+  ok('NPC criado por B aparece em A', await wait(() => names('a').length === antes + 1), names('a').join(', '));
+
+  // A recarrega a página e continua com tudo
+  await load('a', `/vtt/?mesa=${sala}`);
+  ok('após recarregar, A mantém o NPC e o chat', await wait(() => names('a').length === antes + 1 && chatText('a').includes('simultânea B')));
+}
+const fails = results.filter(x => !x.ok);
+document.title = fails.length ? `FALHOU ${fails.length}` : `OK ${results.length}`;
+// ?relatar=1: grava o resultado na mesa "resultado-teste" (mesas/resultado-teste.json) para execução sem tela
+if (new URLSearchParams(location.search).has('relatar')) fetch('/api/mesa/resultado-teste/ops', {
+  method: 'POST', headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ cliente: 'teste-' + Date.now(), lote: 1, ops: [{ op: 'set', path: [], value: { results, quando: new Date().toISOString() } }] }),
+});
+if (results.length) document.getElementById('out').innerHTML = `<p><b>${results.length - fails.length}/${results.length}</b> testes passaram.</p>` +
+  results.map(x => `<pre class="${x.ok ? 'ok' : 'fail'}">${x.ok ? '✓' : '✗'} ${x.name}${x.ok ? '' : ' — ' + x.extra}</pre>`).join('');
+</script></body></html>

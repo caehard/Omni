@@ -4,7 +4,7 @@ import { prepareDerived, aptidaoLabel } from '../system/actor.js';
 import { applyDamage, heal, loseSanity, deathRoll, spendAction, rest } from '../system/combat.js';
 import { blockDistance, zoneForBlocks } from './board.js';
 import { rollFormula } from '../system/dice.js';
-import { state, update, getActor, subscribe } from '../core/store.js';
+import { state, local, update, getActor, subscribe } from '../core/store.js';
 import { makeWindow, esc, getPath, setPath, toast, closeWindow, readFile, pickFile } from './dom.js';
 import { openRollDialog } from './roll-dialog.js';
 import { post, postSystem } from './chat.js';
@@ -443,7 +443,7 @@ function attack(actor, i) {
   if (!chargeTime(actor, w.tempoExtra, `Ataque com ${w.nome || 'arma'}`)) return;
   const limite = Number((w.palavrasChave || '').match(/arma de fogo\s*\((\d+)\)/i)?.[1]) || 0;
   const disparo = Number((w.palavrasChave || '').match(/disparo\s*\((\d+)\)/i)?.[1]) || 0;
-  const alvo = getActor(state.cena.alvoId); // ND do ataque = Evasão do alvo
+  const alvo = getActor(local.alvoId); // ND do ataque = Evasão do alvo
   const rc = rangeCheck(w, alvo && zoneBetween(actor, alvo));
   if (rc.nota.startsWith('⚠')) toast(rc.nota);
   openRollDialog(actor.id, { attr: w.atributo, aptIndex: w.aptIndex, aptExigida: w.aptExigida, manuseio: w.manuseio,

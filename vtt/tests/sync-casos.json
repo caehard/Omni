@@ -1,0 +1,16 @@
+[
+  { "nome": "set aninhado", "inicial": { "a": { "b": 1 } }, "ops": [{ "op": "set", "path": ["a", "b"], "value": 2 }], "esperado": { "a": { "b": 2 } } },
+  { "nome": "set cria chave", "inicial": { "a": {} }, "ops": [{ "op": "set", "path": ["a", "n"], "value": { "x": [1, 2] } }], "esperado": { "a": { "n": { "x": [1, 2] } } } },
+  { "nome": "del chave", "inicial": { "a": 1, "b": 2 }, "ops": [{ "op": "del", "path": ["a"] }], "esperado": { "b": 2 } },
+  { "nome": "set em item identificado", "inicial": { "l": [{ "id": "x", "v": 1 }, { "id": "y", "v": 2 }] }, "ops": [{ "op": "set", "path": ["l", { "id": "y" }, "v"], "value": 5 }], "esperado": { "l": [{ "id": "x", "v": 1 }, { "id": "y", "v": 5 }] } },
+  { "nome": "ins depois de outro", "inicial": { "l": [{ "id": "x" }, { "id": "y" }] }, "ops": [{ "op": "ins", "path": ["l"], "key": "id", "value": { "id": "z" }, "after": "x" }], "esperado": { "l": [{ "id": "x" }, { "id": "z" }, { "id": "y" }] } },
+  { "nome": "ins no início", "inicial": { "l": [{ "id": "x" }] }, "ops": [{ "op": "ins", "path": ["l"], "key": "id", "value": { "id": "z" }, "after": null }], "esperado": { "l": [{ "id": "z" }, { "id": "x" }] } },
+  { "nome": "ins de item existente o reposiciona", "inicial": { "l": [{ "id": "x" }, { "id": "y", "v": 1 }, { "id": "w" }] }, "ops": [{ "op": "ins", "path": ["l"], "key": "id", "value": { "id": "y", "v": 2 }, "after": "w" }], "esperado": { "l": [{ "id": "x" }, { "id": "w" }, { "id": "y", "v": 2 }] } },
+  { "nome": "ins com âncora inexistente vai para o fim", "inicial": { "l": [{ "id": "x" }] }, "ops": [{ "op": "ins", "path": ["l"], "key": "id", "value": { "id": "z" }, "after": "sumiu" }], "esperado": { "l": [{ "id": "x" }, { "id": "z" }] } },
+  { "nome": "del item identificado", "inicial": { "l": [{ "id": "x" }, { "id": "y" }] }, "ops": [{ "op": "del", "path": ["l", { "id": "x" }] }], "esperado": { "l": [{ "id": "y" }] } },
+  { "nome": "set por índice", "inicial": { "l": [{ "v": 1 }, { "v": 2 }] }, "ops": [{ "op": "set", "path": ["l", 1, "v"], "value": 9 }], "esperado": { "l": [{ "v": 1 }, { "v": 9 }] } },
+  { "nome": "caminho que não existe é ignorado", "inicial": { "l": [{ "id": "x", "v": 1 }] }, "ops": [{ "op": "set", "path": ["l", { "id": "nope" }, "v"], "value": 3 }, { "op": "set", "path": ["q", "r"], "value": 1 }], "esperado": { "l": [{ "id": "x", "v": 1 }] } },
+  { "nome": "set na raiz substitui tudo", "inicial": { "a": 1 }, "ops": [{ "op": "set", "path": [], "value": { "b": 2 } }], "esperado": { "b": 2 } },
+  { "nome": "item identificado por atorId", "inicial": { "c": [{ "atorId": "a", "n": 0 }, { "atorId": "b", "n": 0 }] }, "ops": [{ "op": "set", "path": ["c", { "atorId": "b" }, "n"], "value": 3 }], "esperado": { "c": [{ "atorId": "a", "n": 0 }, { "atorId": "b", "n": 3 }] } },
+  { "nome": "várias operações em sequência", "inicial": { "chat": [], "cena": { "tokens": [{ "id": "t1", "x": 0 }] } }, "ops": [{ "op": "ins", "path": ["chat"], "key": "id", "value": { "id": "m1", "texto": "oi" }, "after": null }, { "op": "set", "path": ["cena", "tokens", { "id": "t1" }, "x"], "value": 4 }, { "op": "ins", "path": ["chat"], "key": "id", "value": { "id": "m2", "texto": "olá" }, "after": "m1" }], "esperado": { "chat": [{ "id": "m1", "texto": "oi" }, { "id": "m2", "texto": "olá" }], "cena": { "tokens": [{ "id": "t1", "x": 4 }] } } }
+]
