@@ -5,7 +5,7 @@ Sistema de RPG **autoral** (em testes) + **mesa virtual própria ("TTS")** para 
 ## Regras de trabalho (pedidas pelo autor)
 
 1. **Toda mudança deve ser commitada e enviada** para `https://github.com/caehard/Omni` (branch `main`). Mensagens de commit em português.
-2. **Em caso de dúvida sobre regras, pergunte ao autor antes de assumir.** O livro tem contradições conhecidas. Registre decisões e pendências em [`docs/pendencias.md`](docs/pendencias.md) (decisões D1–D36 e pendência P1 até agora).
+2. **Em caso de dúvida sobre regras, pergunte ao autor antes de assumir.** O livro tem contradições conhecidas. Registre decisões e pendências em [`docs/pendencias.md`](docs/pendencias.md) (decisões D1–D37 até agora; nenhuma pendência aberta).
 3. Ao propor opções de regra, ofereça alternativas concretas (o autor escolhe).
 
 ## Estrutura
@@ -69,7 +69,7 @@ python tools/testar_servidor.py
   2. ✅ Desenho e medição: quadro branco, áreas de efeito (tamanho em zonas, atingidos), régua com vários pontos compartilhada.
   3. ✅ Mestre × jogador e névoa: papéis, donos, ocultos, sussurros, rolagens secretas, névoa (servidor filtra por jogador).
   4. Fluxo de jogo: ✅ dados animados. Falta: barra de ações rápidas, turno ativo destacado, diário/handouts, música ambiente.
-- **Pendência de regra aberta: P1** (tamanho das áreas em zonas → blocos), em `docs/pendencias.md`.
+- **D37** (era P1): zona → blocos usa sempre o limite de cima (C 0, D 1, L 3, ML 7, EL 15). A ferramenta de área tem o tamanho em zona (`fixedArea` em `ui/layers.js`) ou livre.
 
 ## Próximos passos possíveis
 

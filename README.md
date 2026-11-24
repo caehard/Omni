@@ -85,7 +85,7 @@ Toda mudança passa por `store.update()`. O cliente compara o estado com a últi
 - **Mapa** com imagem de fundo, grade em blocos 2×2 e **medição em zonas** (regra do Apêndice 4.1; tokens grandes contam da borda).
 - **Tokens** de 1×1 a 4×4 com barra de vida, ícones de condição, marcas de alvo, Portas da Morte e morte; menu rápido do token selecionado (vida, sanidade, condições, tamanho, ficha, dano/cura); seleção múltipla com caixa e Shift; setas movem.
 - **Ping** no mapa (Alt+clique; com Shift leva a visão de todos) e **desfazer/refazer** (Ctrl+Z / Ctrl+Y).
-- **Ferramentas** na paleta do mapa: régua com vários pontos (todos veem a sua medição ao vivo), desenho tipo quadro branco (livre, linha, retângulo, círculo, texto, borracha), **áreas de efeito** (círculo, quadrado, cone de 45°, linha) que mostram o tamanho em zonas e destacam quem é atingido, e **névoa de guerra** (o mestre revela/cobre arrastando; o servidor não manda aos jogadores os tokens que estão no escuro).
+- **Ferramentas** na paleta do mapa: régua com vários pontos (todos veem a sua medição ao vivo), desenho tipo quadro branco (livre, linha, retângulo, círculo, texto, borracha), **áreas de efeito** (círculo, quadrado, cone de 45°, linha) com tamanho em zona — Curto a Extremamente Longe, pelo limite de cima (Longe = 3 blocos) — ou livre, que destacam quem é atingido, e **névoa de guerra** (o mestre revela/cobre arrastando; o servidor não manda aos jogadores os tokens que estão no escuro).
 - **Dados animados**: cada rolagem aparece rolando sobre o mapa e para nos valores do cartão (🎲 no Registro desliga).
 - **Descanso** rápido, curto e prolongado. Regras opcionais ligáveis.
 - **Multiplayer** por link (veja acima), com lista de quem está conectado e reconexão automática.

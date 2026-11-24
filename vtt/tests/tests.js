@@ -9,7 +9,7 @@ import { diff, applyOps, clone, keyOf } from '../js/core/sync-ops.js';
 import { SyncClient } from '../js/core/sync-client.js';
 import { emptyState, migrate, state, local, update, replaceState, setSyncHook, remoteApplied, ownsActor, sheetAccess } from '../js/core/store.js';
 import { sanitize } from '../js/ui/chat.js';
-import { insideArea, tokensInArea, areaExtent, pathBlocks, tokenVisible, hitDrawing } from '../js/ui/layers.js';
+import { insideArea, tokensInArea, areaExtent, pathBlocks, tokenVisible, hitDrawing, zoneBlocks, fixedArea } from '../js/ui/layers.js';
 import { initHistory, undo, redo, checkpoint } from '../js/core/history.js';
 import { blockDistance } from '../js/ui/board.js';
 
@@ -299,6 +299,22 @@ eq('distância: token 4×4 até 2 blocos à direita', blockDistance({ x: 0, y: 0
   eq('linha: um quadrado de largura', [insideArea(linha, { x: 0.5, y: 3.5 }), insideArea(linha, { x: 1.5, y: 3.5 })], [true, false]);
   eq('quadrado: lado pelo maior deslocamento', [insideArea({ forma: 'quadrado', a: { x: 4.5, y: 4.5 }, b: { x: 6.5, y: 5.5 } }, { x: 2.5, y: 6.5 })], [true]);
   eq('área: tamanho medido como a régua (diâmetro 4 quadrados = 2 blocos)', areaExtent(circ), 2);
+  // D37: tamanho em zona = limite de cima (as pontas ficam N blocos distantes)
+  eq('zona → blocos pelo limite de cima', ['C', 'D', 'L', 'ML', 'EL'].map(zoneBlocks), [0, 1, 3, 7, 15]);
+  const cL = { forma: 'circulo', ...fixedArea('circulo', 'L', { x: 9.3, y: 8.6 }) };
+  eq('círculo diâmetro L: 4 blocos, centro num canto de bloco', [cL.a, cL.b.x - cL.a.x, areaExtent(cL)], [{ x: 10, y: 8 }, 4, 3]);
+  const qC = { forma: 'quadrado', ...fixedArea('quadrado', 'C', { x: 4.2, y: 4.9 }) };
+  const qCatinge = [];
+  for (let x = 0; x < 8; x++) for (let y = 0; y < 8; y++) if (insideArea(qC, { x: x + 0.5, y: y + 0.5 })) qCatinge.push(`${x},${y}`);
+  eq('quadrado lado C: exatamente um bloco', qCatinge, ['4,4', '4,5', '5,4', '5,5']);
+  const qD = { forma: 'quadrado', ...fixedArea('quadrado', 'D', { x: 4.6, y: 4.6 }) };
+  eq('quadrado lado D: 2×2 blocos alinhados', [qD.a, [{ x: 1.5, y: 1.5 }, { x: 2.5, y: 4.5 }, { x: 5.5, y: 5.5 }].map(p => insideArea(qD, p))], [{ x: 4, y: 4 }, [false, true, true]]);
+  const lL = { forma: 'linha', ...fixedArea('linha', 'L', { x: 0.7, y: 0.4 }, { x: 20.7, y: 0.4 }) };
+  const lLatinge = [];
+  for (let x = 0; x < 12; x++) for (let y = 0; y < 4; y++) if (insideArea(lL, { x: x + 0.5, y: y + 0.5 })) lLatinge.push(`${x},${y}`);
+  eq('linha distância L: uma fileira de 4 blocos inteiros a partir do bloco clicado', [lL.a, lL.b, areaExtent(lL), lLatinge.length, lLatinge.includes('0,0'), lLatinge.includes('7,1'), lLatinge.includes('8,0')], [{ x: 0, y: 1 }, { x: 8, y: 1 }, 3, 16, true, true, false]);
+  const coneD = { forma: 'cone', ...fixedArea('cone', 'D', { x: 2.2, y: 2.2 }, { x: 2.2, y: 2.2 }) };
+  eq('cone sem arrasto aponta para a direita, altura D', [coneD.a, coneD.b, insideArea(coneD, { x: 5.5, y: 3.5 }), insideArea(coneD, { x: 6.5, y: 3.5 })], [{ x: 3, y: 3 }, { x: 6, y: 3 }, true, false]);
   eq('régua com vários pontos soma os trechos', pathBlocks([{ x: 0, y: 0 }, { x: 4, y: 0 }, { x: 4, y: 6 }]), 5);
   const nv = { ativa: true, revelado: { '3,3': 1 } };
   eq('névoa: token só aparece com algum quadrado revelado', [tokenVisible(nv, tok(3, 3)), tokenVisible(nv, tok(2, 2, 2)), tokenVisible(nv, tok(5, 5)), tokenVisible({ ativa: false }, tok(5, 5))], [true, true, false, true]);

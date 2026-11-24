@@ -2,7 +2,7 @@
 // áreas de efeito, borracha e névoa de guerra (mestre). A paleta fica no canto do mapa.
 import { state, local, scene, update, isGM } from '../core/store.js';
 import { net, sendEvent, onEvent, playerColor } from '../core/net.js';
-import { hitDrawing } from './layers.js';
+import { hitDrawing, fixedArea } from './layers.js';
 import { uid } from '../system/actor.js';
 import { esc } from './dom.js';
 
@@ -14,14 +14,17 @@ const TOOLS = [
   { id: 'retangulo', icon: '▭', nome: 'Retângulo', tecla: 'Q' },
   { id: 'circulo', icon: '◯', nome: 'Círculo', tecla: 'C' },
   { id: 'texto', icon: 'T', nome: 'Texto: clique onde escrever', tecla: 'T' },
-  { id: 'area', icon: '✺', nome: 'Área de efeito: arraste da origem; mostra quem é atingido', tecla: 'A' },
+  { id: 'area', icon: '✺', nome: 'Área de efeito: escolha forma e tamanho (zona) ou arraste livre; mostra quem é atingido', tecla: 'A' },
   { id: 'borracha', icon: '⌫', nome: 'Borracha: clique ou arraste sobre desenhos', tecla: 'E' },
   { id: 'nevoa', icon: '▦', nome: 'Névoa de guerra (mestre): arraste para revelar ou cobrir', tecla: 'F', mestre: true },
 ];
 const CORES = ['#b5462f', '#2f6690', '#3a7d44', '#a0761e', '#6b3fa0', '#111111'];
 const FORMAS = [['circulo', '◯', 'Círculo/esfera'], ['quadrado', '▢', 'Quadrado/cubo'], ['cone', '◣', 'Cone (45°)'], ['linha', '━', 'Linha']];
 
-const opt = { tool: 'selecionar', cor: CORES[0], esp: 3, forma: 'circulo', modoNevoa: 'revelar' };
+// Tamanho da área: livre (arrasta) ou travado numa zona, pelo limite de cima (D37)
+const TAMANHOS = [['', 'Livre', 'Tamanho livre: arraste'], ['C', 'C', 'Curto (0 bl)'], ['D', 'D', 'Distante (1 bl)'], ['L', 'L', 'Longe (3 bl)'], ['ML', 'ML', 'Muito Longe (7 bl)'], ['EL', 'EL', 'Extremamente Longe (15 bl)']];
+
+const opt = { tool: 'selecionar', cor: CORES[0], esp: 3, forma: 'circulo', zona: '', modoNevoa: 'revelar' };
 let palette, redraw = () => {}, preview = null, fogBox = null, ruler = null;
 const remoteRulers = new Map(); // cliente -> { pts, cor, nome, t }
 
@@ -57,7 +60,8 @@ export function setTool(id) {
 function renderPalette() {
   const sc = scene(), nv = sc?.nevoa || {};
   const extra = {
-    area: `<div class="tp-row">${FORMAS.map(([f, i, n]) => `<button data-forma="${f}" aria-pressed="${opt.forma === f}" title="${n}">${i}</button>`).join('')}</div>`,
+    area: `<div class="tp-row">${FORMAS.map(([f, i, n]) => `<button data-forma="${f}" aria-pressed="${opt.forma === f}" title="${n}">${i}</button>`).join('')}</div>
+      <div class="tp-row tp-zonas">${TAMANHOS.map(([z, r, n]) => `<button data-zona="${z}" aria-pressed="${opt.zona === z}" title="${n}">${r}</button>`).join('')}</div>`,
     nevoa: `<div class="tp-col">
       <label class="tp-check"><input type="checkbox" data-nevoa-ativa ${nv.ativa ? 'checked' : ''}> Névoa ativa</label>
       <div class="tp-row"><button data-modo="revelar" aria-pressed="${opt.modoNevoa === 'revelar'}" title="Arrastar revela">Revelar</button><button data-modo="cobrir" aria-pressed="${opt.modoNevoa === 'cobrir'}" title="Arrastar cobre">Cobrir</button></div>
@@ -78,6 +82,7 @@ function onPaletteClick(e) {
   if (b.dataset.tool) return setTool(b.dataset.tool);
   if (b.dataset.cor) { opt.cor = b.dataset.cor; renderPalette(); return; }
   if (b.dataset.forma) { opt.forma = b.dataset.forma; renderPalette(); return; }
+  if (b.dataset.zona != null) { opt.zona = b.dataset.zona; renderPalette(); return; }
   if (b.dataset.modo) { opt.modoNevoa = b.dataset.modo; renderPalette(); return; }
   const sc = scene();
   if (b.matches('[data-nevoa-ativa]')) { update(() => { sc.nevoa = { revelado: {}, ...(sc.nevoa || {}), ativa: b.checked }; }); renderPalette(); return; }
@@ -133,6 +138,14 @@ export function toolDown(e, api) {
       return;
     }
     case 'area': {
+      if (opt.zona) { // tamanho travado: clique posiciona, arrastar só aponta (cone e linha)
+        const forma = opt.forma, zona = opt.zona, origem = { x: c.fx, y: c.fy };
+        const monta = q => ({ tipo: 'area', forma, ...fixedArea(forma, zona, origem, q), cor: opt.cor });
+        preview = monta(origem);
+        redraw();
+        api.track(e, ev => { const q = api.cell(ev); preview = monta({ x: q.fx, y: q.fy }); redraw(); }, () => commit(true));
+        return;
+      }
       const centro = { x: c.x + 0.5, y: c.y + 0.5 }; // origem no centro do quadrado
       preview = { tipo: 'area', forma: opt.forma, a: centro, b: { ...centro }, cor: opt.cor };
       api.track(e, ev => { const q = api.cell(ev); preview.b = { x: q.x + 0.5, y: q.y + 0.5 }; redraw(); }, () => commit(true));

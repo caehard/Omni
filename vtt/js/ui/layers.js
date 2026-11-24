@@ -55,9 +55,43 @@ export function tokensInArea(area, tokens) {
   });
 }
 
+/** Distância de uma zona em blocos: sempre o limite de cima (decisão D37). C = 0, D = 1, L = 3, ML = 7, EL = 15. */
+export function zoneBlocks(id) {
+  const z = (CONFIG.sistema?.zonas || []).find(z => z.id === id);
+  return z ? (z.blocos[1] ?? z.blocos[0]) : null;
+}
+
+/**
+ * Área com tamanho em zona (D37): as pontas ficam N blocos distantes, como na régua, então a área ocupa N + 1 blocos
+ * de diâmetro/lado/altura/comprimento. Círculo e quadrado ficam centrados e alinhados aos blocos; cone e linha saem
+ * do centro do bloco clicado, na direção do arrasto. p = onde clicou, q = onde está o ponteiro (quadrados, com fração).
+ */
+export function fixedArea(forma, zona, p, q) {
+  const n = zoneBlocks(zona);
+  if (n == null) return null;
+  const meio = n + 1; // em quadrados: metade de N + 1 blocos de 2 quadrados
+  if (forma === 'circulo' || forma === 'quadrado') {
+    // N + 1 blocos: com número par de blocos o centro fica num canto de bloco; com ímpar, no meio de um bloco
+    const snap = v => meio % 2 === 0 ? Math.round(v / 2) * 2 : Math.round((v - 1) / 2) * 2 + 1;
+    const a = { x: snap(p.x), y: snap(p.y) };
+    return { a, b: { x: a.x + meio, y: a.y }, zona };
+  }
+  // cone e linha: a partir do centro do bloco clicado (linha reta = uma fileira de blocos), na direção do arrasto
+  const c = { x: Math.floor(p.x / 2) * 2 + 1, y: Math.floor(p.y / 2) * 2 + 1 };
+  let dx = q.x - p.x, dy = q.y - p.y, len = Math.hypot(dx, dy);
+  if (len < 1e-9) { dx = 1; dy = 0; len = 1; }
+  const ux = dx / len, uy = dy / len, r = v => Math.round(v * 1000) / 1000;
+  // cone: vértice no centro do bloco, altura até a borda do bloco N (2N + 1 quadrados)
+  // linha: começa na borda de trás do bloco de origem e cobre N + 1 blocos inteiros (2N + 2 quadrados)
+  const [atras, L] = forma === 'linha' ? [1, 2 * meio] : [0, 2 * meio - 1];
+  const a = { x: r(c.x - ux * atras), y: r(c.y - uy * atras) };
+  return { a, b: { x: r(a.x + ux * L), y: r(a.y + uy * L) }, zona };
+}
+
 /** Tamanho da área medido como na régua: distância em blocos entre as pontas (diâmetro, lado, altura ou comprimento). */
 export function areaExtent(area) {
   const { a, b, forma } = area;
+  if (area.zona && zoneBlocks(area.zona) != null) return zoneBlocks(area.zona);
   const cell = p => ({ x: Math.floor(p.x), y: Math.floor(p.y) });
   if (forma === 'circulo' || forma === 'quadrado') {
     const r = forma === 'circulo' ? Math.hypot(b.x - a.x, b.y - a.y) : Math.max(Math.abs(b.x - a.x), Math.abs(b.y - a.y));

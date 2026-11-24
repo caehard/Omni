@@ -117,6 +117,8 @@ input[type=number]::-webkit-inner-spin-button { opacity: .5; }
 .tool-palette .tp-col .tp-row { border: none; padding: 0; }
 .tool-palette .tp-check { font-size: 11px; display: flex; gap: 4px; align-items: center; }
 .tool-palette .tp-cores { grid-template-columns: repeat(2, 1fr); }
+.tool-palette .tp-zonas button { font-size: 11px; height: 24px; }
+.tool-palette .tp-zonas button[data-zona=""] { grid-column: 1 / -1; }
 .tool-palette .tp-cores button { height: 18px; min-width: 0; background: var(--c); border: 2px solid var(--paper); box-shadow: 0 0 0 1px var(--line-soft); }
 .tool-palette .tp-cores button[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--ink); background: var(--c); }
 .tool-palette [data-limpar] { font-size: 11px; padding: 2px 4px; border-color: var(--line-soft); }

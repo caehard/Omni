@@ -42,12 +42,11 @@ Este arquivo registra as **decisões já tomadas** sobre contradições do livro
 | D34 | Escudos | São armas (bloqueiam com Impacto + Bloqueio) | 2.5 |
 | D35 | Catálogo | Arcabuz, Mosquete e Revólver em Incomum; Machadinha no lugar do Machado de Guerra comum; “Pike” → Pique | 2.5 |
 | D36 | Ficha | Campo explícito de Atributo de Determinação (Raciocínio/Instinto) | Ficha |
+| D37 | Zona → blocos (era P1) | Sempre o **limite de cima** da zona: C = 0, D = 1, L = 3, ML = 7, EL = 15 blocos de distância. Área de diâmetro Longe: pontas a 3 blocos (4 blocos de ponta a ponta). No TTS, a ferramenta de área tem o tamanho em zona (círculo/quadrado centrados e alinhados aos blocos; cone e linha a partir do bloco clicado) ou livre | Apêndice 4.1, cap. 7, TTS |
 
 ## ❓ Pendências
 
-| # | Tema | Dúvida | Como o TTS faz por enquanto |
-|---|---|---|---|
-| P1 | Áreas de efeito no mapa (cap. 7, Tabela de Áreas) | A tabela dá o tamanho da área em zonas (diâmetro/lado, altura do cone, distância da linha: C, D, L, ML, EL), e o texto diz que acertos em área são por zona. Quantos blocos tem, no mapa, uma área de “diâmetro Longe”? (ex.: o limite de cima da zona — L = 3 blocos —, o de baixo — 2 —, ou atinge zonas inteiras a partir da origem?) | A ferramenta de área não impõe tamanho: o mestre arrasta, e ela mostra o tamanho medido como a régua (distância em blocos entre as pontas → zona) e quem tem algum quadrado dentro. Cone com 45° (como no livro). |
+Nenhuma pendência de regra aberta.
 
 ### Adiado pelo autor
 - Magias (“Pacotes > Magias”; tipos Mahi, Logi e Centi).

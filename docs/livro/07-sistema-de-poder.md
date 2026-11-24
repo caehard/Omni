@@ -263,6 +263,8 @@ Para se utilizar essas tabelas, considera-se que linhas com o mesmo valor de pon
 *Legenda: EL = Extremamente Longe · ML = Muito Longe · L = Longe · D = Distante · C = Curto*
 
 > **Observação:** Para efeitos de simplificação, considera-se que um cone sempre tem 45° de ângulo de abertura.
+>
+> **No mapa com blocos** (Apêndice 4.1), o tamanho em zona usa o limite de cima da zona: uma área de diâmetro Longe tem as pontas a 3 blocos uma da outra (4 blocos de ponta a ponta).
 
 ### Poderes VS Habilidades
 

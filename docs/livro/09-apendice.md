@@ -17,6 +17,8 @@ Nesta seção ofereceremos duas alternativas para a movimentação do jogador se
 | L | ML | ML | ML | ML | EL | EL | EL | EL | EL | EL | EL | EL | FC | FC | FC |
 | ML | ML | ML | ML | EL | EL | EL | EL | EL | EL | EL | EL | FC | FC | FC | FC |
 
+Quando uma distância ou tamanho é dado em zona e precisa virar blocos (por exemplo, o tamanho de uma área de efeito), usa-se sempre o **limite de cima** da zona: Curto = 0, Distante = 1, Longe = 3, Muito Longe = 7 e Extremamente Longe = 15 blocos de distância. Assim, uma área de diâmetro Longe tem as pontas a 3 blocos uma da outra, ocupando 4 blocos de ponta a ponta; uma área Curta ocupa só o próprio bloco.
+
 ***Extra 2:*** Se ainda sim vocês buscarem uma forma de contabilizar o movimento mais precisa, a forma como você faz isso é considerando que uma zona curta é até 1 m de distância, uma zona distante é até 3 m, uma zona longe é 10 m, uma muito longe é 20 m, uma extremamente longe é 50 m e fora de cena é superior a 100 m, nesse cenário, o primeiro deslocamento no turno do personagem é igual a 8 + Destreza + Fortitude em metros e os deslocamentos seguintes são esse valor pela metade.
 
 ## 4.2 Armaduras Fracionárias e Dano Mistos
