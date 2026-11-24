@@ -81,7 +81,7 @@ O link muda a cada vez que o servidor abre. Sem o cloudflared, `serve.bat` funci
 |---|---|---|
 | Cenário (vista ou mapa visto de cima) | SDXL — DreamShaper XL Lightning | ~10 s (a 1ª ~30 s) |
 | Personagem (corpo inteiro ou busto) | SDXL — DreamShaper XL Lightning | ~10 s |
-| Cenário e personagem: cite `@Nome` de personagens da biblioteca (+ um cenário opcional) | Qwen-Image-Edit-2511 (lê até 3 imagens de referência) | ~1–2 min |
+| Cenário e personagem: cite `@Nome` de personagens da biblioteca (+ um cenário opcional) | Qwen-Image-Edit-2511 (lê até 3 imagens de referência) | ~3 min (a 1ª da sessão ~13 min: carrega 22 GB com 16 GB de RAM) |
 
   O texto pode ser escrito em português: um glossário (`data/gerador.json`) traduz para o SDXL, e o Qwen entende português. A calibração (tamanhos, passos, textos-base, estilos) fica toda em `data/gerador.json`. As imagens geradas chegam **ocultas** na biblioteca.
 

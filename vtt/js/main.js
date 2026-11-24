@@ -375,7 +375,7 @@ function openHelp() {
     <h4>Gerador de imagens (mestre)</h4><ul>
       <li>Roda no PC do mestre (ComfyUI). <b>Ligar gerador</b> na aba; <b>Desligar</b> libera a memória da placa.</li>
       <li><b>Cenário</b> (vista ou mapa visto de cima) e <b>Personagem</b> (corpo inteiro ou busto): ~10 s por imagem. Escreva em português.</li>
-      <li><b>Cenário e personagem</b>: cite personagens da biblioteca com <b>@Nome</b> (e um cenário opcional); o modelo lê as ilustrações e põe os personagens na cena (~1–2 min).</li>
+      <li><b>Cenário e personagem</b>: cite personagens da biblioteca com <b>@Nome</b> (e um cenário opcional); o modelo lê as ilustrações e põe os personagens na cena (~3 min; a primeira da sessão bem mais, carregando o modelo).</li>
       <li><b>Ctrl+Enter</b> gera. “Avançado” mostra (e deixa editar) o texto enviado ao modelo.</li></ul>
     <h4>Cenas</h4><ul>
       <li>Na aba <b>Cenas</b>: a marcada “jogadores aqui” é a que todos veem. Clicar em outra mostra só para você; ▶ leva os jogadores para ela.</li>

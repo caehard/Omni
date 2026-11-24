@@ -189,7 +189,7 @@ function renderPrevia() {
   if (!g.editarFinal || !g.positivoFinal) fin.value = r.pedido.positivo;
   const nomes = { sdxl: 'SDXL (DreamShaper XL Lightning)', qwen: 'Qwen-Image-Edit-2511 (lê as imagens de referência)' };
   const dur = status?.duracoes?.[r.pedido.modelo];
-  el.querySelector('[data-modelo-info]').textContent = `Modelo: ${nomes[r.pedido.modelo]} · ${r.pedido.largura}×${r.pedido.altura} · ${r.pedido.passos} passos${dur ? ` · última levou ${Math.round(dur)} s` : r.pedido.modelo === 'qwen' ? ' · a primeira vez demora mais (carrega o modelo)' : ''}`;
+  el.querySelector('[data-modelo-info]').textContent = `Modelo: ${nomes[r.pedido.modelo]} · ${r.pedido.largura}×${r.pedido.altura} · ${r.pedido.passos} passos${dur ? ` · última levou ${Math.round(dur)} s` : r.pedido.modelo === 'qwen' ? ' · ~3 min; a primeira da sessão ~10–15 min (carrega o modelo)' : ''}`;
   el.querySelector('[data-avisos]').innerHTML = r.avisos.map(a => `<p class="hint">⚠ ${esc(a)}</p>`).join('');
 }
 
@@ -279,7 +279,7 @@ function renderTrabalhos() {
   if (!box) return;
   box.innerHTML = trabalhos.map(t => {
     const itens = t.urls?.length ? library().filter(i => t.urls.includes(i.url)) : [];
-    const est = t.estimado || (t.modelo === 'qwen' ? 90 : 12);
+    const est = t.estimado || (t.modelo === 'qwen' ? 200 : 12);
     const pct = t.estado === 'pronto' ? 100 : t.estado === 'gerando' ? Math.min(95, (t.decorrido / est) * 100) : 3;
     return `<div class="ger-trab ${t.estado}">
       <div class="ger-trab-top"><b>${esc(t.rotulo)}</b> <small>${{ fila: 'na fila…', gerando: `gerando… ${Math.round(t.decorrido)} s`, pronto: 'pronta ✓', erro: 'erro' }[t.estado] || ''}</small>

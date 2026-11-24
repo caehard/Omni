@@ -77,7 +77,7 @@ python tools/testar_gerador.py
   2. ✅ Desenho e medição: quadro branco, áreas de efeito (tamanho em zonas, atingidos), régua com vários pontos compartilhada.
   3. ✅ Mestre × jogador e névoa: papéis, donos, ocultos, sussurros, rolagens secretas, névoa (servidor filtra por jogador).
   4. Fluxo de jogo: ✅ dados animados. Falta: barra de ações rápidas, turno ativo destacado, diário/handouts, música ambiente.
-- **Biblioteca + gerador de imagens local** (2026-11-24, pedido do autor): aba Biblioteca (todos) com Criação de token; aba Gerador de imagens (mestre) com 3 modos calibrados; ComfyUI instalado em `C:\Users\caean\Omni-Gerador` (RTX 3060 12 GB, 16 GB RAM). Testado de verdade: SDXL ~10 s por imagem (1ª ~30 s com carga do modelo).
+- **Biblioteca + gerador de imagens local** (2026-11-24, pedido do autor): aba Biblioteca (todos) com Criação de token; aba Gerador de imagens (mestre) com 3 modos calibrados; ComfyUI instalado em `C:\Users\caean\Omni-Gerador` (RTX 3060 12 GB, 16 GB RAM). Testado de verdade: SDXL ~10 s por imagem (1ª ~30 s); Qwen com 2 personagens + cenário ~3,3 min (1ª da sessão ~13,5 min: 16 GB de RAM não comportam o Qwen 12,8 GB + leitor 9,4 GB juntos, o Windows usa o disco). Personagens saem fiéis às ilustrações.
 - **D37** (era P1): zona → blocos usa sempre o limite de cima (C 0, D 1, L 3, ML 7, EL 15). A ferramenta de área tem o tamanho em zona (`fixedArea` em `ui/layers.js`) ou livre.
 
 ## Próximos passos possíveis
