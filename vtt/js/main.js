@@ -8,7 +8,9 @@ import { initScenes } from './ui/scenes.js';
 import { fillResources } from './system/actor.js';
 import { rollFormula } from './system/dice.js';
 import { initChat, postText, postSystem } from './ui/chat.js';
-import { initBoard, setRulerMode, centerView, focusView, worldToScreen, getView, getSelection, selectTokens } from './ui/board.js';
+import { initBoard, centerView, focusView, worldToScreen, getView, getSelection, selectTokens, redraw } from './ui/board.js';
+import { initTools, setTool, refreshPalette } from './ui/tools.js';
+import { initDiceTray } from './ui/dice-tray.js';
 import { initSidebar, newActor } from './ui/sidebar.js';
 import { openSheet } from './ui/sheet.js';
 import { makeWindow, toast, downloadFile, pickFile, readFile, esc } from './ui/dom.js';
@@ -35,6 +37,9 @@ async function boot() {
   initChat(document.getElementById('chat-log'));
   initBoard(document.getElementById('board'), { openSheet });
   initTokenHud(document.querySelector('.board-wrap'), { onOpenSheet: openSheet });
+  initTools(document.querySelector('.board-wrap'), { onRedraw: redraw });
+  initDiceTray(document.querySelector('.board-wrap'), document.getElementById('btn-dados-animados'));
+  subscribe(refreshPalette);
   initScenes({ list: document.getElementById('scenes'), banner: document.getElementById('scene-banner') });
   initSidebar({ actors: document.getElementById('actors'), combat: document.getElementById('combat'), onOpenSheet: openSheet });
 
@@ -46,7 +51,7 @@ async function boot() {
   update(undefined, { historico: false }); // primeira renderização
   focusView();
   // para depurar no console do navegador (e para os testes de interface)
-  window.omni = { state, local, scene, update, CONFIG, net, board: { worldToScreen, getView, getSelection, selectTokens } };
+  window.omni = { state, local, scene, update, CONFIG, net, board: { worldToScreen, getView, getSelection, selectTokens }, setTool };
 }
 
 function bindShortcuts() {
@@ -226,8 +231,6 @@ function bindToolbar() {
     };
     img.src = url;
   });
-  const ruler = document.getElementById('btn-ruler');
-  ruler.addEventListener('click', () => { const v = ruler.getAttribute('aria-pressed') !== 'true'; ruler.setAttribute('aria-pressed', v); setRulerMode(v); });
   on('btn-center', centerView);
   on('btn-scene', openSceneDialog);
   on('btn-rules', openRulesDialog);
@@ -335,6 +338,11 @@ function openHelp() {
       <li>Token selecionado mostra a <b>zona</b> até os demais (tokens grandes contam da borda). <b>Ctrl+arrastar</b> ou 📏 mede distâncias.</li>
       <li><b>Alt+clique</b> faz um ping para todos; <b>Alt+Shift+clique</b> também leva a visão de todos até lá.</li>
       <li><b>Ctrl+Z</b> desfaz e <b>Ctrl+Y</b> refaz o que você mudou (o chat não entra).</li></ul>
+    <h4>Ferramentas (paleta no canto do mapa)</h4><ul>
+      <li><b>V</b> selecionar · <b>R</b> régua com vários pontos (clique marca, duplo clique/Esc/botão direito termina; todos veem) · <b>D</b> desenho livre · <b>L</b> linha · <b>Q</b> retângulo · <b>C</b> círculo · <b>T</b> texto · <b>E</b> borracha.</li>
+      <li><b>A</b> área de efeito (círculo, quadrado, cone de 45°, linha): arraste da origem; mostra o tamanho em zonas e destaca quem é atingido.</li>
+      <li><b>F</b> névoa de guerra (mestre): arraste para revelar ou cobrir; os jogadores não recebem tokens que estão no escuro.</li>
+      <li>🎲 no Registro liga/desliga os dados animados.</li></ul>
     <h4>Cenas</h4><ul>
       <li>Na aba <b>Cenas</b>: a marcada “jogadores aqui” é a que todos veem. Clicar em outra mostra só para você; ▶ leva os jogadores para ela.</li>
       <li>🗺 Mapa e ⚙ Cena mexem na cena que você está vendo.</li></ul>

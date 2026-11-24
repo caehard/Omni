@@ -9,6 +9,7 @@ import { diff, applyOps, clone, keyOf } from '../js/core/sync-ops.js';
 import { SyncClient } from '../js/core/sync-client.js';
 import { emptyState, migrate, state, local, update, replaceState, setSyncHook, remoteApplied, ownsActor, sheetAccess } from '../js/core/store.js';
 import { sanitize } from '../js/ui/chat.js';
+import { insideArea, tokensInArea, areaExtent, pathBlocks, tokenVisible, hitDrawing } from '../js/ui/layers.js';
 import { initHistory, undo, redo, checkpoint } from '../js/core/history.js';
 import { blockDistance } from '../js/ui/board.js';
 
@@ -283,6 +284,27 @@ eq('distância: tokens 1×1 vizinhos de bloco', blockDistance({ x: 0, y: 0 }, { 
 eq('distância: token 2×2 conta da borda', blockDistance({ x: 0, y: 0, tamanho: 2 }, { x: 2, y: 0 }), 1);
 eq('distância: token 4×4 encostado = mesmo bloco (Curto)', blockDistance({ x: 0, y: 0, tamanho: 4 }, { x: 3, y: 3 }), 0);
 eq('distância: token 4×4 até 2 blocos à direita', blockDistance({ x: 0, y: 0, tamanho: 4 }, { x: 6, y: 1 }), 2);
+
+// --- áreas de efeito, régua e névoa ---
+{
+  const tok = (x, y, tamanho = 1) => ({ id: `${x},${y}`, x, y, tamanho });
+  const circ = { forma: 'circulo', a: { x: 5.5, y: 5.5 }, b: { x: 7.5, y: 5.5 } }; // raio 2 quadrados
+  eq('círculo: atinge quem tem o centro dentro', tokensInArea(circ, [tok(5, 5), tok(7, 5), tok(8, 5), tok(6, 6), tok(6, 7)]).map(t => t.id), ['5,5', '7,5', '6,6']);
+  eq('círculo: token grande atingido pela ponta', tokensInArea(circ, [tok(8, 4, 2)]).length, 0);
+  eq('círculo: token grande com um quadrado dentro', tokensInArea(circ, [tok(7, 4, 2)]).length, 1);
+  const cone = { forma: 'cone', a: { x: 0.5, y: 0.5 }, b: { x: 6.5, y: 0.5 } }; // 45° no total
+  eq('cone: em frente, dentro do alcance', [insideArea(cone, { x: 5.5, y: 0.5 }), insideArea(cone, { x: 5.5, y: 2.5 })], [true, true]);
+  eq('cone: fora dos 22,5° de cada lado e além do alcance', [insideArea(cone, { x: 3.5, y: 3.5 }), insideArea(cone, { x: 7.5, y: 0.5 }), insideArea(cone, { x: -1.5, y: 0.5 })], [false, false, false]);
+  const linha = { forma: 'linha', a: { x: 0.5, y: 0.5 }, b: { x: 0.5, y: 6.5 } };
+  eq('linha: um quadrado de largura', [insideArea(linha, { x: 0.5, y: 3.5 }), insideArea(linha, { x: 1.5, y: 3.5 })], [true, false]);
+  eq('quadrado: lado pelo maior deslocamento', [insideArea({ forma: 'quadrado', a: { x: 4.5, y: 4.5 }, b: { x: 6.5, y: 5.5 } }, { x: 2.5, y: 6.5 })], [true]);
+  eq('área: tamanho medido como a régua (diâmetro 4 quadrados = 2 blocos)', areaExtent(circ), 2);
+  eq('régua com vários pontos soma os trechos', pathBlocks([{ x: 0, y: 0 }, { x: 4, y: 0 }, { x: 4, y: 6 }]), 5);
+  const nv = { ativa: true, revelado: { '3,3': 1 } };
+  eq('névoa: token só aparece com algum quadrado revelado', [tokenVisible(nv, tok(3, 3)), tokenVisible(nv, tok(2, 2, 2)), tokenVisible(nv, tok(5, 5)), tokenVisible({ ativa: false }, tok(5, 5))], [true, true, false, true]);
+  eq('borracha acerta a linha perto e erra longe', [hitDrawing({ tipo: 'linha', a: { x: 0, y: 0 }, b: { x: 4, y: 0 } }, { x: 2, y: 0.2 }), hitDrawing({ tipo: 'linha', a: { x: 0, y: 0 }, b: { x: 4, y: 0 } }, { x: 2, y: 1 })], [true, false]);
+  eq('borracha no desenho livre', hitDrawing({ tipo: 'livre', pts: [0, 0, 1, 1, 2, 1] }, { x: 1.5, y: 1.1 }), true);
+}
 
 // --- desfazer / refazer ---
 {

@@ -116,6 +116,28 @@ if (!ping?.omni) {
   omni('a').update(() => { delete tokBand.oculto; });
   ok('token revelado volta para o jogador', await wait(() => tokC(tokBand.id)));
 
+  // quadro branco: o jogador desenha uma linha, o mestre vê
+  omni('c').setTool('linha');
+  const q0 = tokenScreen('c', { x: 1, y: 1 }), q1 = tokenScreen('c', { x: 4, y: 3 });
+  pointer('c', 'pointerdown', q0.x, q0.y); pointer('c', 'pointermove', q1.x, q1.y); pointer('c', 'pointerup', q1.x, q1.y);
+  omni('c').setTool('selecionar');
+  ok('desenho do jogador aparece para o mestre (com o autor)', await wait(() => omni('b').scene().desenhos?.some(d => d.tipo === 'linha' && d.de === 'jog-c')));
+  // área de efeito feita pelo mestre chega ao jogador
+  omni('a').setTool('area');
+  const a0 = tokenScreen('a', { x: t0.x, y: t0.y }), a1 = tokenScreen('a', { x: t0.x + 3, y: t0.y });
+  pointer('a', 'pointerdown', a0.x, a0.y); pointer('a', 'pointermove', a1.x, a1.y); pointer('a', 'pointerup', a1.x, a1.y);
+  omni('a').setTool('selecionar');
+  ok('área de efeito do mestre aparece para o jogador', await wait(() => omni('c').scene().desenhos?.some(d => d.tipo === 'area')));
+
+  // névoa: só a área de Aria revelada; o Bandido some para o jogador até ser revelado
+  const tA = omni('a').scene().tokens.find(t => t.id === t0.id);
+  omni('a').update(() => { omni('a').scene().nevoa = { ativa: true, revelado: { [`${tA.x},${tA.y}`]: 1 } }; });
+  ok('névoa ativa: jogador não recebe token alheio no escuro', await wait(() => !tokC(tokBand.id)));
+  ok('…mas continua vendo o próprio token', !!tokC(t0.id));
+  omni('a').update(() => { omni('a').scene().nevoa.revelado[`${tokBand.x},${tokBand.y}`] = 1; });
+  ok('revelar o quadrado traz o token de volta', await wait(() => tokC(tokBand.id)));
+  omni('a').update(() => { omni('a').scene().nevoa.ativa = false; });
+
   // cenas: A cria e prepara uma cena sem tirar B de onde está, depois leva B
   const cenaB = omni('b').scene().id;
   doc('a').querySelector('#scenes [data-act="nova"]').click();

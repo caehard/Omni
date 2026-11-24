@@ -147,6 +147,28 @@ class Papeis(unittest.TestCase):
         servidor.pode(e, 'ana', op)
         self.assertEqual(op['value']['de'], 'ana')  # o servidor corrige o autor da mensagem
 
+    def test_nevoa_esconde_tokens_alheios(self):
+        e = mesa_exemplo()
+        e['cenas'][0]['nevoa'] = {'ativa': True, 'revelado': {'5,1': 1}}
+        e['cenas'][0]['tokens'].append({'id': 't5', 'atorId': 'npc', 'x': 4, 'y': 0, 'tamanho': 2})  # um quadrado em 5,1
+        ids = [t['id'] for t in servidor.vista_jogador(e, 'ana')['cenas'][0]['tokens']]
+        self.assertEqual(ids, ['t1', 't2', 't5'])  # t1 é de Ana (sempre vê); t2 e t5 estão revelados
+        e['cenas'][0]['nevoa']['revelado'] = {}
+        self.assertEqual([t['id'] for t in servidor.vista_jogador(e, 'ana')['cenas'][0]['tokens']], ['t1'])
+
+    def test_desenhos(self):
+        e = mesa_exemplo()
+        e['cenas'][0]['desenhos'] = [{'id': 'd1', 'tipo': 'linha', 'de': 'mestre'}, {'id': 'd2', 'tipo': 'livre', 'de': 'ana'}]
+        e['cenas'][1]['desenhos'] = []
+        ins = {'op': 'ins', 'path': ['cenas', {'id': 'c1'}, 'desenhos'], 'key': 'id', 'value': {'id': 'd3', 'tipo': 'area', 'de': 'outro'}, 'after': 'd2'}
+        self.assertTrue(servidor.pode(e, 'ana', ins))
+        self.assertEqual(ins['value']['de'], 'ana')
+        self.assertTrue(servidor.pode(e, 'ana', {'op': 'del', 'path': ['cenas', {'id': 'c1'}, 'desenhos', {'id': 'd2'}]}))
+        self.assertFalse(servidor.pode(e, 'ana', {'op': 'del', 'path': ['cenas', {'id': 'c1'}, 'desenhos', {'id': 'd1'}]}))  # do mestre
+        self.assertFalse(servidor.pode(e, 'ana', {'op': 'ins', 'path': ['cenas', {'id': 'c2'}, 'desenhos'], 'key': 'id', 'value': {'id': 'x', 'tipo': 'livre'}, 'after': None}))  # cena em preparo
+        self.assertFalse(servidor.pode(e, 'ana', {'op': 'ins', 'path': ['cenas', {'id': 'c1'}, 'desenhos'], 'key': 'id', 'value': {'id': 'x', 'tipo': 'script'}, 'after': None}))
+        self.assertFalse(servidor.pode(e, 'ana', {'op': 'set', 'path': ['cenas', {'id': 'c1'}, 'nevoa', 'ativa'], 'value': False}))
+
     def test_le_link_do_tunel(self):
         servidor.TUNEL['url'] = None
         achados = []

@@ -12,7 +12,9 @@ export function emptyScene(nome = 'Cena 1') {
     fundo: '',                      // dataURL da imagem do mapa
     tamanhoQuadrado: 48,            // px por quadrado (bloco = 2×2 quadrados)
     colunas: 40, linhas: 28,
-    tokens: [],                     // { id, atorId, x, y, tamanho } — posição e tamanho em quadrados
+    tokens: [],                     // { id, atorId, x, y, tamanho, oculto? } — posição e tamanho em quadrados
+    desenhos: [],                   // quadro branco e áreas de efeito (ui/layers.js), em quadrados
+    nevoa: { ativa: false, revelado: {} }, // névoa de guerra: revelado = { "x,y": 1 } por quadrado
   };
 }
 
@@ -42,7 +44,11 @@ export function migrate(s) {
   }
   if (!s.cenas.length) s.cenas.push(emptyScene());
   if (!s.cenas.some(c => c.id === s.cenaAtiva)) s.cenaAtiva = s.cenas[0].id;
-  for (const c of s.cenas) c.tokens ||= [];
+  for (const c of s.cenas) {
+    c.tokens ||= [];
+    c.desenhos ||= [];
+    c.nevoa ||= { ativa: false, revelado: {} };
+  }
   s.versao = 2;
   return s;
 }

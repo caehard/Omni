@@ -273,6 +273,18 @@ def mensagem_visivel(msg, jogador):
     return para is None or msg.get('de') == jogador or jogador in para
 
 
+def _token_fora_da_nevoa(nevoa, t):
+    """Com a névoa ativa, o jogador só recebe tokens alheios com algum quadrado revelado (como tokenVisible em layers.js)."""
+    if not _eh_obj(nevoa) or not nevoa.get('ativa'):
+        return True
+    rev = nevoa.get('revelado') if _eh_obj(nevoa.get('revelado')) else {}
+    try:
+        x, y, s = int(t.get('x', 0)), int(t.get('y', 0)), max(1, min(4, int(t.get('tamanho') or 1)))
+    except (TypeError, ValueError):
+        return False
+    return any(f'{x + i},{y + j}' in rev for i in range(s) for j in range(s))
+
+
 def vista_jogador(estado, jogador):
     """O que um jogador (não mestre) recebe: sem fichas/tokens ocultos, só a cena ativa, sem sussurros alheios."""
     if estado is None:
@@ -299,7 +311,8 @@ def vista_jogador(estado, jogador):
                     continue  # cenas em preparo ficam só com o mestre
                 cena = {ck: _copia_rasa_profunda(cv) for ck, cv in c.items() if ck != 'tokens'}
                 cena['tokens'] = [_copia_rasa_profunda(t) for t in c.get('tokens') or []
-                                  if _eh_obj(t) and not t.get('oculto') and t.get('atorId') in visiveis]
+                                  if _eh_obj(t) and not t.get('oculto') and t.get('atorId') in visiveis
+                                  and (_dono(estado, jogador, t.get('atorId')) or _token_fora_da_nevoa(c.get('nevoa'), t))]
                 vista[k].append(cena)
         elif k == 'chat':
             vista[k] = [_copia_rasa_profunda(m) for m in v or [] if mensagem_visivel(m, jogador)]
@@ -313,6 +326,7 @@ def vista_jogador(estado, jogador):
 
 
 CAMPOS_SO_MESTRE = ('donos', 'oculto', 'permissao', 'id')
+TIPOS_DESENHO = ('livre', 'linha', 'retangulo', 'circulo', 'texto', 'area')
 
 
 def pode(estado, jogador, op):
@@ -337,6 +351,17 @@ def pode(estado, jogador, op):
             return jogador in (v.get('donos') or []) and not v.get('oculto')
         if len(p) >= 2 and _eh_obj(p[1]) and 'id' in p[1] and _dono(estado, jogador, p[1]['id']):
             return t == 'del' if len(p) == 2 else p[2] not in CAMPOS_SO_MESTRE
+        return False
+    if raiz == 'cenas' and len(p) >= 3 and _eh_obj(p[1]) and p[2] == 'desenhos':
+        cena = _achar_id(estado.get('cenas'), 'id', p[1].get('id'))
+        if not cena or cena.get('id') != estado.get('cenaAtiva'):
+            return False
+        if t == 'ins' and len(p) == 3 and _eh_obj(op.get('value')):
+            op['value']['de'] = jogador  # todo desenho é de quem o fez (só ele ou o mestre apaga)
+            return op['value'].get('tipo') in TIPOS_DESENHO
+        if t == 'del' and len(p) == 4 and _eh_obj(p[3]):
+            d = _achar_id(cena.get('desenhos'), 'id', p[3].get('id'))
+            return bool(d) and d.get('de') == jogador
         return False
     if raiz == 'cenas' and len(p) >= 3 and _eh_obj(p[1]) and p[2] == 'tokens':
         cena = _achar_id(estado.get('cenas'), 'id', p[1].get('id'))

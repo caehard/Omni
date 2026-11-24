@@ -1,11 +1,13 @@
 // Tabuleiro: mapa, grade em blocos (2×2 quadrados, Apêndice 4.1), tokens, seleção, medição de zonas e ping.
-import { state, local, scene, update, notify, getActor, subscribe, ownsActor } from '../core/store.js';
+import { state, local, scene, update, notify, getActor, subscribe, ownsActor, isGM } from '../core/store.js';
 import { prepareDerived, uid } from '../system/actor.js';
 import { CONFIG } from '../system/config.js';
 import { checkpoint } from '../core/history.js';
 import { net, onEvent, sendEvent, playerColor } from '../core/net.js';
+import { drawDrawings, drawAreaLabels, drawFog, drawRuler, tokenVisible } from './layers.js';
+import { currentTool, toolDown, toolHover, toolRightClick, toolOverlay, quickRuler } from './tools.js';
 
-let canvas, ctx, view = { x: 40, y: 40, zoom: 1 }, ruler = null, rulerMode = false, box = null, hoverId = null;
+let canvas, ctx, view = { x: 40, y: 40, zoom: 1 }, box = null, hoverId = null;
 let selected = new Set(), dragging = false, lastSceneId = null;
 const pings = [];
 const imgCache = new Map();
@@ -50,7 +52,6 @@ export function initBoard(el, { openSheet }) {
   resize();
 }
 
-export function setRulerMode(v) { rulerMode = v; canvas.style.cursor = v ? 'crosshair' : ''; }
 /** Tokens selecionados (ids) que ainda existem na cena. */
 export function getSelection() { return scene().tokens.filter(t => selected.has(t.id)); }
 export function selectTokens(ids) { selected = new Set(ids); draw(); }
@@ -118,7 +119,7 @@ function draw() {
   const sc = scene(), q = sc.tamanhoQuadrado;
   if (sc.id !== lastSceneId) { // trocou de cena: limpa seleção e enquadra
     const first = lastSceneId === null;
-    lastSceneId = sc.id; selected.clear(); ruler = null;
+    lastSceneId = sc.id; selected.clear();
     if (!first) { focusView(); return; }
   }
   for (const id of selected) if (!sc.tokens.some(t => t.id === id)) selected.delete(id);
@@ -146,15 +147,16 @@ function draw() {
     ctx.beginPath(); ctx.moveTo(0, j * q); ctx.lineTo(W, j * q); ctx.stroke();
   }
 
+  const ov = toolOverlay();
+  const toks = visibleTokens(sc);
+  drawDrawings(ctx, sc, view, { preview: ov.preview, tokens: toks });
+
   const sel = getSelection();
   const origin = sel.length === 1 ? sel[0] : null;
-  for (const t of sc.tokens) {
-    const a = getActor(t.atorId);
-    if (a) drawToken(t, a, q, selected.has(t.id), a.id === local.alvoId, t.id === hoverId);
-  }
+  for (const t of toks) drawToken(t, getActor(t.atorId), q, selected.has(t.id), t.atorId === local.alvoId, t.id === hoverId);
   // zona a partir do token selecionado até os demais
-  if (origin) for (const t of sc.tokens) {
-    if (t === origin || !getActor(t.atorId)) continue;
+  if (origin) for (const t of toks) {
+    if (t === origin) continue;
     const n = blockDistance(origin, t), z = zoneForBlocks(n);
     const temSelos = Object.keys(getActor(t.atorId).system.condicoes || {}).length > 0;
     label((t.x + size(t) / 2) * q, t.y * q - (temSelos ? Math.max(7, q * 0.17) * 1.6 : 0) - 11 / view.zoom, `${z.id} · ${n} bl`, cssVar('--accent'));
@@ -163,14 +165,16 @@ function draw() {
     const from = dragStart.get(t.id);
     if (from && (from.x !== t.x || from.y !== t.y)) label((t.x + size(t) / 2) * q, (t.y + size(t) + 0.3) * q, `movido: ${zoneForBlocks(blockDistance({ ...from, tamanho: t.tamanho }, t)).nome}`, cssVar('--ink'));
   }
-  if (ruler) {
-    const a = ruler.a, b = ruler.b;
-    ctx.strokeStyle = cssVar('--accent'); ctx.lineWidth = 3 / view.zoom; ctx.setLineDash([8 / view.zoom, 6 / view.zoom]);
-    ctx.beginPath(); ctx.moveTo((a.x + 0.5) * q, (a.y + 0.5) * q); ctx.lineTo((b.x + 0.5) * q, (b.y + 0.5) * q); ctx.stroke();
-    ctx.setLineDash([]);
-    const n = blockDistance(a, b), z = zoneForBlocks(n);
-    label((b.x + 0.5) * q, (b.y + 1.2) * q, `${z.nome} (${n} blocos)`, cssVar('--accent'));
+  drawFog(ctx, sc, view, isGM());
+  drawAreaLabels(ctx, sc, view, { preview: ov.preview, tokens: toks });
+  if (ov.fogBox) {
+    const { a, b, modo } = ov.fogBox;
+    ctx.fillStyle = modo === 'revelar' ? cssVar('--ok') : '#000'; ctx.globalAlpha = 0.25;
+    ctx.fillRect(Math.min(a.x, b.x) * q, Math.min(a.y, b.y) * q, (Math.abs(a.x - b.x) + 1) * q, (Math.abs(a.y - b.y) + 1) * q);
+    ctx.globalAlpha = 1;
   }
+  for (const r of ov.remotes) drawRuler(ctx, view, q, r.pts, r.cor || cssVar('--accent'), r.nome);
+  if (ov.ruler) drawRuler(ctx, view, q, ov.ruler.pts, cssVar('--accent'));
   if (box) {
     const x = Math.min(box.a.wx, box.b.wx), y = Math.min(box.a.wy, box.b.wy), w = Math.abs(box.a.wx - box.b.wx), h = Math.abs(box.a.wy - box.b.wy);
     ctx.fillStyle = cssVar('--accent'); ctx.globalAlpha = 0.12;
@@ -180,6 +184,14 @@ function draw() {
   }
   drawPings();
   for (const fn of viewListeners) fn();
+}
+
+/** Tokens que este jogador vê: o servidor já não manda os ocultos; a névoa esconde os que não são dele. */
+function visibleTokens(sc) {
+  return sc.tokens.filter(t => {
+    const a = getActor(t.atorId);
+    return a && (isGM() || ownsActor(a) || tokenVisible(sc.nevoa, t));
+  });
 }
 
 const iconFor = id => CONFIG.condicaoById?.[id]?.icone || (id[0] || '?').toUpperCase();
@@ -308,14 +320,18 @@ function onNetEvent(d) {
 function toCell(e) {
   const r = canvas.getBoundingClientRect(), q = scene().tamanhoQuadrado;
   const wx = (e.clientX - r.left - view.x) / view.zoom, wy = (e.clientY - r.top - view.y) / view.zoom;
-  return { x: Math.floor(wx / q), y: Math.floor(wy / q), wx, wy };
+  return { x: Math.floor(wx / q), y: Math.floor(wy / q), wx, wy, fx: wx / q, fy: wy / q }; // fx/fy: em quadrados, com fração
 }
-const tokenAt = c => [...scene().tokens].reverse().find(t => getActor(t.atorId) && c.x >= t.x && c.x < t.x + size(t) && c.y >= t.y && c.y < t.y + size(t));
+const tokenAt = c => [...visibleTokens(scene())].reverse().find(t => c.x >= t.x && c.x < t.x + size(t) && c.y >= t.y && c.y < t.y + size(t));
+const baseCursor = () => (currentTool() === 'selecionar' ? '' : 'crosshair');
 
 function onHover(e) {
-  if (dragging || box || ruler) return;
-  const id = tokenAt(toCell(e))?.id || null;
-  if (id !== hoverId) { hoverId = id; canvas.style.cursor = rulerMode ? 'crosshair' : id ? 'pointer' : ''; draw(); }
+  if (dragging || box) return;
+  const c = toCell(e);
+  if (toolHover(c)) return;
+  const id = currentTool() === 'selecionar' ? tokenAt(c)?.id || null : null;
+  canvas.style.cursor = id ? 'pointer' : baseCursor();
+  if (id !== hoverId) { hoverId = id; draw(); }
 }
 
 /** Acompanha um arrasto do ponteiro até soltar. */
@@ -338,16 +354,17 @@ function onDown(e) {
       if (!moved && Math.hypot(ev.clientX - sx, ev.clientY - sy) > 4) moved = true;
       if (moved) { view.x = v0.x + ev.clientX - sx; view.y = v0.y + ev.clientY - sy; draw(); }
     }, () => {
-      if (moved || !t) return;
+      if (moved || toolRightClick() || !t) return; // clique direito também encerra a régua
       local.alvoId = local.alvoId === t.atorId ? null : t.atorId; // cada jogador tem o seu alvo
       notify();
     });
     return;
   }
   if (e.button !== 0) return;
-  if (rulerMode || e.ctrlKey || e.metaKey) {
-    ruler = { a: c, b: c };
-    track(e, ev => { ruler.b = toCell(ev); draw(); }, () => { ruler = null; draw(); });
+  if (currentTool() !== 'selecionar') { toolDown(e, { cell: toCell, track }); return; }
+  if (e.ctrlKey || e.metaKey) { // régua rápida
+    quickRuler(c, c);
+    track(e, ev => { quickRuler(c, toCell(ev)); draw(); }, () => { quickRuler(null); draw(); });
     return;
   }
   if (t) {
@@ -402,7 +419,7 @@ function startDrag(e, c0) {
 function pan(e) {
   const sx = e.clientX - view.x, sy = e.clientY - view.y;
   canvas.style.cursor = 'grabbing';
-  track(e, ev => { view.x = ev.clientX - sx; view.y = ev.clientY - sy; draw(); }, () => { canvas.style.cursor = rulerMode ? 'crosshair' : ''; });
+  track(e, ev => { view.x = ev.clientX - sx; view.y = ev.clientY - sy; draw(); }, () => { canvas.style.cursor = baseCursor(); });
 }
 
 function onWheel(e) {
@@ -430,7 +447,7 @@ let spaceDown = false;
 function onKey(e) {
   if (e.target.closest?.('input, textarea, select, [contenteditable]')) return;
   if (e.code === 'Space') { spaceDown = true; if (e.target === document.body) e.preventDefault(); return; }
-  if (e.key === 'Escape') { selected.clear(); ruler = null; box = null; draw(); return; }
+  if (e.key === 'Escape') { selected.clear(); box = null; draw(); return; }
   const toks = movable(getSelection());
   if (!toks.length) return;
   if (e.key === 'Delete' || e.key === 'Backspace') {

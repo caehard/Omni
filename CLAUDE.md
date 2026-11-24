@@ -5,7 +5,7 @@ Sistema de RPG **autoral** (em testes) + **mesa virtual própria ("TTS")** para 
 ## Regras de trabalho (pedidas pelo autor)
 
 1. **Toda mudança deve ser commitada e enviada** para `https://github.com/caehard/Omni` (branch `main`). Mensagens de commit em português.
-2. **Em caso de dúvida sobre regras, pergunte ao autor antes de assumir.** O livro tem contradições conhecidas. Registre decisões e pendências em [`docs/pendencias.md`](docs/pendencias.md) (decisões D1–D36 até agora).
+2. **Em caso de dúvida sobre regras, pergunte ao autor antes de assumir.** O livro tem contradições conhecidas. Registre decisões e pendências em [`docs/pendencias.md`](docs/pendencias.md) (decisões D1–D36 e pendência P1 até agora).
 3. Ao propor opções de regra, ofereça alternativas concretas (o autor escolhe).
 
 ## Estrutura
@@ -23,13 +23,15 @@ Sistema de RPG **autoral** (em testes) + **mesa virtual própria ("TTS")** para 
 | `vtt/js/core/history.js` | Ctrl+Z/Ctrl+Y: guarda as operações inversas das mudanças locais (não do chat nem dos outros jogadores) |
 | `vtt/js/ui/board.js` | Mapa: tokens com `tamanho` 1–4, seleção (caixa/Shift), arrasto em grupo, ping (evento passageiro `/evento`), zonas |
 | `vtt/js/ui/token-hud.js` · `ui/scenes.js` | Menu do token selecionado (canto do mapa) · aba Cenas e aviso de “vendo outra cena” |
+| `vtt/js/ui/tools.js` · `ui/layers.js` | Paleta de ferramentas (régua com pontos compartilhada via evento `regua`, desenho, área, borracha, névoa) · desenho das camadas e geometria pura (áreas, névoa, borracha), em **quadrados**. `cena.desenhos[]` (cada um com `de` = autor) e `cena.nevoa = {ativa, revelado: {"x,y":1}}` |
+| `vtt/js/ui/dice-tray.js` | Dados animados para cada rolagem nova (só visual; liga/desliga no 🎲 do Registro) |
 | `vtt/js/core/sync-ops.js` | `diff`/`applyOps` do estado (set/del/ins; listas com `id`/`atorId` comparadas por identificador). **Espelhado em `servidor.py`** — mudou um, mude o outro e rode os dois testes |
 | `vtt/js/core/sync-client.js` | Lógica de convergência sem rede (lotes pendentes, eco do próprio lote, reconexão) |
 | `vtt/js/core/net.js` | Rede: SSE `/api/mesa/<nome>/eventos` + POST `/ops`, presença, status |
 | `servidor.py` | Servidor da mesa (stdlib): serve só `vtt/`, `data/`, `docs/`; mesas em `mesas/<nome>.json` (gitignored, com a chave do mestre). **Papéis**: mestre = localhost sem cabeçalho de proxy, ou `chave`; jogador recebe `vista_jogador()` (sem ocultos, só a cena ativa, sem sussurros alheios) e cada op passa por `pode()`; recusa → o jogador recebe o estado de novo. Tem `diff` em Python (espelho do JS, casos em `vtt/tests/diff-casos.json`). `--online` abre túnel do cloudflared e expõe o link em `/api/ping` (`publico`) |
 | `jogar-online.bat` / `.sh` | `servidor.py --online` |
-| `vtt/tests/` | `index.html`: regras, sincronização, cenas, desfazer, permissões, filtro de HTML (134 passando) · `multiplayer.html`: dois mestres + um jogador (`?como=jogador&jid=`) em iframes, com cliques e arrastos sintéticos (31 passando, precisa do servidor; usa `window.omni`) · casos JS/Python em `sync-casos.json` e `diff-casos.json` |
-| `tools/testar_servidor.py` | Testes do servidor (operações, diff, vista do jogador, permissões, papéis via túnel/chave, protocolo, arquivos bloqueados) — 17 passando |
+| `vtt/tests/` | `index.html`: regras, sincronização, cenas, desfazer, permissões, filtro de HTML, geometria de áreas/névoa (146 passando) · `multiplayer.html`: dois mestres + um jogador (`?como=jogador&jid=`) em iframes, com cliques e arrastos sintéticos (36 passando, precisa do servidor; usa `window.omni`) · casos JS/Python em `sync-casos.json` e `diff-casos.json` |
+| `tools/testar_servidor.py` | Testes do servidor (operações, diff, vista do jogador, névoa, desenhos, permissões, papéis via túnel/chave, protocolo, arquivos bloqueados) — 19 passando |
 | `tools/extrair_habilidades.py` | Livro (cap. 08) → `data/habilidades.json`. Rode após editar habilidades |
 | `tools/equipamentos.py` | Valida `data/equipamentos.json` pelos pontos de criação e regenera a tabela do livro (cap. 04, entre marcadores). Rode após editar equipamentos |
 | `original/` | `.docx` V4 original e ficha antiga em PDF (não editar) |
@@ -64,9 +66,10 @@ python tools/testar_servidor.py
 
 - **Melhorias do VTT** (pedido do autor: ficar “fluido e completo como Roll20/Foundry”, mantendo o visual atual refinado). Plano em 4 pacotes, nesta ordem:
   1. ✅ Mapa e tokens: cenas, tamanhos, menu do token, ícones de condição, seleção múltipla, ping, desfazer.
-  2. Desenho e medição: desenho livre/formas/texto, áreas de efeito (círculo, cone, linha) mostrando zonas, régua com vários pontos.
-  3. Mestre × jogador e névoa: ✅ papéis, donos, ocultos, sussurros, rolagens secretas (servidor filtra por jogador). Falta a névoa de guerra.
-  4. Fluxo de jogo: barra de ações rápidas, turno ativo destacado, diário/handouts, música ambiente.
+  2. ✅ Desenho e medição: quadro branco, áreas de efeito (tamanho em zonas, atingidos), régua com vários pontos compartilhada.
+  3. ✅ Mestre × jogador e névoa: papéis, donos, ocultos, sussurros, rolagens secretas, névoa (servidor filtra por jogador).
+  4. Fluxo de jogo: ✅ dados animados. Falta: barra de ações rápidas, turno ativo destacado, diário/handouts, música ambiente.
+- **Pendência de regra aberta: P1** (tamanho das áreas em zonas → blocos), em `docs/pendencias.md`.
 
 ## Próximos passos possíveis
 
