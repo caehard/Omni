@@ -7,7 +7,8 @@ import { absorptionFor } from '../js/system/actor.js';
 import { parseExtra } from '../js/ui/roll-dialog.js';
 import { diff, applyOps, clone, keyOf } from '../js/core/sync-ops.js';
 import { SyncClient } from '../js/core/sync-client.js';
-import { emptyState, migrate, state, update, replaceState, setSyncHook, remoteApplied } from '../js/core/store.js';
+import { emptyState, migrate, state, local, update, replaceState, setSyncHook, remoteApplied, ownsActor, sheetAccess } from '../js/core/store.js';
+import { sanitize } from '../js/ui/chat.js';
 import { initHistory, undo, redo, checkpoint } from '../js/core/history.js';
 import { blockDistance } from '../js/ui/board.js';
 
@@ -247,6 +248,27 @@ const join = (srv, cliente) => { const c = new SyncClient({}, cliente); c.start(
   same('reconexão: A converge', A.state, srv.estado);
   same('reconexão: B converge', B.state, srv.estado);
   eq('mensagem fora de ordem pede o estado inteiro', A.receive({ tipo: 'ops', v: A.v + 2, ops: [] }), 'lacuna');
+}
+
+// diff: os mesmos casos que o servidor testa em Python (diff dos dois lados reproduz o estado novo)
+const diffCasos = await (await fetch('./diff-casos.json')).json();
+for (const c of diffCasos) same(`diff: ${c.nome}`, applyOps(clone(c.a), diff(c.a, c.b)), c.b);
+
+// --- papéis e segurança ---
+eq('HTML de mensagem: scripts e eventos somem', sanitize('<b>ok</b><img src=x onerror="alert(1)"><script>alert(2)</script><div class="effect" onclick="x()">d</div>'),
+  '<b>ok</b>alert(2)<div class="effect">d</div>');
+eq('HTML de mensagem: links viram texto', sanitize('<a href="javascript:x">clique</a>'), 'clique');
+{
+  const antes = { ...local };
+  Object.assign(local, { mestre: false, jogadorId: 'ana' });
+  const meu = { tipo: 'personagem', donos: ['ana'] }, outroPj = { tipo: 'personagem' }, npc = { tipo: 'npc' };
+  eq('jogador: dono edita a ficha', [ownsActor(meu), sheetAccess(meu)], [true, 'editar']);
+  eq('jogador: personagem de outro é só leitura', sheetAccess(outroPj), 'ver');
+  eq('jogador: NPC fica fechado por padrão', sheetAccess(npc), 'nenhum');
+  eq('jogador: mestre pode liberar a ficha do NPC', sheetAccess({ ...npc, permissao: 'ver' }), 'ver');
+  local.mestre = true;
+  eq('mestre edita tudo', sheetAccess(npc), 'editar');
+  Object.assign(local, antes);
 }
 
 // --- cenas e tokens ---

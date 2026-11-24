@@ -1,7 +1,7 @@
 // Ponto de entrada do TTS Omni.
 import { loadConfig, CONFIG } from './system/config.js';
-import { state, local, scene, update, load, replaceState, subscribe, readLocalSave, emptyState, migrate } from './core/store.js';
-import { net, probe, connect, onNetChange, cleanRoom } from './core/net.js';
+import { state, local, scene, update, load, replaceState, subscribe, readLocalSave, emptyState, migrate, isGM, ownsActor } from './core/store.js';
+import { net, probe, connect, onNetChange, cleanRoom, refreshInfo } from './core/net.js';
 import { initHistory, undo, redo } from './core/history.js';
 import { initTokenHud } from './ui/token-hud.js';
 import { initScenes } from './ui/scenes.js';
@@ -25,9 +25,12 @@ async function boot() {
   const info = await probe(); // servida pelo servidor.py? então a mesa é compartilhada
   if (info) await bootOnline(info);
   else if (!load()) seedDemo();
-  migrate(state); // mesas antigas (uma cena só) viram o formato com várias cenas
-  applyDefaults();
-  state.atores.forEach(fillResources);
+  if (isGM()) { // ajustes que mudam a mesa: só o mestre faz (o jogador recebe pronto)
+    migrate(state); // mesas antigas (uma cena só) viram o formato com várias cenas
+    applyDefaults();
+  } else if (!state.cenas) Object.assign(state, emptyState()); // mesa ainda não aberta pelo mestre
+  state.atores.filter(ownsActor).forEach(fillResources);
+  applyRoleClass();
 
   initChat(document.getElementById('chat-log'));
   initBoard(document.getElementById('board'), { openSheet });
@@ -61,22 +64,48 @@ function applyDefaults() {
 
 // ---- multiplayer ----
 const NAME_KEY = 'omni-nome';
-const savedName = () => { try { return localStorage.getItem(NAME_KEY) || ''; } catch { return ''; } };
-const saveName = n => { try { localStorage.setItem(NAME_KEY, n); } catch { /* navegador sem armazenamento */ } };
+const store = {
+  get: k => { try { return localStorage.getItem(k) || ''; } catch { return ''; } },
+  set: (k, v) => { try { localStorage.setItem(k, v); } catch { /* navegador sem armazenamento */ } },
+};
+const savedName = () => store.get(NAME_KEY);
+const saveName = n => store.set(NAME_KEY, n);
 /** Autor das mensagens digitadas no chat. */
 const author = () => (net.online ? net.nome : 'Mestre');
+
+/** Identidade persistente deste navegador (é por ela que o mestre dá fichas aos jogadores). */
+function playerId(params) {
+  const forced = params.get('jid'); // só para testes (duas mesas no mesmo navegador)
+  if (forced) return forced.slice(0, 64);
+  let id = store.get('omni-jogador-id');
+  if (!id) { id = 'j' + Math.random().toString(36).slice(2, 12); store.set('omni-jogador-id', id); }
+  return id;
+}
 
 async function bootOnline(info) {
   const params = new URLSearchParams(location.search);
   const sala = cleanRoom(params.get('mesa'));
-  if (params.get('mesa') !== sala) history.replaceState(null, '', `?mesa=${sala}`);
+  // link de co-mestre (?mestre=chave): guarda a chave e tira do endereço, para não vazar ao copiar o link
+  if (params.get('mestre')) store.set('omni-chave-' + sala, params.get('mestre'));
+  const como = params.get('como') === 'jogador' ? 'jogador' : '';
+  const clean = new URLSearchParams({ mesa: sala, ...(como && { como }), ...(params.get('jid') && { jid: params.get('jid') }) });
+  if (location.search !== '?' + clean) history.replaceState(null, '', '?' + clean);
   const nome = savedName() || await askName();
-  const existed = await connect({ sala, nome, info });
+  const existed = await connect({ sala, nome, info, jogador: playerId(params), chave: store.get('omni-chave-' + sala), como });
   if (existed) return;
+  if (!isGM()) { toast('Esta mesa ainda não foi aberta pelo mestre. Ela aparece aqui assim que ele entrar.', 6000); return; }
   // mesa nova no servidor: começa com a mesa deste navegador (se houver) ou com o exemplo
   const saved = readLocalSave();
   if (saved?.atores?.length && confirm(`A mesa “${sala}” é nova. Usar nela a mesa salva neste navegador (${saved.atores.length} ficha(s))?\n\nCancelar = começar com a mesa de exemplo.`)) Object.assign(state, saved);
   else seedDemo();
+}
+
+/** body.jogador esconde o que é só do mestre (classe .so-mestre). */
+function applyRoleClass() {
+  document.body.classList.toggle('jogador', !isGM());
+  const papel = document.getElementById('papel-badge');
+  papel.hidden = !net.online;
+  papel.textContent = isGM() ? '👑 Mestre' : (net.como ? 'Vendo como jogador' : 'Jogador');
 }
 
 function askName(atual = '') {
@@ -110,6 +139,7 @@ function bindNet() {
     btn.title = `Mesa “${net.sala}” — ${net.jogadores.map(j => j.nome).join(', ') || 'ninguém'}\nClique para convidar jogadores`;
     if (net.erro) { toast(net.erro, 5000); net.erro = null; }
     if (document.getElementById('net-players')) fillPlayers();
+    applyRoleClass();
   };
   onNetChange(render);
   btn.addEventListener('click', openNetDialog);
@@ -118,14 +148,15 @@ function bindNet() {
 
 const fillPlayers = () => {
   const el = document.getElementById('net-players');
-  el.innerHTML = net.jogadores.map(j => `<li>${esc(j.nome)}${j.cliente === net.cliente ? ' <small>(você)</small>' : ''}</li>`).join('') || '<li class="muted">Ninguém conectado.</li>';
+  el.innerHTML = net.jogadores.map(j => `<li>${j.mestre ? '👑 ' : ''}${esc(j.nome)}${j.cliente === net.cliente ? ' <small>(você)</small>' : ''}${j.mestre ? ' <small>mestre</small>' : ''}</li>`).join('') || '<li class="muted">Ninguém conectado.</li>';
 };
 
 function inviteLinks() {
   const path = `/vtt/?mesa=${encodeURIComponent(net.sala)}`;
   const links = [];
+  if (net.info?.publico) links.push({ url: net.info.publico + path, nota: '🌐 internet — mande este para os amigos', destaque: true });
   const isLocal = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
-  if (!isLocal) links.push({ url: location.origin + path, nota: 'endereço que você está usando' });
+  if (!isLocal && !links.some(l => l.url === location.origin + path)) links.push({ url: location.origin + path, nota: 'endereço que você está usando' });
   for (const ip of net.info?.enderecos || []) {
     const url = `http://${ip}:${net.info.porta}${path}`;
     if (!links.some(l => l.url === url)) links.push({ url, nota: 'mesma rede (Wi-Fi/cabo)' });
@@ -133,15 +164,23 @@ function inviteLinks() {
   return links;
 }
 
-function openNetDialog() {
-  const w = makeWindow('net', 'Mesa compartilhada', { width: 460 });
+const linkRow = l => `<div class="invite ${l.destaque ? 'destaque' : ''}"><input readonly value="${esc(l.url)}"><button data-copy>Copiar</button><small>${esc(l.nota)}</small></div>`;
+
+async function openNetDialog() {
+  const w = makeWindow('net', 'Mesa compartilhada', { width: 480 });
+  if (isGM()) await refreshInfo(); // o link público do túnel pode ter aparecido depois
   const links = inviteLinks();
+  const base = links[0]?.url.split('/vtt/')[0] || location.origin;
+  const coMestre = net.chave ? `${base}/vtt/?mesa=${encodeURIComponent(net.sala)}&mestre=${encodeURIComponent(net.chave)}` : '';
   w.body.innerHTML = `<div class="net-dialog">
-    <p>Mesa <b>${esc(net.sala)}</b> · você é <b>${esc(net.nome)}</b></p>
+    <p>Mesa <b>${esc(net.sala)}</b> · você é <b>${esc(net.nome)}</b> (${isGM() ? 'mestre' : 'jogador'})</p>
     <h4>Na mesa agora</h4><ul id="net-players" class="net-players"></ul>
-    <h4>Convidar</h4>
-    ${links.map(l => `<div class="invite"><input readonly value="${esc(l.url)}"><button data-copy>Copiar</button><small>${esc(l.nota)}</small></div>`).join('') || '<p class="muted">Nenhum endereço de rede encontrado.</p>'}
-    <p class="hint">Jogadores fora da sua rede: abra um túnel (ex.: <code>cloudflared tunnel --url http://localhost:${net.info?.porta || 8000}</code>) e envie o endereço que ele gerar, terminando em <code>/vtt/?mesa=${esc(net.sala)}</code>. Veja “Jogar online” no README.</p>
+    ${isGM() ? `<h4>Convidar jogadores</h4>
+    ${links.map(linkRow).join('') || '<p class="muted">Nenhum endereço de rede encontrado.</p>'}
+    ${net.info?.publico ? '' : `<p class="hint">Para jogar <b>pela internet</b>, feche o servidor e abra <code>jogar-online.bat</code> (ou <code>python servidor.py --online</code>): o link 🌐 aparece aqui. Precisa do cloudflared instalado uma vez (veja o README).</p>`}
+    <p class="hint">Quem entra pelo link é <b>jogador</b>: vê só a cena ativa, mexe só nas fichas que você der a ele (🔑 na lista de fichas) e não vê o que estiver oculto.</p>
+    ${coMestre ? `<details><summary>Link de co-mestre (não compartilhe com jogadores)</summary>${linkRow({ url: coMestre, nota: 'quem abrir vira mestre também' })}</details>` : ''}
+    <p><a href="?mesa=${encodeURIComponent(net.sala)}&como=jogador" target="_blank" rel="noopener">Abrir uma aba vendo como jogador ↗</a></p>` : ''}
     <form class="roll-form" data-room>
       <label>Ir para outra mesa <input name="sala" placeholder="nome-da-mesa"></label>
       <div class="row"><button>Entrar</button></div></form>
@@ -218,13 +257,21 @@ function bindChatInput() {
     e.preventDefault();
     const txt = form.msg.value.trim();
     if (!txt) return;
-    const m = txt.match(/^\/r(?:oll)?\s+(\d*)d(\d+)\s*([+-]\s*\d+)?$/i);
-    if (m) {
-      const n = +(m[1] || 1), f = +m[2], mod = Number((m[3] || '0').replace(/\s/g, ''));
+    const m = txt.match(/^\/(g?)r(?:oll)?\s+(\d*)d(\d+)\s*([+-]\s*\d+)?$/i);
+    if (m) { // /r 2d10 · /gr 2d10 (rolagem oculta: só o mestre vê)
+      const n = +(m[2] || 1), f = +m[3], mod = Number((m[4] || '0').replace(/\s/g, ''));
       const r = rollFormula(n, f);
-      postSystem(`🎲 ${n}d${f}${mod ? (mod > 0 ? '+' : '') + mod : ''}: [${r.values.join(', ')}] = <b>${r.total + mod}</b>`, { autor: author() });
+      postSystem(`🎲 ${n}d${f}${mod ? (mod > 0 ? '+' : '') + mod : ''}: [${r.values.join(', ')}] = <b>${r.total + mod}</b>`, { autor: author(), ...(m[1] && { para: [] }) });
+    } else if (/^\/m\s+/i.test(txt)) { // para o mestre
+      postText(txt.replace(/^\/m\s+/i, ''), { autor: author(), para: [] });
+    } else if (/^\/[sw]\s+/i.test(txt)) { // sussurro: /s Nome mensagem
+      const resto = txt.replace(/^\/[sw]\s+/i, '');
+      const jogs = Object.entries(state.jogadores || {}).sort((a, b) => b[1].nome.length - a[1].nome.length);
+      const alvo = jogs.find(([, j]) => resto.toLowerCase().startsWith(j.nome.toLowerCase() + ' '));
+      if (!alvo) { toast(`Para quem? Jogadores: ${jogs.map(([, j]) => j.nome).join(', ') || 'nenhum ainda'}. Para o mestre: /m mensagem`, 5000); return; }
+      postText(resto.slice(alvo[1].nome.length + 1), { autor: author(), para: [alvo[0]] });
     } else if (txt.startsWith('/')) {
-      toast('Comando desconhecido. Use /r 2d10');
+      toast('Comandos: /r 2d10 · /gr 2d10 (oculta) · /s Nome msg (sussurro) · /m msg (para o mestre)', 5000);
       return;
     } else postText(txt, { autor: author() });
     form.msg.value = '';

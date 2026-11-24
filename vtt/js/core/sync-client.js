@@ -20,12 +20,16 @@ export class SyncClient {
 
   get ready() { return this.shadow !== null; }
 
-  /** Primeira mensagem do servidor. Devolve true se a mesa já existia. */
-  start({ v, estado }) {
+  /**
+   * Primeira mensagem do servidor. Devolve true se a mesa já existia.
+   * Mesa nova: quem pode criar (o mestre) envia o estado local vazio como ponto de partida;
+   * um jogador só espera o mestre abrir a mesa.
+   */
+  start({ v, estado }, podeCriar = true) {
     this.v = v;
     if (estado != null) { this.#load(estado); return true; }
-    this.shadow = clone(this.state); // mesa nova: o estado local (vazio) vira o ponto de partida
-    this.#push([{ op: 'set', path: [], value: clone(this.state) }]);
+    this.shadow = clone(this.state);
+    if (podeCriar) this.#push([{ op: 'set', path: [], value: clone(this.state) }]);
     return false;
   }
 
@@ -61,7 +65,8 @@ export class SyncClient {
     this.flush();
     this.v = v;
     this.pending = this.pending.filter(b => b.lote > lote);
-    this.#load(estado ?? {});
+    if (estado == null) this.shadow = clone(this.state); // mesa ainda não criada pelo mestre
+    else this.#load(estado);
     this.#reapplyPending();
     for (const b of this.pending) b.enviado = false;
   }

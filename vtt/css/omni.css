@@ -121,6 +121,27 @@ input[type=number]::-webkit-inner-spin-button { opacity: .5; }
   background: var(--ink); color: var(--paper); padding: 6px 8px 6px 14px; border-radius: 999px; box-shadow: var(--shadow); font-size: 13px; white-space: nowrap; }
 .scene-banner button { padding: 2px 10px; font-size: 12px; }
 
+/* ---------- papéis (mestre × jogador) ---------- */
+body.jogador .so-mestre { display: none !important; }
+.papel-badge { font-size: 12px; font-weight: 600; letter-spacing: .04em; padding: 2px 10px; border-radius: 999px; border: 1.5px solid var(--line); }
+body.jogador .papel-badge { border-color: var(--line-soft); color: var(--ink-2); font-weight: 500; }
+.privado { font-size: 11px; color: #5b5f97; margin-left: 6px; font-weight: 500; }
+.msg-privada { border-style: dashed; border-color: #5b5f97; }
+.estimativa { font-size: 12px; font-weight: 600; padding: 1px 10px; border-radius: 999px; border: 1.5px solid currentColor; }
+.estimativa.bem { color: var(--ok); } .estimativa.meio { color: #a0761e; } .estimativa.mal { color: var(--danger); }
+.actor-list li.oculto { border-style: dashed; opacity: .75; }
+.actor-list li.alheio { cursor: default; }
+.perm-form { display: flex; flex-direction: column; gap: 10px; }
+.perm-form fieldset { border: 1.5px solid var(--line-soft); border-radius: 10px; padding: 6px 10px; display: flex; flex-direction: column; gap: 4px; }
+.perm-form legend { font-size: 12px; font-weight: 600; padding: 0 4px; }
+.perm-form label { display: flex; gap: 6px; align-items: center; font-size: 13px; }
+.somente-leitura .window-head h2::after { content: ''; }
+.somente-leitura input:disabled, .somente-leitura select:disabled, .somente-leitura textarea:disabled { color: inherit; opacity: 1; }
+.invite.destaque input { border-bottom-color: var(--ok); font-weight: 600; }
+.invite.destaque small { color: var(--ok); font-weight: 600; }
+.net-dialog details { margin: 8px 0; font-size: 13px; }
+.net-dialog summary { cursor: pointer; color: var(--ink-2); }
+
 /* ---------- mesa compartilhada ---------- */
 .net-badge { font-size: 12px; }
 .net-badge[data-status="conectado"] { border-color: var(--ok); color: var(--ok); }

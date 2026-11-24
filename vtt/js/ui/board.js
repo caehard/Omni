@@ -1,5 +1,5 @@
 // Tabuleiro: mapa, grade em blocos (2×2 quadrados, Apêndice 4.1), tokens, seleção, medição de zonas e ping.
-import { state, local, scene, update, notify, getActor, subscribe } from '../core/store.js';
+import { state, local, scene, update, notify, getActor, subscribe, ownsActor } from '../core/store.js';
 import { prepareDerived, uid } from '../system/actor.js';
 import { CONFIG } from '../system/config.js';
 import { checkpoint } from '../core/history.js';
@@ -90,6 +90,7 @@ export function panTo(wx, wy) {
 
 export function addToken(atorId, x, y) {
   const sc = scene();
+  if (!ownsActor(getActor(atorId))) return;
   if (x == null) { // posição livre perto do canto
     const used = new Set(sc.tokens.map(t => t.x + ',' + t.y));
     x = 1; y = 1;
@@ -186,9 +187,10 @@ const iconFor = id => CONFIG.condicaoById?.[id]?.icone || (id[0] || '?').toUpper
 function drawToken(t, a, q, isSel, isTarget, isHover) {
   const s = size(t), r0 = q * s / 2;
   const cx = t.x * q + r0, cy = t.y * q + r0, r = r0 * 0.84;
-  const rec = a.system.recursos;
+  const rec = a.system.recursos, oculto = t.oculto || a.oculto; // só o mestre recebe tokens ocultos
   ctx.save();
   if (rec.morto) ctx.globalAlpha = 0.55;
+  if (oculto) ctx.globalAlpha = 0.4;
   ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.closePath();
   ctx.fillStyle = a.cor || '#333'; ctx.fill();
   if (a.imagem) {
@@ -200,8 +202,11 @@ function drawToken(t, a, q, isSel, isTarget, isHover) {
   }
   ctx.lineWidth = (isSel ? 4 : isHover ? 3 : 2) / view.zoom;
   ctx.strokeStyle = isSel ? cssVar('--accent') : cssVar('--ink');
+  if (oculto) ctx.setLineDash([5 / view.zoom, 4 / view.zoom]);
   ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+  ctx.setLineDash([]);
   ctx.globalAlpha = 1;
+  if (oculto) badge(t.x * q + Math.max(7, q * 0.17), t.y * q + q * s - Math.max(7, q * 0.17), Math.max(7, q * 0.17), '👁');
   if (isTarget) {
     ctx.strokeStyle = cssVar('--danger'); ctx.lineWidth = 2.5 / view.zoom; ctx.setLineDash([4 / view.zoom, 3 / view.zoom]);
     ctx.beginPath(); ctx.arc(cx, cy, r + 6 / view.zoom, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]);
@@ -367,8 +372,12 @@ function onDown(e) {
   }, () => { box = null; draw(); });
 }
 
+/** Tokens que este jogador pode mover (os das fichas dele; o mestre move todos). */
+const movable = toks => toks.filter(t => ownsActor(getActor(t.atorId)));
+
 function startDrag(e, c0) {
-  const sc = scene(), toks = getSelection();
+  const sc = scene(), toks = movable(getSelection());
+  if (!toks.length) return;
   dragStart = new Map(toks.map(t => [t.id, { x: t.x, y: t.y }]));
   let moved = false;
   track(e, ev => {
@@ -422,7 +431,7 @@ function onKey(e) {
   if (e.target.closest?.('input, textarea, select, [contenteditable]')) return;
   if (e.code === 'Space') { spaceDown = true; if (e.target === document.body) e.preventDefault(); return; }
   if (e.key === 'Escape') { selected.clear(); ruler = null; box = null; draw(); return; }
-  const toks = getSelection();
+  const toks = movable(getSelection());
   if (!toks.length) return;
   if (e.key === 'Delete' || e.key === 'Backspace') {
     const ids = new Set(toks.map(t => t.id));

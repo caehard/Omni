@@ -4,7 +4,7 @@ import { prepareDerived, aptidaoLabel } from '../system/actor.js';
 import { applyDamage, heal, loseSanity, deathRoll, spendAction, rest } from '../system/combat.js';
 import { blockDistance, zoneForBlocks } from './board.js';
 import { rollFormula } from '../system/dice.js';
-import { state, local, scene, update, getActor, subscribe } from '../core/store.js';
+import { state, local, scene, update, getActor, subscribe, ownsActor, sheetAccess } from '../core/store.js';
 import { makeWindow, esc, getPath, setPath, toast, closeWindow, readFile, pickFile } from './dom.js';
 import { openRollDialog } from './roll-dialog.js';
 import { post, postSystem } from './chat.js';
@@ -14,6 +14,7 @@ const sheets = new Map(); // actorId -> { w, tab, sig, unsub }
 export function openSheet(actorId) {
   const actor = getActor(actorId);
   if (!actor) return;
+  if (sheetAccess(actor) === 'nenhum') { toast('O mestre não liberou esta ficha para você.'); return; }
   if (sheets.has(actorId)) { makeWindow('sheet-' + actorId, ''); return; }
   const w = makeWindow('sheet-' + actorId, actor.nome, {
     width: 980, className: 'sheet-window',
@@ -31,17 +32,26 @@ function structureSig(a) {
   const s = a.system;
   return [s.aptidoes.length, s.virtudes.length, s.falhas.length, s.habilidades.length, s.poderes.length,
     s.inventario.length, s.armas.length, (s.armaduras || []).length, Object.keys(s.condicoes).sort().join(','), Object.keys(s.absorcao).join(','),
-    a.tipo, a.imagem.length, s.recursos.portasDaMorte, s.recursos.morto].join('|');
+    a.tipo, a.imagem.length, s.recursos.portasDaMorte, s.recursos.morto, sheetAccess(a)].join('|');
+}
+
+/** Ficha de outro jogador liberada só para ver: tudo desabilitado, menos as abas. */
+function applyReadonly(ctx, actor) {
+  const ro = sheetAccess(actor) !== 'editar';
+  ctx.w.el.classList.toggle('somente-leitura', ro);
+  if (!ro) return;
+  ctx.w.setTitle(`${actor.nome} (só leitura)`);
+  ctx.w.body.querySelectorAll('input, select, textarea, button:not([data-tab])').forEach(el => { el.disabled = true; });
 }
 
 function refresh(actorId) {
   const ctx = sheets.get(actorId), actor = getActor(actorId);
   if (!ctx) return;
-  if (!actor) { closeWindow('sheet-' + actorId); return; }
+  if (!actor || sheetAccess(actor) === 'nenhum') { closeWindow('sheet-' + actorId); return; }
   if (structureSig(actor) !== ctx.sig) { render(actorId); return; }
   // atualização leve: valores calculados e campos não focados
   const d = prepareDerived(actor);
-  ctx.w.setTitle(actor.nome);
+  ctx.w.setTitle(actor.nome + (sheetAccess(actor) === 'editar' ? '' : ' (só leitura)'));
   ctx.w.body.querySelectorAll('[data-calc]').forEach(el => { el.textContent = calcValue(d, el.dataset.calc); });
   ctx.w.body.querySelectorAll('[data-path]').forEach(el => {
     if (el === document.activeElement) return;
@@ -75,6 +85,7 @@ function render(actorId) {
     <div class="sheet-page">${ctx.tab === 'principal' ? pagePrincipal(actor, d) : ctx.tab === 'habilidades' ? pageHabilidades(actor, d) : pageInventario(actor, d)}</div>`;
   ctx.w.body.querySelector('.sheet-page').scrollTop = scroll;
   renderWarnings(ctx.w.body, d);
+  applyReadonly(ctx, actor);
 }
 
 function renderWarnings(body, d) {
@@ -318,6 +329,7 @@ function pageInventario(a, d) {
 function onChange(actorId, e) {
   const el = e.target;
   const actor = getActor(actorId);
+  if (!ownsActor(actor)) return;
   if (el.dataset.armorAbs != null) {
     // "Cortante 7, Perfurante 7" -> { cortante: 7, perfurante: 7 }
     const byName = Object.fromEntries(Object.values(CONFIG.tipoDano).map(t => [t.nome.toLowerCase(), t.id]));
@@ -344,6 +356,7 @@ function onClick(actorId, e) {
   if (!b) return;
   const ctx = sheets.get(actorId), actor = getActor(actorId), s = actor.system, body = ctx.w.body;
   if (b.dataset.tab) { ctx.tab = b.dataset.tab; render(actorId); return; }
+  if (!ownsActor(actor)) return;
   const act = b.dataset.act;
   const sel = name => body.querySelector(`[data-new="${name}"]`)?.value;
   const blank = {

@@ -1,0 +1,13 @@
+[
+  { "nome": "campos simples", "a": { "x": 1, "y": "a", "z": true }, "b": { "x": 2, "y": "a", "w": null } },
+  { "nome": "lista identificada: muda, sai e entra", "a": { "l": [{ "id": "x", "v": 1 }, { "id": "y" }] }, "b": { "l": [{ "id": "w" }, { "id": "x", "v": 2 }, { "id": "q" }] } },
+  { "nome": "lista identificada reordenada", "a": { "l": [{ "id": "x" }, { "id": "y" }, { "id": "z" }] }, "b": { "l": [{ "id": "z" }, { "id": "x" }] } },
+  { "nome": "lista sem id, mesmo tamanho", "a": { "l": [{ "v": 1 }, { "v": 2 }] }, "b": { "l": [{ "v": 1 }, { "v": 3 }] } },
+  { "nome": "lista sem id, tamanho diferente", "a": { "l": [1, 2, 3] }, "b": { "l": [1, 5, 3, 4] } },
+  { "nome": "tipo muda", "a": { "x": 1, "y": { "z": [] } }, "b": { "x": "1", "y": "texto" } },
+  { "nome": "número vira booleano", "a": { "x": 1 }, "b": { "x": true } },
+  { "nome": "por atorId", "a": { "c": [{ "atorId": "a", "n": 0 }] }, "b": { "c": [{ "atorId": "a", "n": 1 }, { "atorId": "b", "n": 0 }] } },
+  { "nome": "ids repetidos", "a": { "l": [{ "id": "x", "v": 1 }, { "id": "x", "v": 2 }] }, "b": { "l": [{ "id": "x", "v": 1 }, { "id": "x", "v": 3 }] } },
+  { "nome": "lista vazia ganha itens", "a": { "chat": [] }, "b": { "chat": [{ "id": "m1" }, { "id": "m2" }] } },
+  { "nome": "aninhado", "a": { "cenas": [{ "id": "c", "tokens": [{ "id": "t", "x": 1 }] }] }, "b": { "cenas": [{ "id": "c", "tokens": [{ "id": "t", "x": 4 }, { "id": "u", "x": 0 }] }] } }
+]

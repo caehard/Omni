@@ -2,7 +2,7 @@
 import { CONFIG } from '../system/config.js';
 import { rollBase, autoPenalties, aptidaoLabel, prepareDerived, ATTRS } from '../system/actor.js';
 import { rollPool } from '../system/dice.js';
-import { state, getActor } from '../core/store.js';
+import { state, getActor, isGM } from '../core/store.js';
 import { makeWindow, esc } from './dom.js';
 import { post } from './chat.js';
 
@@ -45,7 +45,10 @@ export function openRollDialog(actorId, preset = {}) {
     <label>Desvantagem <input type="number" name="desvantagem" min="0" value="${preset.desvantagem ?? 0}"></label>
     <label>Dados extras <input name="extra" placeholder="ex.: 2 ou 2d4" title="Só o número = dado do domínio" value="${esc(preset.extra || '')}"></label>
     <p class="preview full" aria-live="polite"></p>
-    <div class="row full"><button type="submit" class="primary">Rolar</button></div>
+    <div class="row full"><label>Quem vê <select name="visivel">
+        <option value="todos">Todos</option>
+        <option value="mestre" ${preset.oculta || actor.oculto ? 'selected' : ''}>Só o mestre${isGM() ? ' (rolagem secreta)' : ' (e eu)'}</option></select></label>
+      <button type="submit" class="primary">Rolar</button></div>
   </form>`;
 
   const f = w.body.querySelector('form');
@@ -100,7 +103,7 @@ export function openRollDialog(actorId, preset = {}) {
     post({ tipo: 'roll', atorId: actor.id, roll,
       titulo: f.titulo.value ? `${f.titulo.value} · ${tituloBase}` : tituloBase,
       notas: c.auto.motivos.length ? 'auto: ' + c.auto.motivos.join(', ') : '',
-      dano: preset.dano, bloqueio: preset.bloqueio });
+      dano: preset.dano, bloqueio: preset.bloqueio, ...(f.visivel.value === 'mestre' && { para: [] }) });
     preset.onRolled?.(roll);
     w.close();
   });

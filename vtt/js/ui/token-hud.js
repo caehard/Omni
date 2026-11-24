@@ -1,5 +1,6 @@
 // Menu rápido do token selecionado (vida, sanidade, condições, tamanho e atalhos), no canto do mapa.
-import { state, local, scene, update, notify, getActor, subscribe } from '../core/store.js';
+import { state, local, scene, update, notify, getActor, subscribe, isGM, ownsActor, sheetAccess } from '../core/store.js';
+import { openPermissionsDialog } from './sidebar.js';
 import { prepareDerived } from '../system/actor.js';
 import { CONFIG } from '../system/config.js';
 import { getSelection, isDragging, onViewChange } from './board.js';
@@ -37,8 +38,8 @@ function refresh() {
 function structureSig(sel) {
   if (sel.length > 1) return 'multi:' + sel.map(t => t.id).join(',');
   const t = sel[0], a = getActor(t.atorId);
-  return [t.id, t.tamanho, a?.id, JSON.stringify(a?.system.condicoes), local.alvoId === a?.id,
-    state.combate.combatentes.some(c => c.atorId === a?.id)].join('|');
+  return [t.id, t.tamanho, t.oculto, a?.id, JSON.stringify(a?.system.condicoes), local.alvoId === a?.id, ownsActor(a), sheetAccess(a),
+    !ownsActor(a) && a ? healthKey(a) : '', state.combate.combatentes.some(c => c.atorId === a?.id)].join('|');
 }
 
 function render(sel) {
@@ -53,6 +54,15 @@ function render(sel) {
   const t = sel[0], a = getActor(t.atorId);
   if (!a) { el.innerHTML = ''; return; }
   const d = prepareDerived(a), r = a.system.recursos;
+  if (!ownsActor(a)) { // token de outro: só o que um jogador perceberia
+    el.innerHTML = `<header><span class="dot" style="background:${esc(a.cor)}"></span><b>${esc(a.nome)}</b></header>
+      <div class="hud-row">${healthEstimate(r.vida, d.vidaMax)}</div>
+      <div class="hud-conds">${Object.keys(a.system.condicoes || {}).map(id => { const c = CONFIG.condicaoById[id]; return `<span class="chip" title="${esc(c?.descricao || '')}">${esc(c?.icone || '')} ${esc(c?.nome || id)}</span>`; }).join('')}</div>
+      <div class="hud-actions">
+        ${sheetAccess(a) !== 'nenhum' ? '<button data-act="ficha">Ficha</button>' : ''}
+        <button data-act="alvo" aria-pressed="${local.alvoId === a.id}" title="Marcar como alvo (botão direito no token)">◎ Alvo</button></div>`;
+    return;
+  }
   const ativas = Object.entries(a.system.condicoes || {});
   const emCombate = state.combate.combatentes.some(c => c.atorId === a.id);
   el.innerHTML = `<header><span class="dot" style="background:${esc(a.cor)}"></span><b>${esc(a.nome)}</b><small>Nv ${d.nivel}</small></header>
@@ -73,7 +83,18 @@ function render(sel) {
       <button data-act="dano">Dano/Cura</button>
       <button data-act="alvo" aria-pressed="${local.alvoId === a.id}" title="Marcar como alvo (botão direito no token)">◎ Alvo</button>
       <button data-act="combate" ${emCombate ? 'disabled' : ''} title="Adicionar ao combate">${emCombate ? 'Em combate' : '+ Combate'}</button>
+      ${isGM() ? `<button data-act="ocultar" aria-pressed="${!!t.oculto}" title="Token oculto: os jogadores não o veem">${t.oculto ? '👁 Revelar' : '👁 Ocultar'}</button>
+      <button data-act="perm" title="Dar a ficha a um jogador, ocultar a ficha">🔑</button>` : ''}
       <button data-act="remover" class="danger" title="Remover do mapa (Delete)">Remover</button></div>`;
+}
+
+const healthKey = a => healthEstimate(a.system.recursos.vida, prepareDerived(a).vidaMax);
+
+/** O que um jogador vê da vida de quem não é dele: uma estimativa, não o número. */
+function healthEstimate(v, max) {
+  const p = max > 0 ? v / max : 1;
+  const [txt, cls] = v <= 0 ? ['Caído', 'mal'] : p >= 1 ? ['Ileso', 'bem'] : p > 0.5 ? ['Ferido', 'meio'] : p > 0.25 ? ['Muito ferido', 'mal'] : ['À beira da morte', 'mal'];
+  return `<span class="estimativa ${cls}">${txt}</span>`;
 }
 
 const size = t => Math.max(1, Math.min(4, Number(t.tamanho) || 1));
@@ -106,7 +127,8 @@ function syncValues(sel) {
 function onClick(e) {
   const b = e.target.closest('button[data-act]');
   if (!b) return;
-  const sel = getSelection(), t = sel[0], a = t && getActor(t.atorId);
+  const all = getSelection(), t = all[0], a = t && getActor(t.atorId);
+  const sel = all.filter(x => ownsActor(getActor(x.atorId))); // ações em grupo: só nos tokens que são seus
   const act = b.dataset.act;
   if (act === 'remover') {
     const ids = new Set(sel.map(x => x.id));
@@ -119,9 +141,12 @@ function onClick(e) {
   }
   if (!a) return;
   const r = a.system.recursos;
-  if (act === 'ficha') openSheet(a.id);
+  if (act === 'ficha') { openSheet(a.id); return; }
+  if (act === 'alvo') { local.alvoId = local.alvoId === a.id ? null : a.id; notify(); return; }
+  if (!ownsActor(a)) return;
+  if (act === 'ocultar' && isGM()) update(() => { if (t.oculto) delete t.oculto; else t.oculto = true; });
+  else if (act === 'perm') openPermissionsDialog(a.id);
   else if (act === 'dano') openDamageDialog(a.id);
-  else if (act === 'alvo') { local.alvoId = local.alvoId === a.id ? null : a.id; notify(); }
   else if (act === 'res-' || act === 'res+') update(() => { r[b.dataset.res] = (Number(r[b.dataset.res]) || 0) + (act === 'res+' ? 1 : -1); });
   else if (act === 'cond-x') update(() => { delete a.system.condicoes[b.dataset.id]; });
   else if (act === 'cond+' || act === 'cond-') {
@@ -132,7 +157,7 @@ function onClick(e) {
 }
 
 function onChange(e) {
-  const f = e.target.dataset.field, sel = getSelection();
+  const f = e.target.dataset.field, sel = getSelection().filter(x => ownsActor(getActor(x.atorId)));
   if (!f || !sel.length) return;
   if (f === 'tamanho' && e.target.value) {
     const n = Number(e.target.value), sc = scene();

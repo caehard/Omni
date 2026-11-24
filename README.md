@@ -24,6 +24,7 @@ Precisa apenas de Python 3 e de um navegador (nada para instalar com `pip`).
 ```sh
 ./serve.sh            # Linux/macOS  (ou: python3 servidor.py)
 serve.bat             # Windows      (ou: python servidor.py)
+jogar-online.bat      # Windows, com link pela internet (ou: python servidor.py --online)
 ```
 
 Abra **http://localhost:8000/vtt/**. Na primeira vez, uma mesa de exemplo é criada.
@@ -33,26 +34,40 @@ o servidor tem os seus em `python tools/testar_servidor.py`.
 > Abrir o `index.html` direto pelo arquivo (`file://`) não funciona: o navegador bloqueia o carregamento dos módulos e dos JSON.
 > Servido por `python -m http.server`, o TTS funciona como antes, só neste navegador (sem multiplayer).
 
-## Jogar online (multiplayer)
+## Jogar online com os amigos
 
-Com o `servidor.py` rodando, a mesa é **compartilhada**: todos que abrirem o link veem e mexem nas mesmas fichas, mapa, combate e chat, atualizando na hora.
+**Uma vez só:** instale o túnel gratuito do Cloudflare (no Windows, no PowerShell):
 
-1. O mestre roda o servidor e abre `http://localhost:8000/vtt/`. Na primeira vez o TTS pede o seu nome.
-2. O botão com o nome da mesa (canto superior direito) mostra quem está conectado e os **links de convite**.
-3. Cada jogador abre o link, informa o nome e entra.
+```
+winget install --id Cloudflare.cloudflared
+```
 
-Como os jogadores chegam até o seu PC:
+**A cada sessão:**
 
-| Situação | O que fazer |
-|---|---|
-| Mesma rede (Wi-Fi/cabo) | Use o link `http://192.168.x.x:8000/vtt/?mesa=...` mostrado no convite. No Windows, permita o Python no firewall quando ele perguntar. |
-| Pela internet (mais fácil) | Instale o [cloudflared](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads/) e rode `cloudflared tunnel --url http://localhost:8000`. Ele mostra um endereço `https://….trycloudflare.com`; envie `https://….trycloudflare.com/vtt/?mesa=principal`. Muda a cada execução. |
-| Grupo fixo | [Tailscale](https://tailscale.com/) (rede privada entre os PCs do grupo) ou redirecionamento da porta 8000 no roteador. |
+1. Dê dois cliques em **`jogar-online.bat`** (Linux/macOS: `./jogar-online.sh`). A janela mostra `>>> Link para os amigos: https://….trycloudflare.com/vtt/?mesa=principal`.
+2. Abra `http://localhost:8000/vtt/` — quem abre pelo **localhost** é o **mestre** (👑 no topo).
+3. Mande o link 🌐 para os amigos (ele também aparece no botão da mesa, no canto superior direito). Quem entra por ele é **jogador**.
+4. Para dar uma ficha a um jogador: 🔑 na lista de fichas → marque o nome dele. Os jogadores aparecem ali depois de entrarem uma vez.
 
+O link muda a cada vez que o servidor abre. Sem o cloudflared, `serve.bat` funciona na **mesma rede** (Wi-Fi/cabo) com o link `http://192.168.x.x:8000/…` do convite — no Windows, permita o Python no firewall quando ele perguntar. Para um grupo fixo também dá para usar o [Tailscale](https://tailscale.com/).
+
+### Mestre × jogador
+
+| | Mestre | Jogador |
+|---|---|---|
+| Fichas | todas | edita as suas (🔑); vê as de personagens de outros só para leitura; NPCs ficam fechados (o mestre pode liberar) |
+| Mapa | todas as cenas; tokens ocultos aparecem translúcidos | só a cena ativa; não recebe tokens ocultos; move só os próprios tokens |
+| Vida de quem não é seu | número | estimativa (Ileso, Ferido, Muito ferido…) |
+| Chat | vê tudo | não recebe sussurros alheios nem rolagens secretas |
+| Combate, cenas, regras, NPCs | controla | — |
+
+- **O servidor confere tudo**: cada jogador só recebe a sua vista da mesa e cada mudança que ele manda é checada (não adianta trapacear pelo console).
+- **Chat**: `/s Nome mensagem` (sussurro), `/m mensagem` (só o mestre), `/gr 2d10` (rolagem secreta). No diálogo de rolagem, “Quem vê: Só o mestre”.
+- **Ocultar**: no menu do token, 👁 Ocultar esconde o token; no 🔑, “Oculto” esconde a ficha e todos os tokens dela (emboscadas).
+- **Co-mestre**: o botão da mesa tem um “link de co-mestre” (com uma chave secreta). **Ver como jogador**: o mesmo botão abre uma aba com a visão dos jogadores.
 - **Mesas separadas**: `?mesa=nome` no endereço (ex.: uma por campanha). Cada uma fica salva em `mesas/<nome>.json` (fora do git).
-- **Mesa nova**: o TTS oferece usar a mesa que você já tinha salva no navegador (modo local); senão, começa com o exemplo.
-- **Alvo** (botão direito num token) é de cada jogador; o resto é compartilhado.
-- Ainda **não há permissões**: quem tem o link pode editar tudo. Só o servidor serve as pastas `vtt/`, `data/` e `docs/` (o resto do repositório não fica exposto). A visão mestre × jogador é o próximo passo.
+- **Mesa nova**: o TTS oferece usar a mesa que você já tinha salva no navegador (modo local); senão, começa com o exemplo. Um jogador que chega antes do mestre espera ele abrir.
+- Só as pastas `vtt/`, `data/` e `docs/` são servidas (o resto do repositório não fica exposto), e o HTML das mensagens é filtrado (nada de scripts vindos de outros jogadores).
 
 ### Como a sincronização funciona
 

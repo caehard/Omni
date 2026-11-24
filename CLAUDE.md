@@ -26,9 +26,10 @@ Sistema de RPG **autoral** (em testes) + **mesa virtual própria ("TTS")** para 
 | `vtt/js/core/sync-ops.js` | `diff`/`applyOps` do estado (set/del/ins; listas com `id`/`atorId` comparadas por identificador). **Espelhado em `servidor.py`** — mudou um, mude o outro e rode os dois testes |
 | `vtt/js/core/sync-client.js` | Lógica de convergência sem rede (lotes pendentes, eco do próprio lote, reconexão) |
 | `vtt/js/core/net.js` | Rede: SSE `/api/mesa/<nome>/eventos` + POST `/ops`, presença, status |
-| `servidor.py` | Servidor da mesa (stdlib): serve só `vtt/`, `data/`, `docs/`; mesas em `mesas/<nome>.json` (gitignored) |
-| `vtt/tests/` | `index.html`: regras, sincronização, cenas, desfazer (116 passando) · `multiplayer.html`: duas mesas em iframes, inclusive cliques e arrastos sintéticos no mapa (16 passando, precisa do servidor; usa `window.omni`) · casos compartilhados JS/Python em `sync-casos.json` |
-| `tools/testar_servidor.py` | Testes do servidor (operações, protocolo, arquivos bloqueados) |
+| `servidor.py` | Servidor da mesa (stdlib): serve só `vtt/`, `data/`, `docs/`; mesas em `mesas/<nome>.json` (gitignored, com a chave do mestre). **Papéis**: mestre = localhost sem cabeçalho de proxy, ou `chave`; jogador recebe `vista_jogador()` (sem ocultos, só a cena ativa, sem sussurros alheios) e cada op passa por `pode()`; recusa → o jogador recebe o estado de novo. Tem `diff` em Python (espelho do JS, casos em `vtt/tests/diff-casos.json`). `--online` abre túnel do cloudflared e expõe o link em `/api/ping` (`publico`) |
+| `jogar-online.bat` / `.sh` | `servidor.py --online` |
+| `vtt/tests/` | `index.html`: regras, sincronização, cenas, desfazer, permissões, filtro de HTML (134 passando) · `multiplayer.html`: dois mestres + um jogador (`?como=jogador&jid=`) em iframes, com cliques e arrastos sintéticos (31 passando, precisa do servidor; usa `window.omni`) · casos JS/Python em `sync-casos.json` e `diff-casos.json` |
+| `tools/testar_servidor.py` | Testes do servidor (operações, diff, vista do jogador, permissões, papéis via túnel/chave, protocolo, arquivos bloqueados) — 17 passando |
 | `tools/extrair_habilidades.py` | Livro (cap. 08) → `data/habilidades.json`. Rode após editar habilidades |
 | `tools/equipamentos.py` | Valida `data/equipamentos.json` pelos pontos de criação e regenera a tabela do livro (cap. 04, entre marcadores). Rode após editar equipamentos |
 | `original/` | `.docx` V4 original e ficha antiga em PDF (não editar) |
@@ -56,13 +57,15 @@ python tools/testar_servidor.py
 ## Estado atual (2026-11-24)
 
 - Feito: livro reformatado, ficha nova, dados JSON, TTS (fichas, rolagens, combate, dano/morte, mapa com zonas, descanso, armaduras, catálogo de 46 armas e 12 armaduras validadas).
-- **Multiplayer por link** (2026-11-24): `servidor.py` + SSE/POST, várias mesas (`?mesa=`), nome do jogador, presença, convite com links da rede local, reconexão. Alvo virou por jogador. Sem permissões ainda (qualquer um edita tudo). Jogar pela internet = túnel (cloudflared) ou Tailscale, documentado no README.
+- **Multiplayer por link** (2026-11-24): `servidor.py` + SSE/POST, várias mesas (`?mesa=`), nome do jogador, presença, convite, reconexão. Alvo é por jogador.
+- **Jogar online + papéis** (2026-11-24): `jogar-online.bat` abre túnel cloudflared e mostra o link; mestre × jogador com permissões conferidas no servidor (donos das fichas via 🔑, fichas/tokens ocultos, `permissao` ver/nenhum, estimativa de vida, sussurros `/s`, `/m`, rolagem secreta `/gr`), link de co-mestre, “ver como jogador”, HTML do chat filtrado. Identidade do jogador = `omni-jogador-id` no localStorage.
+- **Pesquisa de diferenciais** (pedido do autor): o que mais se elogia em VTTs — entrar por link sem conta (Owlbear), desenho tipo quadro branco e névoa de guerra (lista “mínimo” dos fóruns), dados animados (Dice So Nice, módulo muito instalado no Foundry), régua ao arrastar (Drag Ruler), música/ambiente (Alchemy).
 - **Nenhuma pendência de regra aberta.** Adiados pelo autor: magias (tipos Mahi/Logi/Centi), Investigação e Exploração, Uso de Classes, Cidades.
 
 - **Melhorias do VTT** (pedido do autor: ficar “fluido e completo como Roll20/Foundry”, mantendo o visual atual refinado). Plano em 4 pacotes, nesta ordem:
   1. ✅ Mapa e tokens: cenas, tamanhos, menu do token, ícones de condição, seleção múltipla, ping, desfazer.
   2. Desenho e medição: desenho livre/formas/texto, áreas de efeito (círculo, cone, linha) mostrando zonas, régua com vários pontos.
-  3. Mestre × jogador e névoa: papel de mestre, dono de cada ficha, tokens/fichas ocultos, névoa de guerra, rolagens ocultas e sussurros. Vai exigir o servidor filtrar o estado por jogador (hoje todos recebem tudo).
+  3. Mestre × jogador e névoa: ✅ papéis, donos, ocultos, sussurros, rolagens secretas (servidor filtra por jogador). Falta a névoa de guerra.
   4. Fluxo de jogo: barra de ações rápidas, turno ativo destacado, diário/handouts, música ambiente.
 
 ## Próximos passos possíveis

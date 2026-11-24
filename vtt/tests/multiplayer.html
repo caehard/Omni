@@ -1,11 +1,11 @@
 <!doctype html>
 <html lang="pt-BR"><head><meta charset="utf-8"><title>Omni — Teste multiplayer</title>
 <style>body{font:14px system-ui;margin:20px;background:#fff;color:#111}.ok{color:#2a7a3a}.fail{color:#b00;font-weight:bold}pre{margin:0}
-iframe{width:49%;height:420px;border:1px solid #999}</style></head>
+iframe{width:33%;height:420px;border:1px solid #999}</style></head>
 <body><h1>Teste multiplayer</h1>
 <p>Precisa do <code>servidor.py</code>. Abre duas cópias da mesa numa mesa nova e confere se o que uma faz aparece na outra.</p>
 <div id="out">rodando…</div>
-<iframe id="a" title="Jogador A"></iframe><iframe id="b" title="Jogador B"></iframe>
+<iframe id="a" title="Mestre A"></iframe><iframe id="b" title="Mestre B"></iframe><iframe id="c" title="Jogador C"></iframe>
 <script type="module">
 const results = [];
 const ok = (name, cond, extra = '') => results.push({ name, ok: !!cond, extra });
@@ -82,6 +82,40 @@ if (!ping?.omni) {
   pointer('a', 'pointerdown', c1.x, c1.y); pointer('a', 'pointermove', c2.x, c2.y); pointer('a', 'pointerup', c2.x, c2.y);
   ok('caixa de seleção pega todos os tokens', omni('a').board.getSelection().length === sc.tokens.length, `${omni('a').board.getSelection().length}/${sc.tokens.length}`);
 
+  // ---- papéis: C entra como jogador (A e B são mestres, pois abrem pelo localhost) ----
+  await load('c', `/vtt/?mesa=${sala}&como=jogador&jid=jog-c`);
+  ok('C entra como jogador', await wait(() => omni('c')?.local.mestre === false && doc('c').getElementById('papel-badge').textContent.includes('jogador')));
+  ok('jogador não vê os botões do mestre', doc('c').getElementById('btn-new-npc').offsetParent === null && doc('a').getElementById('btn-new-npc').offsetParent !== null);
+  const band = omni('a').state.atores.find(a => a.tipo === 'npc'), tokBand = omni('a').scene().tokens.find(t => t.atorId === band.id);
+  const tokC = id => omni('c').scene().tokens.find(t => t.id === id);
+  ok('jogador vê o token do NPC', await wait(() => tokC(tokBand.id)));
+  omni('a').update(() => { tokBand.oculto = true; });
+  ok('token oculto pelo mestre some para o jogador', await wait(() => !tokC(tokBand.id)));
+  ok('…mas continua para o outro mestre', await wait(() => tokB(tokBand.id)?.oculto === true));
+  ok('o mestre recebe o jogador na lista (para dar fichas)', await wait(() => omni('a').state.jogadores?.['jog-c']));
+
+  // mensagens privadas
+  fa.msg.value = '/m segredo-do-mestre'; fa.requestSubmit();
+  fa.msg.value = '/s Teste oi-so-pra-c'; fa.requestSubmit();
+  ok('sussurro chega ao destinatário', await wait(() => chatText('c').includes('oi-so-pra-c')));
+  ok('mensagem só para o mestre não chega ao jogador', await wait(() => chatText('b').includes('segredo-do-mestre')) && !chatText('c').includes('segredo-do-mestre'));
+
+  // fichas: o mestre dá Aria a C; C move Aria, mas não mexe no NPC
+  omni('a').update(() => { ator.donos = ['jog-c']; });
+  ok('C passa a ser dono de Aria', await wait(() => omni('c').state.atores.find(a => a.id === ator.id)?.donos?.includes('jog-c')));
+  const tc = tokC(t0.id), y0 = tc.y, pc = tokenScreen('c', tc), passoC = omni('c').scene().tamanhoQuadrado * omni('c').board.getView().zoom;
+  pointer('c', 'pointerdown', pc.x, pc.y); pointer('c', 'pointermove', pc.x, pc.y + passoC); pointer('c', 'pointerup', pc.x, pc.y + passoC);
+  ok('jogador move o próprio token (B vê)', await wait(() => tokB(t0.id)?.y === y0 + 1), `y em B: ${tokB(t0.id)?.y}, esperado ${y0 + 1}`);
+  const bandC = () => omni('c').state.atores.find(a => a.id === band.id);
+  const vidaBand = band.system.recursos.vida;
+  omni('c').update(() => { bandC().system.recursos.vida = 99; }); // tentativa de trapaça pelo console
+  ok('servidor recusa mudar a ficha do NPC e o jogador volta ao valor certo', await wait(() => bandC()?.system.recursos.vida === vidaBand));
+  ok('…e nada muda para o mestre', omni('b').state.atores.find(a => a.id === band.id).system.recursos.vida === vidaBand);
+  doc('c').querySelector(`#actors [data-id="${band.id}"]`)?.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 2 }));
+  ok('jogador não abre a ficha do NPC', !doc('c').querySelector('.sheet-window'));
+  omni('a').update(() => { delete tokBand.oculto; });
+  ok('token revelado volta para o jogador', await wait(() => tokC(tokBand.id)));
+
   // cenas: A cria e prepara uma cena sem tirar B de onde está, depois leva B
   const cenaB = omni('b').scene().id;
   doc('a').querySelector('#scenes [data-act="nova"]').click();
@@ -90,6 +124,7 @@ if (!ping?.omni) {
   const nova = omni('a').scene().id;
   doc('a').querySelector('#scene-banner [data-act="ativar"]').click();
   ok('“levar jogadores” muda a cena de B', await wait(() => omni('b').scene().id === nova));
+  ok('o jogador vai junto e só recebe a cena ativa', await wait(() => omni('c').scene().id === nova && omni('c').state.cenas.length === 1));
 
   // A recarrega a página e continua com tudo
   await load('a', `/vtt/?mesa=${sala}`);

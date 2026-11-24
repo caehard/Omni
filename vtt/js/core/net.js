@@ -1,7 +1,7 @@
 // Conexão com o servidor da mesa (servidor.py).
 // Recebe o estado e as mudanças dos outros por SSE (/eventos) e envia as mudanças locais por POST (/ops).
 // A lógica de convergência fica em sync-client.js.
-import { state, setSyncHook, notify, remoteApplied } from './store.js';
+import { state, local, setSyncHook, notify, remoteApplied } from './store.js';
 import { SyncClient } from './sync-client.js';
 
 export const net = {
@@ -10,10 +10,15 @@ export const net = {
   nome: null,
   cliente: null,
   status: 'offline',   // offline | conectando | conectado | reconectando
-  jogadores: [],       // [{ cliente, nome }]
-  info: null,          // resposta de /api/ping (endereços para convite)
+  jogadores: [],       // [{ cliente, nome, jogador, mestre }] — quem está conectado agora
+  info: null,          // resposta de /api/ping (endereços para convite, link público)
+  papel: 'mestre',     // mestre | jogador (no modo local, sempre mestre)
+  chave: null,         // chave do mestre (só o mestre recebe; vai no link de co-mestre)
   erro: null,
 };
+
+/** Atualiza as informações do servidor (o link público do túnel pode aparecer depois de abrir). */
+export async function refreshInfo() { const i = await probe(); if (i) net.info = i; return net.info; }
 
 const listeners = new Set();
 export function onNetChange(fn) { listeners.add(fn); return () => listeners.delete(fn); }
@@ -38,21 +43,31 @@ export async function probe() {
 export const cleanRoom = s => (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
   .replace(/[^a-z0-9_-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40) || 'principal';
 
+/** Aplica o papel informado pelo servidor (mestre ou jogador). */
+function setRole(msg) {
+  const mestre = msg.papel !== 'jogador';
+  if (msg.chave) net.chave = msg.chave;
+  if (local.mestre !== mestre || net.papel !== msg.papel) { local.mestre = mestre; net.papel = msg.papel || 'mestre'; changed(); }
+}
+
 /**
  * Entra na mesa. Resolve com `true` se a mesa já existia no servidor (o estado foi carregado)
- * ou `false` se é nova (o estado local, vazio, é enviado como ponto de partida).
+ * ou `false` se é nova (o mestre envia o estado local, vazio, como ponto de partida; o jogador espera).
+ * jogador: id persistente deste navegador · chave: chave do mestre (link de co-mestre) · como: 'jogador' para ver como jogador.
  */
-export function connect({ sala, nome, info }) {
+export function connect({ sala, nome, info, jogador, chave = '', como = '' }) {
   const cliente = Math.random().toString(36).slice(2, 10) + Date.now().toString(36); // um por carregamento de página
-  Object.assign(net, { online: true, sala, nome, cliente, info });
+  Object.assign(net, { online: true, sala, nome, cliente, info, jogador, chaveUsada: chave, como });
+  local.jogadorId = jogador;
   sync = new SyncClient(state, cliente);
   setSyncHook(schedule);
   addEventListener('pagehide', () => { flush(); pump(true); });
+  const q = new URLSearchParams({ cliente, nome, jogador, ...(chave && { chave }), ...(como && { como }) });
   return new Promise(resolve => {
     let first = true;
     const open = () => {
       setStatus(first ? 'conectando' : 'reconectando');
-      es = new EventSource(api(`/eventos?cliente=${encodeURIComponent(cliente)}&nome=${encodeURIComponent(nome)}`));
+      es = new EventSource(api(`/eventos?${q}`));
       es.onerror = () => {
         setStatus('reconectando');
         // o EventSource tenta de novo sozinho, exceto se o servidor respondeu com erro
@@ -62,7 +77,8 @@ export function connect({ sala, nome, info }) {
         const msg = JSON.parse(ev.data);
         if (msg.tipo === 'estado') {
           setStatus('conectado');
-          if (first) { first = false; const existed = sync.start(msg); pump(); resolve(existed); }
+          setRole(msg);
+          if (first) { first = false; const existed = sync.start(msg, local.mestre); pump(); resolve(existed); }
           else { sync.resync(msg); remoteApplied(null); notify(); pump(); }
         } else if (msg.tipo === 'ops') {
           const r = sync.receive(msg);
@@ -116,7 +132,8 @@ async function pump(keepalive = false) {
   sending = true;
   let b;
   while ((b = sync.nextUnsent())) {
-    const body = JSON.stringify({ cliente: net.cliente, lote: b.lote, ops: b.ops });
+    const body = JSON.stringify({ cliente: net.cliente, lote: b.lote, ops: b.ops, jogador: net.jogador,
+      ...(net.chaveUsada && { chave: net.chaveUsada }), ...(net.como && { como: net.como }) });
     try {
       // grande demais: nem tenta (o servidor fecharia a conexão e a fila tentaria para sempre)
       const r = body.length > (net.info?.limite || Infinity) ? { status: 413, text: async () => 'local' } : await fetch(api('/ops'), {

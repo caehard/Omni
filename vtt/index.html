@@ -15,26 +15,27 @@
       <div class="brand"><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="44"/><polygon points="50,22 24,74 76,74"/></svg>OMNI <small>mesa virtual · protótipo</small></div>
       <nav class="tools" aria-label="Ferramentas">
         <button id="btn-new-pc">＋ Personagem</button>
-        <button id="btn-new-npc">＋ NPC</button>
+        <button id="btn-new-npc" class="so-mestre">＋ NPC</button>
         <span class="sep"></span>
-        <button id="btn-map" title="Carregar imagem de mapa">🗺 Mapa</button>
+        <button id="btn-map" class="so-mestre" title="Carregar imagem de mapa">🗺 Mapa</button>
         <button id="btn-ruler" aria-pressed="false" title="Régua de zonas (ou Ctrl+arrastar)">📏 Régua</button>
         <button id="btn-center" title="Ver a cena inteira">⌖</button>
-        <button id="btn-scene" title="Configurar cena e grade">⚙ Cena</button>
+        <button id="btn-scene" class="so-mestre" title="Configurar cena e grade">⚙ Cena</button>
         <span class="sep"></span>
-        <button id="btn-rules">Regras</button>
+        <button id="btn-rules" class="so-mestre">Regras</button>
         <button id="btn-export" title="Baixar a mesa em JSON">Exportar</button>
-        <button id="btn-import" title="Carregar mesa ou personagem JSON">Importar</button>
+        <button id="btn-import" class="so-mestre" title="Carregar mesa ou personagem JSON">Importar</button>
         <button id="btn-help" title="Ajuda">?</button>
       </nav>
       <span id="round-badge" class="round-badge" aria-live="polite"></span>
+      <span id="papel-badge" class="papel-badge" hidden></span>
       <button id="btn-net" class="net-badge" hidden title="Mesa compartilhada"></button>
     </header>
 
     <aside class="left">
       <div class="panel-tabs" role="tablist">
         <button data-panel="actors" aria-selected="true" role="tab">Fichas</button>
-        <button data-panel="scenes" aria-selected="false" role="tab">Cenas</button>
+        <button data-panel="scenes" class="so-mestre" aria-selected="false" role="tab">Cenas</button>
         <button data-panel="combat" aria-selected="false" role="tab">Combate</button>
       </div>
       <div id="actors" class="panel"></div>

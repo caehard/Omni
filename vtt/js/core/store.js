@@ -52,9 +52,23 @@ export const state = emptyState();
 
 /**
  * Estado só deste navegador/aba (não é sincronizado).
- * alvoId: alvo marcado · cenaVista: cena que estou olhando (null = a ativa, onde os jogadores estão).
+ * alvoId: alvo marcado · cenaVista: cena que estou olhando (null = a ativa, onde os jogadores estão) ·
+ * mestre: este jogador é o mestre (sempre, no modo local) · jogadorId: identidade persistente deste navegador.
  */
-export const local = { alvoId: null, cenaVista: null };
+export const local = { alvoId: null, cenaVista: null, mestre: true, jogadorId: 'local' };
+
+// ---- permissões (o servidor confere de novo; aqui é para a interface mostrar só o que dá para fazer) ----
+export const isGM = () => local.mestre;
+/** Este jogador controla a ficha (é dono ou mestre)? */
+export const ownsActor = a => !!a && (local.mestre || (a.donos || []).includes(local.jogadorId));
+/** Acesso à ficha: 'editar' (dono/mestre), 'ver' (permissão de observar) ou 'nenhum'. Personagens são visíveis por padrão. */
+export function sheetAccess(a) {
+  if (!a) return 'nenhum';
+  if (ownsActor(a)) return 'editar';
+  return (a.permissao || (a.tipo === 'npc' ? 'nenhum' : 'ver')) === 'ver' ? 'ver' : 'nenhum';
+}
+/** Nome de um jogador pelo id (lista mantida pelo servidor). */
+export const playerName = id => state.jogadores?.[id]?.nome || (id === local.jogadorId ? 'você' : 'jogador');
 
 /** Cena mostrada no mapa deste jogador. */
 export function scene() {
